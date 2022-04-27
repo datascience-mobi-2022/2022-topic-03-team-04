@@ -9,30 +9,26 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+```{r}
+#MS_Table <- read.table("c://khalida//desktop//2022-topic-03-team-04//RDeeP_A549_NS.csv", header=TRUE, row.names=1, sep = ";")
+MS_Table <- read.table("~/Desktop/2022-topic-03-team-04/RDeeP_A549_NS.csv", header=TRUE, row.names=1, sep = ";")
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
-```{r cars}
-summary(cars)
 ```
-
-
-
 
 
 ```{r}
-print("lalala")
+# RNA associates with proteins to form RNA-Protein complexes that play key regulatory roles in cellular processes --> RNA metabolism and the regulation of gene expression 
+
+# concept of RNA dependence (R-DeeP) describes proteins and protein complexes whose interactions are directly or indirectly dependent on the presence of RNA 
+
+
+
+# aim: identify RNA-dependent proteins from the position of the proteins in an untreated cell lysate as t
 ```
 
-## Including Plots
 
-You can also embed plots, for example:
 
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
