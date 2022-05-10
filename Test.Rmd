@@ -254,8 +254,10 @@ MICA_Human_Protein_RNase = ggplot() +
 
 
 ```{r}
-# Data Normalization
+head(RNase)
+head(Ctrl)
 
+<<<<<<< Updated upstream
 #Define Min-Max normalization function
 min_max_norm <- function(x) {
     (x - min(x)) / (max(x) - min(x))
@@ -281,9 +283,13 @@ head(Data.norm.RNase)
 #Both results should be the same
 
 ```
+=======
+#Standardization
+ 
+
+>>>>>>> Stashed changes
 
 
-```{r}
 
 ```
 
