@@ -254,7 +254,7 @@ MICA_Human_Protein_RNase = ggplot() +
 
 
 ```{r}
-# Data Normalization Min Max Method
+# Data Normalization
 
 #Define Min-Max normalization function
 min_max_norm <- function(x) {
@@ -264,21 +264,9 @@ min_max_norm <- function(x) {
 ```
 
 ```{r}
-#Data Normalization Z Transformation Method
-Data.norm.ctrl <- as.data.frame(scale(Ctrl[1:11040]))
+Data.norm.ctrl <- as.data.frame(scale(Ctrl[1:25]))
 head(Data.norm.ctrl)
 
-Data.norm.RNase <- as.data.frame(scale(RNase[1:11040]))
-head(Data.norm.RNase)
-
-#Data Normalization Z Transformation Method Using Formula
-Data.norm.ctrl <- as.data.frame(apply(Ctrl,2,function(x){(x-mean(x))/sd(x)}))
-head(Data.norm.ctrl)
-
-Data.norm.RNase <- as.data.frame(apply(RNase,2,function(x){(x-mean(x))/sd(x)}))
-head(Data.norm.RNase)
-
-#Both results should be the same
 ```
 
 
