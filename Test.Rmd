@@ -33,7 +33,7 @@ library(qqplotr)
 
 ```{r 1.1 loading data}
 #loading "RDeeP_A549_NS.csv" into Data.raw dataframe
-MS_Table <- read.table("~/Desktop/2022-topic-03-team-04/RDeeP_A549_NS.csv", header=TRUE, row.names=1, sep = ";")
+#MS_Table <- read.table("~/Desktop/2022-topic-03-team-04/RDeeP_A549_NS.csv", header=TRUE, row.names=1, sep = ";")
 Data.raw <- read.table("~/Desktop/2022-topic-03-team-04/RDeeP_A549_NS.csv", header=TRUE, row.names=1, sep = ";")
 
 #creating a copy of Data.raw and saving it as Data.copy
@@ -264,8 +264,21 @@ min_max_norm <- function(x) {
 ```
 
 ```{r}
-Data.norm.ctrl <- as.data.frame(scale(Ctrl[1:25]))
+#Data Normalization Z Transformation Method
+Data.norm.ctrl <- as.data.frame(scale(Ctrl[1:11040]))
 head(Data.norm.ctrl)
+
+Data.norm.RNase <- as.data.frame(scale(RNase[1:11040]))
+head(Data.norm.RNase)
+
+#Data Normalization Z Transformation Method Using Formula
+Data.norm.ctrl <- as.data.frame(apply(Ctrl,2,function(x){(x-mean(x))/sd(x)}))
+head(Data.norm.ctrl)
+
+Data.norm.RNase <- as.data.frame(apply(RNase,2,function(x){(x-mean(x))/sd(x)}))
+head(Data.norm.RNase)
+
+#Both results should be the same
 
 ```
 
