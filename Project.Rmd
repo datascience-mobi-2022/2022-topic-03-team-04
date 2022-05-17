@@ -236,17 +236,17 @@ MICA_Human_Protein_RNase = ggplot() +
 ```
 
 
-```{r}
+```{r by Richard}
 #Data Normalization Z Transformation Method
 Data.norm.ctrl.scaled <- as.data.frame(scale(Ctrl[1:11040]))
 head(Data.norm.ctrl.scaled)
 Data.norm.RNase.scaled <- as.data.frame(scale(RNase[1:11040]))
 head(Data.norm.RNase.scaled)
 #Data Normalization Z Transformation Method Using Formula
-Data.norm.Ctrl <- as.data.frame(apply(Ctrl,2,function(x){(x-mean(x))/sd(x)}))
-head(Data.norm.ctrl)
-Data.norm.RNase <- as.data.frame(apply(RNase,2,function(x){(x-mean(x))/sd(x)}))
-head(Data.norm.RNase)
+Data.norm.ctrl.z <- as.data.frame(apply(Ctrl,2,function(x){(x-mean(x))/sd(x)}))
+head(Data.norm.ctrl.z)
+Data.norm.RNase.z <- as.data.frame(apply(RNase,2,function(x){(x-mean(x))/sd(x)}))
+head(Data.norm.RNase.z)
 #Both results should be the same
 ```
 
@@ -255,30 +255,30 @@ head(Data.norm.RNase)
 ```{r}
 
 Fractions = c(1:25)
-SPB6_Human_Protein_Ctrl_norm = ggplot() + 
-  geom_line(data = select(Data.norm.ctrl,1),  aes(x = Fractions, y = SPB6_HUMAN_Rep_1, color= 'Ctrl_Rep1')) + 
+SPB6_Human_Protein_Ctrl_norm_z = ggplot() + 
+  geom_line(data = select(Data.norm.ctrl.z,1),  aes(x = Fractions, y = SPB6_HUMAN_Rep_1, color= 'Ctrl_Rep1')) + 
   
-  geom_line(data = select(Data.norm.ctrl,2),  aes(x = Fractions, y = SPB6_HUMAN_Rep_2 , color= 'Ctrl_Rep2')) + 
+  geom_line(data = select(Data.norm.ctrl.z,2),  aes(x = Fractions, y = SPB6_HUMAN_Rep_2 , color= 'Ctrl_Rep2')) + 
   
-  geom_line(data = select(Data.norm.ctrl,3),  aes(x = Fractions, y = SPB6_HUMAN_Rep_3 , color= 'Ctrl_Rep3')) +
+  geom_line(data = select(Data.norm.ctrl.z,3),  aes(x = Fractions, y = SPB6_HUMAN_Rep_3 , color= 'Ctrl_Rep3')) +
   
   scale_colour_manual(name="legend",values=c(Ctrl_Rep1="blue2",Ctrl_Rep2="cyan3", Ctrl_Rep3="violetred4")) +
   
-  labs(title="SPB6_HUMAN_Ctrl_Normalized", y= "Protein Amount") 
+  labs(title="SPB6_HUMAN_Ctrl_Normalized_Z", y= "Protein Amount") 
  SPB6_Human_Protein_Ctrl_norm + scale_x_continuous(breaks = seq(1, 25, by = 1))
   
   
-SPB6_Human_Protein_RNase_norm = ggplot() + 
-  geom_line(data = select(Data.norm.RNase,1),  aes(x = Fractions, y = SPB6_HUMAN_Rep_1 , color= 'RNase_Rep1')) + 
+SPB6_Human_Protein_RNase_norm_z = ggplot() + 
+  geom_line(data = select(Data.norm.RNase.z,1),  aes(x = Fractions, y = SPB6_HUMAN_Rep_1 , color= 'RNase_Rep1')) + 
   
-  geom_line(data = select(Data.norm.RNase,2), aes(x = Fractions, y = SPB6_HUMAN_Rep_2, color= 'RNase_Rep2')) +
+  geom_line(data = select(Data.norm.RNase.z,2), aes(x = Fractions, y = SPB6_HUMAN_Rep_2, color= 'RNase_Rep2')) +
   
-  geom_line(data = select(Data.norm.RNase,3), aes(x = Fractions, y = SPB6_HUMAN_Rep_3, color= 'RNase_Rep3')) +
+  geom_line(data = select(Data.norm.RNase.z,3), aes(x = Fractions, y = SPB6_HUMAN_Rep_3, color= 'RNase_Rep3')) +
   
    scale_colour_manual(name="legend",values=c(RNase_Rep1="blue2",RNase_Rep2="cyan3", RNase_Rep3= "violetred4")) +
   
-  labs(title="SPB6_HUMAN_RNase_Normalized", y= "Protein Amount") 
-  SPB6_Human_Protein_RNase_norm + scale_x_continuous(breaks = seq(1, 25, by = 1))
+  labs(title="SPB6_HUMAN_RNase_Normalized_Z", y= "Protein Amount") 
+  SPB6_Human_Protein_RNase_norm_z + scale_x_continuous(breaks = seq(1, 25, by = 1))
   
 ```
 
