@@ -292,14 +292,44 @@ Total_Protein_by_fractions = cbind(Rep_1_Ctrl_fsums,Rep_2_Ctrl_fsums, Rep_3_Ctrl
 
 Total_Protein_norm = t(Total_Protein_by_fractions)/Total_Protein_amount
 Total_Protein_norm = as.data.frame(Total_Protein_norm)
+Total_Protein_norm
+
 Total_Protein_amount_norm = rowSums(Total_Protein_norm)
 barplot(Total_Protein_amount_norm)
 
 
+```
+```{r}
+## same concept but in general function 
+norm_func = function(x) { 
+  x/sum(x) 
+}
+# Applying the normalization to the data
+RNase_Data_norm = data.frame(apply(RNase, 1, norm_func))
+RNase_Data_norm
 
+Ctrl_Data_norm = data.frame(apply(Ctrl, 1, norm_func))
+Ctrl_Data_norm
+
+#Remove the NAs that result from some proteins having 0 Protein amount in certain repetitions.
+Ctrl_Data_norm[is.na(Ctrl_Data_norm)] <- 0
+RNase_Data_norm[is.na(RNase_Data_norm)] <- 0
 
 
 ```
+
+After we execute the fraction-wise normalization the protein amount between all three Ctrl 
+replicates as well as between the three RNase replicates should be equal.
+In order to check if this is the case the "bar.total.prot"-function sums all normalized columns for the three Ctrl and RNase replicates and gives out a bar plot with the respective protein amount.
+
+The bar plot shows that the amount of proteins between the three Ctrl replicate are identical. The same applies for the three RNase sample. The protein amounts between Ctrl and RNase differ from each other.
+
+
+
+```{r}
+
+```
+
 
 
 
