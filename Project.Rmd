@@ -296,9 +296,12 @@ Total_Protein_norm = as.data.frame(Total_Protein_norm)
 Total_Protein_norm
 
 Total_Protein_amount_norm = rowSums(Total_Protein_norm)
-barplot(Total_Protein_amount_norm)
 
 
+Total_Protein_amount_norm
+plotdata_norm = data.frame(Total_Protein_amount_norm, Replicates = c("Ctrl1", "Ctrl2", "Ctrl3", "RNase1", "RNase2", "RNase3"))
+ggplot(data = plotdata_norm, aes(x = Replicates, y = Total_Protein_amount_norm)) + geom_bar(stat = "identity")                      
+                          
 ```
 ```{r}
 ## same concept but in general function 
@@ -323,9 +326,25 @@ RNase_Data_norm
 
 tRNase_Norm <- as.data.frame(t(RNase_Data_norm))
 tRNase_Norm
+```
+```{r}
+#Normalized 
+Rep_1_Ctrl_Norm = select(tCtrl_Norm, contains("Rep_1"))
+Rep_2_Ctrl_Norm = select(tCtrl_Norm, contains("Rep_2"))
+Rep_3_Ctrl_Norm = select(tCtrl_Norm, contains("Rep_3"))
+  
+Rep_1_RNase_Norm = select(tRNase_Norm, contains("Rep_1"))
+Rep_2_RNase_Norm = select(tRNase_Norm, contains("Rep_2"))
+Rep_3_RNase_Norm = select(tRNase_Norm, contains("Rep_3")) 
 
+  
+```
 
+```{r Fraction-wise total protein amounts Ctrl, echo=FALSE}
 
+barplot(rowSums(Rep_1_Ctrl_Norm), las=2)
+barplot(rowSums(Rep_2_Ctrl_Norm), las=2)
+barplot(rowSums(Rep_3_Ctrl_Norm), las=2)
 
 ```
 
@@ -334,9 +353,6 @@ tRNase_Norm
 ```{r}
 Fractions = c(1:25)
 
-
-  
-  
 MICA_HUMAN_Protein_Ctrl = ggplot() + 
   geom_line(data = select(Ctrl, contains("MICA_HUMAN_Rep_1")),  aes(x = Fractions, y = MICA_HUMAN_Rep_1, color= 'Ctrl_Rep1')) + 
   
@@ -371,28 +387,14 @@ MICA_HUMAN_Protein_Ctrl = ggplot() +
 ```
 
 
-
 ```{r}
-  
-Fractions = c(1:25)
-SPB6_Human_Protein_Norm = ggplot() +
- geom_line(data = select(Ctrl_Data_norm,1),  aes(x = Fractions, y = SPB6_HUMAN_Rep_1, color= 'Ctrl_Rep1')) + 
-  
-  geom_line(data = select(Ctrl_Data_norm,2),  aes(x = Fractions, y = SPB6_HUMAN_Rep_2 , color= 'Ctrl_Rep2')) + 
-  
-  geom_line(data = select(Ctrl_Data_norm,3),  aes(x = Fractions, y = SPB6_HUMAN_Rep_3 , color= 'Ctrl_Rep3')) +
-  
-  geom_line(data = select(RNase_Data_norm,1),  aes(x = Fractions, y = SPB6_HUMAN_Rep_1 , color= 'RNase_Rep1')) + 
-  
-  geom_line(data = select(RNase_Data_norm,2), aes(x = Fractions, y = SPB6_HUMAN_Rep_2, color= 'RNase_Rep2')) +
-  
-  geom_line(data = select(RNase_Data_norm,3), aes(x = Fractions, y = SPB6_HUMAN_Rep_3 , color= 'RNase_Rep3')) +
-  
-  scale_colour_manual(name="legend",values=c(Ctrl_Rep1="blue2",RNase_Rep1="cyan3", Ctrl_Rep2="violetred4", RNase_Rep2="tomato1",Ctrl_Rep3="darkviolet", RNase_Rep3="pink")) +
-  
-  labs(title="SPB6_HUMAN", y= "Protein Amount") 
-  SPB6_Human_Protein_Norm + scale_x_continuous(breaks = seq(1, 25, by = 1))
+### Second Normalization
+
+
 ```
+
+
+
 
 
 After we execute the fraction-wise normalization the protein amount between all three Ctrl 
@@ -450,11 +452,7 @@ Defining a maximum the way we did successfully results in detecting local peaks.
 
 ```{r}
 find_peaks <- function (input_df, threshold ) {
-  peaks <- sapply(1:dim(input_df[1], function(i) {
-    if (i == 1)
-      
-  })
-}
+  peaks <- sapply(1:25, function(i))
 ```
 
 
