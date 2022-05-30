@@ -33,6 +33,7 @@ library(qqplotr)
 Data.raw <- read.table("~/Desktop/2022-topic-03-team-04/RDeeP_A549_NS.csv", header=TRUE, row.names=1, sep = ";")
 #creating a copy of Data.raw and saving it as Data.copy
 Data.copy = Data.raw
+
 ```
 
 
@@ -306,17 +307,93 @@ norm_func = function(x) {
 }
 # Applying the normalization to the data
 RNase_Data_norm = data.frame(apply(RNase, 1, norm_func))
-RNase_Data_norm
+
 
 Ctrl_Data_norm = data.frame(apply(Ctrl, 1, norm_func))
-Ctrl_Data_norm
+
 
 #Remove the NAs that result from some proteins having 0 Protein amount in certain repetitions.
 Ctrl_Data_norm[is.na(Ctrl_Data_norm)] <- 0
+Ctrl_Data_norm
+tCtrl_Norm <- as.data.frame(t(Ctrl_Data_norm))
+tCtrl_Norm
+
 RNase_Data_norm[is.na(RNase_Data_norm)] <- 0
+RNase_Data_norm
+
+tRNase_Norm <- as.data.frame(t(RNase_Data_norm))
+tRNase_Norm
+
+
 
 
 ```
+
+
+
+```{r}
+Fractions = c(1:25)
+
+
+  
+  
+MICA_HUMAN_Protein_Ctrl = ggplot() + 
+  geom_line(data = select(Ctrl, contains("MICA_HUMAN_Rep_1")),  aes(x = Fractions, y = MICA_HUMAN_Rep_1, color= 'Ctrl_Rep1')) + 
+  
+  geom_line(data = select(Ctrl, contains("MICA_HUMAN_Rep_2")),  aes(x = Fractions, y = MICA_HUMAN_Rep_2 , color= 'Ctrl_Rep2')) + 
+  
+  geom_line(data = select(Ctrl, contains("MICA_HUMAN_Rep_3")),  aes(x = Fractions, y = MICA_HUMAN_Rep_3 , color= 'Ctrl_Rep3')) +
+  
+  scale_colour_manual(name="legend",values=c(Ctrl_Rep1="blue2",Ctrl_Rep2="purple4", Ctrl_Rep3="magenta1")) +
+  
+  labs(title="MICA_HUMAN_Ctrl", y= "Protein Amount") 
+ MICA_HUMAN_Protein_Ctrl + scale_x_continuous(breaks = seq(1, 25, by = 1))
+    
+    
+  
+  MICA_HUMAN_Protein_Ctrl_Norm = ggplot() + 
+  geom_line(data = select(tCtrl_Norm, contains("MICA_HUMAN_Rep_1")),  aes(x = Fractions, y = MICA_HUMAN_Rep_1, color= 'Ctrl_Rep1')) + 
+  
+  geom_line(data = select(tCtrl_Norm, contains("MICA_HUMAN_Rep_2")),  aes(x = Fractions, y = MICA_HUMAN_Rep_2 , color= 'Ctrl_Rep2')) + 
+  
+  geom_line(data = select(tCtrl_Norm, contains("MICA_HUMAN_Rep_3")),  aes(x = Fractions, y = MICA_HUMAN_Rep_3 , color= 'Ctrl_Rep3')) +
+  
+  scale_colour_manual(name="legend",values=c(Ctrl_Rep1="blue2",Ctrl_Rep2="purple4", Ctrl_Rep3="magenta1")) +
+  
+  labs(title="MICA_HUMAN_Ctrl_Norm", y= "Protein Amount") 
+ MICA_HUMAN_Protein_Ctrl_Norm + scale_x_continuous(breaks = seq(1, 25, by = 1))
+  
+  
+  
+  
+  
+
+```
+
+
+
+```{r}
+  
+Fractions = c(1:25)
+SPB6_Human_Protein_Norm = ggplot() +
+ geom_line(data = select(Ctrl_Data_norm,1),  aes(x = Fractions, y = SPB6_HUMAN_Rep_1, color= 'Ctrl_Rep1')) + 
+  
+  geom_line(data = select(Ctrl_Data_norm,2),  aes(x = Fractions, y = SPB6_HUMAN_Rep_2 , color= 'Ctrl_Rep2')) + 
+  
+  geom_line(data = select(Ctrl_Data_norm,3),  aes(x = Fractions, y = SPB6_HUMAN_Rep_3 , color= 'Ctrl_Rep3')) +
+  
+  geom_line(data = select(RNase_Data_norm,1),  aes(x = Fractions, y = SPB6_HUMAN_Rep_1 , color= 'RNase_Rep1')) + 
+  
+  geom_line(data = select(RNase_Data_norm,2), aes(x = Fractions, y = SPB6_HUMAN_Rep_2, color= 'RNase_Rep2')) +
+  
+  geom_line(data = select(RNase_Data_norm,3), aes(x = Fractions, y = SPB6_HUMAN_Rep_3 , color= 'RNase_Rep3')) +
+  
+  scale_colour_manual(name="legend",values=c(Ctrl_Rep1="blue2",RNase_Rep1="cyan3", Ctrl_Rep2="violetred4", RNase_Rep2="tomato1",Ctrl_Rep3="darkviolet", RNase_Rep3="pink")) +
+  
+  labs(title="SPB6_HUMAN", y= "Protein Amount") 
+  SPB6_Human_Protein_Norm + scale_x_continuous(breaks = seq(1, 25, by = 1))
+```
+
 
 After we execute the fraction-wise normalization the protein amount between all three Ctrl 
 replicates as well as between the three RNase replicates should be equal.
@@ -326,26 +403,6 @@ The bar plot shows that the amount of proteins between the three Ctrl replicate 
 
 
 
-```{r}
-
-```
-
-
-
-
-```{r by Richard}
-#Data Normalization Z Transformation Method
-Data.norm.ctrl.scaled <- as.data.frame(scale(Ctrl[1:11040]))
-head(Data.norm.ctrl.scaled)
-Data.norm.RNase.scaled <- as.data.frame(scale(RNase[1:11040]))
-head(Data.norm.RNase.scaled)
-#Data Normalization Z Transformation Method Using Formula
-Data.norm.ctrl.z <- as.data.frame(apply(Ctrl,2,function(x){(x-mean(x))/sd(x)}))
-head(Data.norm.ctrl.z)
-Data.norm.RNase.z <- as.data.frame(apply(RNase,2,function(x){(x-mean(x))/sd(x)}))
-head(Data.norm.RNase.z)
-#Both results should be the same
-```
 
 
 
@@ -377,6 +434,86 @@ SPB6_Human_Protein_RNase_norm_z = ggplot() +
   labs(title="SPB6_HUMAN_RNase_Normalized_Z", y= "Protein Amount") 
   SPB6_Human_Protein_RNase_norm_z + scale_x_continuous(breaks = seq(1, 25, by = 1))
   
+```
+
+## Peaks Identification 
+
+We define a threshold 
+
+
+
+Proteins which depend on RNA are expected to migrate to different positions in the RNase treated sample in comparison to the Ctrl sample. To identify whether a protein is a RBP or not we need to detect the maxima in both samples. We want to detect both local and global maxima because even a shift of a local maximum could hold relevant biological information.
+We defined a maximum as a point x whose neighboring values are smaller than it and who exceeds a threshold value of 20% of the global maximum. 
+
+###6.3 Discussion
+Defining a maximum the way we did successfully results in detecting local peaks. The threshold allows us to only detect maxima with a certain significance. However, a threshold of 20% protein value is not enough to really get only significant maxima. The significance could be further increased by comparing the values of +2  fractions from the maxima or by fitting the curve. 
+
+```{r}
+find_peaks <- function (input_df, threshold ) {
+  peaks <- sapply(1:dim(input_df[1], function(i) {
+    if (i == 1)
+      
+  })
+}
+```
+
+
+```{r}
+find_peaks <- function(x, m=2) { #The "find_peaks"-function requires a data frame ("x") and "m" as parameters
+                                   peaks <- sapply(1:length(x), function(i) { #The function iterates via an "sapply" over all values (protein amounts of the fractions) in the data frame "x". All peaks that were found during this iteration will be saved in a list named "peaks"
+                                    
+                                                                            if (x[i] == 0) return (numeric(length = 0)) #If the value at position "i" is equal to zero the value for this position in the vector will be set as an empty value
+                                                                            #In the next step the function defines the "left"- and "right"-border of the neighborhood 
+                                                                            left <- max(c(1,i-m)) #For the "left"-border ("max(c(1,i-m))") of the neighborhood we get the output "1" if the value of position "i" is smaller or equal to m. Otherwise we get the value of position i minus m (i-m) as an output for the left border
+                                                                            right <- min(c(i+m,length(x))) #For the "right"-border ("min(c(i+m,length(x)))") of the neighborhood the value will be set to the value of position "i" plus the threshold of the neighborhood m if i+m is smaller or equal to the value of the length of the vector "x". Otherwise the "right"-border will be set to length of the row of the data frame "x"
+                                                                            
+                                                                            if(all(x[left : right] <= x[i])) return(i) else return(numeric(0)) #Next we check if all values between the left and the right border are smaller or equal to the value of position "i" from the vector "x".If this is the case, the function will return the value of position "i" and otherwise it returns zero for position "i"
+                                                              } #Finish inner function
+                                                   ) #Finish "sapply"
+                                  
+                                  return(unlist(peaks)) #The final step of this function is to return the unlisted list "peaks"
+} #Finish outer function
+
+```
+
+
+```{r}
+
+max_detec_df <- function(Input_df, threshold){#Input is 3680x25 dataframe from mean, median or similmean method
+
+  temp_df <- as.data.frame(matrix(nrow=dim(Input_df)[1], ncol = dim(Input_df)[2]))#empty dataframe
+  rownames(temp_df) <- rownames(Data_copy) ###Proteins
+  colnames(temp_df) <- rownames(RNase_Data_norm) ###Fractions
+  j=1
+  for (j in 1:dim(Input_df)[1]){#j should take the number of the line to access the line in the if statement
+    i = 1 #i is the column number and is set to 1 after changing the row       
+   while (i <= dim(Input_df)[2]){  #all columns are tested for one row
+    if (i == 1){    #for the first column, which has a comparison element on the right only
+      if(Input_df[j,i] > Input_df[j,i+1] && Input_df[j,i] > threshold * max(Input_df[j,])){
+        temp_df[j,i] <- i  #the element in the new data frame is set to the maximum location (fraction number containing maximum)
+      }else{
+        temp_df[j,i] <- 0  #if there is no maximum the element is set to zero, so the dataframe still has the same dimension as the input
+      }
+    }
+    if (i < dim(Input_df)[2]&& i!=1){#for fraction 2 to 24 (values right and left of the location are considered)
+      if(Input_df[j,i]>Input_df[j,i+1] && Input_df[j,i]> Input_df[j,i-1] && Input_df[j,i] > threshold * max(Input_df[j,])){
+        temp_df[j,i] <- i
+      }else {
+       temp_df[j,i] <- 0
+      }
+    }
+    if (i == dim(Input_df)[2]){#for the 25. fraction (only left value)
+      if(Input_df[j,i]>Input_df[j,i-1] && Input_df[j,i] > threshold * max(Input_df[j,])){
+        temp_df[j,i] <- i
+      }else{
+          temp_df[j,i] <- 0
+        }
+      }
+    i=i+1 #increasing i to move through the next column
+    } 
+  }   
+  return(temp_df)   #at the end a data frame is returned, which contains the maxima locations for all proteins
+}
 ```
 
 
