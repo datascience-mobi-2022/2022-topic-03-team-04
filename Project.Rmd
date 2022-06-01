@@ -519,6 +519,31 @@ Normalization is needed in order to compare the data in RNase treted and Control
 ## 3. Peaks identification
 distribution of protein in 25 fractions of both samples, Control and RNase
 find global and local maxima for both 
+```{r}
+# Maxima Detection (Next Step: Determine which are included as Local Maxima)
+maximafunction = function(input){
+  output = 0
+  b = 0
+  for (i in 1:(length(input)-1)){
+  if (input[i+1]-input[i]>0) {
+    b[i] = 1}
+    else {
+      b[i] = 0
+    }
+    c = sort(input[which(diff(b)==-1)+1], decreasing = TRUE)
+    # 1:10 = First until Tenth Maxima
+    for (j in 1:10){ 
+      # Direct below we can add threshold using if to classify which will be included as peaks 
+      output[j] = c[j]  
+    }
+  }
+  return(output)
+  # Output is a matrix
+}
+allmaxima_Ctrl = data.frame(apply(tCtrl_Norm, 2, maximafunction))
+allmaxima_Ctrl = data.frame(apply(tRNase_Norm, 2, maximafunction))
+# Rows represent 1st-10th Maxima
+```
 how to define a maximum in order to allow the program to find the right fraction 
 t-test 
 ## 4. Fit of the protein profiles
