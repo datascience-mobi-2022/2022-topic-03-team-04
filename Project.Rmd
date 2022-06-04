@@ -520,29 +520,54 @@ Normalization is needed in order to compare the data in RNase treted and Control
 distribution of protein in 25 fractions of both samples, Control and RNase
 find global and local maxima for both 
 ```{r}
-# Maxima Detection (Next Step: Determine which are included as Local Maxima)
+# Global and Maxima Detection (need to add threshold in if function)
 maximafunction = function(input){
   output = 0
-  b = 0
-  for (i in 1:(length(input)-1)){
-  if (input[i+1]-input[i]>0) {
-    b[i] = 1}
-    else {
-      b[i] = 0
+  for (i in 1:(length(input))){
+    # 1st Fraction
+    if (i == 1){
+      if(input[i]<input[i+1]){
+        output[i] = input[i]}
+      else{
+        output[i] = 0}
     }
-    c = sort(input[which(diff(b)==-1)+1], decreasing = TRUE)
-    # 1:10 = First until Tenth Maxima
-    for (j in 1:10){ 
-      # Direct below we can add threshold using if to classify which will be included as peaks 
-      output[j] = c[j]  
+    
+    # 2nd-24th Fraction
+    if (i>1 && i<length(input)){
+      if(input[i]<input[i+1] && input[i]>input[i-1]){
+        output[i] = input[i]}
+      else{
+        output[i] = 0}
+    }
+    
+    # 25th Fraction
+    if (i==length(input)){
+      if(input[i]>input[i-1]){
+        output[i] = input[i]
+      }
+      else{
+        output[i] = 0}
     }
   }
+  
+# Only the first 2 highest values are taken. Others = 0
+  for (i in 1:length(output)){
+    if(output[i]==max(output) || output[i]== sort(output, decreasing = TRUE)[2]){
+      output[i] = output [i]}
+    else{
+      output[i] = 0}
+    }
   return(output)
-  # Output is a matrix
 }
-allmaxima_Ctrl = data.frame(apply(tCtrl_Norm, 2, maximafunction))
-allmaxima_Ctrl = data.frame(apply(tRNase_Norm, 2, maximafunction))
-# Rows represent 1st-10th Maxima
+
+# A Vector for Fraction's Names
+for (i in 1:25) {
+    fractionnames[i] = paste("Fraction",i,sep="_")
+  }
+
+# Results
+allmaxima_Ctrl = data.frame(apply(tCtrl_Norm, 2, maximafunction), row.names = fractionnames)
+allmaxima_RNase = data.frame(apply(tRNase_Norm, 2, maximafunction), row.names = fractionnames )
 ```
 how to define a maximum in order to allow the program to find the right fraction 
 t-test 
