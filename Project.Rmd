@@ -561,6 +561,7 @@ maximafunction = function(input){
 }
 
 # A Vector for Fraction's Names
+fractionnames = 0
 for (i in 1:25) {
     fractionnames[i] = paste("Fraction",i,sep="_")
   }
