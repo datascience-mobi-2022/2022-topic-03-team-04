@@ -31,7 +31,7 @@ library(qqplotr)
 #Richard's folder location for convenience sake :D (C:/Users/Archid Knighton/Documents/GitHub/2022-topic-03-team-04/RDeeP_A549_NS.csv)
 
 #loading "RDeeP_A549_NS.csv" into Data.raw data frame
-Data.raw <- read.table("C:/Users/Archid Knighton/Documents/GitHub/2022-topic-03-team-04/RDeeP_A549_NS.csv", header=TRUE, row.names=1, sep = ";")
+Data.raw <- read.table("~/Desktop/2022-topic-03-team-04/RDeeP_A549_NS.csv", header=TRUE, row.names=1, sep = ";")
 
 #creating a copy of Data.raw and saving it as Data.copy
 Data.copy = Data.raw
@@ -466,10 +466,59 @@ return(new_df_combi)
 
 Ctrl_combi_df = df_combi_function(Ctrl_Data_norm)
 RNase_combi_df = df_combi_function(RNase_Data_norm)
+Ctrl_combi_df
+
+tCtrl_combi_df = as.data.frame(t(Ctrl_combi_df))
+tRNase_combi_df = as.data.frame(t(RNase_combi_df))
 
 # Changed: rows of last 3 loops and adds # to row 462
 ```
 
+```{r}
+Fractions = c(1:25)
+
+MICA_HUMAN_Protein_Ctrl = ggplot() + 
+  geom_line(data = select(Ctrl, contains("MICA_HUMAN_Rep_1")),  aes(x = Fractions, y = MICA_HUMAN_Rep_1, color= 'Ctrl_Rep1')) + 
+  
+  geom_line(data = select(Ctrl, contains("MICA_HUMAN_Rep_2")),  aes(x = Fractions, y = MICA_HUMAN_Rep_2 , color= 'Ctrl_Rep2')) + 
+  
+  geom_line(data = select(Ctrl, contains("MICA_HUMAN_Rep_3")),  aes(x = Fractions, y = MICA_HUMAN_Rep_3 , color= 'Ctrl_Rep3')) +
+  
+  scale_colour_manual(name="legend",values=c(Ctrl_Rep1="blue2",Ctrl_Rep2="purple4", Ctrl_Rep3="magenta1")) +
+  
+  labs(title="MICA_HUMAN_Ctrl", y= "Protein Amount") 
+ MICA_HUMAN_Protein_Ctrl + scale_x_continuous(breaks = seq(1, 25, by = 1))
+    
+    
+  
+  MICA_HUMAN_Protein_Ctrl_Norm = ggplot() + 
+  geom_line(data = select(tCtrl_Norm, contains("MICA_HUMAN_Rep_1")),  aes(x = Fractions, y = MICA_HUMAN_Rep_1, color= 'Ctrl_Rep1')) + 
+  
+  geom_line(data = select(tCtrl_Norm, contains("MICA_HUMAN_Rep_2")),  aes(x = Fractions, y = MICA_HUMAN_Rep_2 , color= 'Ctrl_Rep2')) + 
+  
+  geom_line(data = select(tCtrl_Norm, contains("MICA_HUMAN_Rep_3")),  aes(x = Fractions, y = MICA_HUMAN_Rep_3 , color= 'Ctrl_Rep3')) +
+  
+  scale_colour_manual(name="legend",values=c(Ctrl_Rep1="blue2",Ctrl_Rep2="purple4", Ctrl_Rep3="magenta1")) +
+  
+  labs(title="MICA_HUMAN_Ctrl_Norm", y= "Protein Amount") 
+ MICA_HUMAN_Protein_Ctrl_Norm + scale_x_continuous(breaks = seq(1, 25, by = 1))
+ 
+ 
+ 
+ MICA_HUMAN_Protein_Ctrl_Norm_Second = ggplot() + 
+  geom_line(data = select(tCtrl_combi_df, contains("MICA_HUMAN_Rep_1")),  aes(x = Fractions, y = MICA_HUMAN_Rep_1, color= 'Ctrl_Rep1')) + 
+  
+  geom_line(data = select(tCtrl_combi_df, contains("MICA_HUMAN_Rep_2")),  aes(x = Fractions, y = MICA_HUMAN_Rep_2 , color= 'Ctrl_Rep2')) + 
+  
+  geom_line(data = select(tCtrl_combi_df, contains("MICA_HUMAN_Rep_3")),  aes(x = Fractions, y = MICA_HUMAN_Rep_3 , color= 'Ctrl_Rep3')) +
+  
+  scale_colour_manual(name="legend",values=c(Ctrl_Rep1="blue2",Ctrl_Rep2="purple4", Ctrl_Rep3="magenta1")) +
+  
+  labs(title="MICA_HUMAN_Ctrl_Norm_Second", y= "Protein Amount") 
+ MICA_HUMAN_Protein_Ctrl_Norm_Second + scale_x_continuous(breaks = seq(1, 25, by = 1))
+ 
+ 
+```
 
 ## 3. Peaks Identification 
 
