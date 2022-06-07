@@ -29,8 +29,10 @@ library(qqplotr)
 
 ```{r 1.1 loading data}
 #loading "RDeeP_A549_NS.csv" into Data.raw dataframe
+#Richard's Data Location (for convenience Sake :D)
+## C:/Users/Archid Knighton/Documents/GitHub/2022-topic-03-team-04
 #MS_Table <- read.table("~/Desktop/2022-topic-03-team-04/RDeeP_A549_NS.csv", header=TRUE, row.names=1, sep = ";")
-Data.raw <- read.table("RDeeP_A549_NS.csv", header=TRUE, row.names=1, sep = ";")
+Data.raw <- read.table("C:/Users/Archid Knighton/Documents/GitHub/2022-topic-03-team-04/RDeeP_A549_NS.csv", header=TRUE, row.names=1, sep = ";")
 #creating a copy of Data.raw and saving it as Data.copy
 Data.copy = Data.raw
 ```
@@ -313,8 +315,9 @@ Ctrl_Data_norm
 
 #Remove the NAs that result from some proteins having 0 Protein amount in certain repetitions.
 Ctrl_Data_norm[is.na(Ctrl_Data_norm)] <- 0
+tCtrl_Norm <- as.data.frame(t(Ctrl_Data_norm))
 RNase_Data_norm[is.na(RNase_Data_norm)] <- 0
-
+tRNase_Norm <- as.data.frame(t(RNase_Data_norm))
 
 ```
 
@@ -412,11 +415,6 @@ SPB6_Human_Protein_RNase_norm_z = ggplot() +
 
   
 ```
-```{r}
-
-```
-
-
 ##
 Main motivation is to determine the role of RNA or non coding RNA in the cell, as RNA molecules are much more than a template for protein production
 screen RNA --> molecular mechanisms 
