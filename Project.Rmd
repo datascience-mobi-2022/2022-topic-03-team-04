@@ -164,7 +164,6 @@ SPB6_Human_Protein = ggplot() +
 
 
 ```{r}
-Fractions = c(1:25)
 MICA_HUMAN_Protein  = ggplot() +
  geom_line(data = select(Ctrl, contains("MICA_HUMAN_Rep_1")),  aes(x = Fractions, y = MICA_HUMAN_Rep_1, color= 'Ctrl_Rep1')) + 
   
@@ -249,9 +248,12 @@ Ctrl_RNase_sums = cbind(Ctrl_sums, RNase_sums)
 Total_Protein_amount = colSums(Ctrl_RNase_sums)
 Total_Protein_amount
 
+colour = c("#E9D5CA", "#827397", "#4D4C7D","#E9D5CA", "#827397", "#4D4C7D") # MADLEEN (Meine Farben)
 value = Total_Protein_amount
 plotdata = data.frame(value, names=c("Ctrl1", "Ctrl2", "Ctrl3", "RNase1", "RNase2", "RNase3"))
-ggplot(data = plotdata, aes(x = names, y = value)) + geom_bar(stat = "identity")                      
+ggplot(plotdata, aes(names, value)) +
+  geom_bar(stat = "identity", fill = colour) +
+  labs( title = "not normalized", y = "-yLab", x = "x-Lab")
                           
 ```
 
@@ -529,17 +531,15 @@ restructure_func = function(input_df,start){ #start = 1 for Ctrl and start = 2 f
 }
 Ctrl = restructure_func(Data.copy,1)
 RNase = restructure_func(Data.copy,2)
+
+rm(i, k, s, restructure_func, Data.copy) # MADLEEN
 ```
 
 
 
-```{r}
-Ctrl = t(Ctrl)
-Ctrl = data.frame(Ctrl) ## In order to be able to use the select function
-
-RNase = t(RNase)
-RNase = data.frame(RNase)
-
+```{r transpose matrix}
+Ctrl = as.data.frame(t(Ctrl)) # MADLEEN 
+RNase = as.data.frame(t(RNase)) #MADLEEN
 ```
 
 
@@ -551,6 +551,7 @@ RNase = data.frame(RNase)
 
 ```{r Plots for SPB6_Human_Protein}
 Fractions = c(1:25)
+
 SPB6_Human_Protein_Ctrl = ggplot() + 
   geom_line(data = select(Ctrl,1),  aes(x = Fractions, y = SPB6_HUMAN_Rep_1, color= 'Ctrl_Rep1')) + 
   
