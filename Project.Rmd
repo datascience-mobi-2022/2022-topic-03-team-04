@@ -31,7 +31,7 @@ library(qqplotr)
 #Richard's folder location for convenience sake :D (C:/Users/Archid Knighton/Documents/GitHub/2022-topic-03-team-04/RDeeP_A549_NS.csv)
 
 #loading "RDeeP_A549_NS.csv" into Data.raw data frame
-Data.raw <- read.table("~/Desktop/2022-topic-03-team-04/RDeeP_A549_NS.csv", header=TRUE, row.names=1, sep = ";")
+Data.raw <- read.table("C:/Users/Archid Knighton/Documents/GitHub/2022-topic-03-team-04/RDeeP_A549_NS.csv", header=TRUE, row.names=1, sep = ";")
 
 #creating a copy of Data.raw and saving it as Data.copy
 Data.copy = Data.raw
@@ -593,9 +593,57 @@ maximafunction = function(input, threshold){
     fractionnames[i] = paste("Fraction",i,sep="_")
     }
 
-# Results
-allmaxima_Ctrl = data.frame(apply(tCtrl_Norm, 2, function(x){maximafunction(x,0.5)}), row.names = fractionnames)
-allmaxima_RNase = data.frame(apply(tRNase_Norm, 2, function(x){maximafunction(x,0.5)}), row.names = fractionnames )
+# Creating Maxima Data Frames with different Threshold
+allmaxima_Ctrl_0.1 = data.frame(apply(tCtrl_Norm, 2, function(x){maximafunction(x,0.1)}), row.names = fractionnames)
+allmaxima_Ctrl_0.2 = data.frame(apply(tCtrl_Norm, 2, function(x){maximafunction(x,0.2)}), row.names = fractionnames)
+allmaxima_Ctrl_0.3 = data.frame(apply(tCtrl_Norm, 2, function(x){maximafunction(x,0.3)}), row.names = fractionnames)
+allmaxima_Ctrl_0.4 = data.frame(apply(tCtrl_Norm, 2, function(x){maximafunction(x,0.4)}), row.names = fractionnames)
+allmaxima_Ctrl_0.5 = data.frame(apply(tCtrl_Norm, 2, function(x){maximafunction(x,0.5)}), row.names = fractionnames)
+
+allmaxima_RNase_0.1 = data.frame(apply(tRNase_Norm, 2, function(x){maximafunction(x,0.1)}), row.names = fractionnames)
+allmaxima_RNase_0.2 = data.frame(apply(tRNase_Norm, 2, function(x){maximafunction(x,0.2)}), row.names = fractionnames)
+allmaxima_RNase_0.3 = data.frame(apply(tRNase_Norm, 2, function(x){maximafunction(x,0.3)}), row.names = fractionnames)
+allmaxima_RNase_0.4 = data.frame(apply(tRNase_Norm, 2, function(x){maximafunction(x,0.4)}), row.names = fractionnames)
+allmaxima_RNase_0.5 = data.frame(apply(tRNase_Norm, 2, function(x){maximafunction(x,0.5)}), row.names = fractionnames)
+
+# Data Frame with number of Maxima from each threshold
+maximanumber = function(input){
+  output = 0
+  temp = 0
+  for (i in 1:length(input)){
+    if (input[i] != 0){
+      temp[i] = 1}
+      else{
+        temp[i] = 0}
+  }
+  output = sum(temp)
+  return(output)
+}
+  
+max_number_Ctrl_0.1 = apply(allmaxima_Ctrl_0.1, 2, maximanumber)
+max_number_Ctrl_0.2 = apply(allmaxima_Ctrl_0.2, 2, maximanumber)
+max_number_Ctrl_0.3 = apply(allmaxima_Ctrl_0.3, 2, maximanumber)
+max_number_Ctrl_0.4 = apply(allmaxima_Ctrl_0.4, 2, maximanumber)
+max_number_Ctrl_0.5 = apply(allmaxima_Ctrl_0.5, 2, maximanumber)
+
+max_number_RNase_0.1 = apply(allmaxima_RNase_0.1, 2, maximanumber)
+max_number_RNase_0.2 = apply(allmaxima_RNase_0.2, 2, maximanumber)
+max_number_RNase_0.3 = apply(allmaxima_RNase_0.3, 2, maximanumber)
+max_number_RNase_0.4 = apply(allmaxima_RNase_0.4, 2, maximanumber)
+max_number_RNase_0.5 = apply(allmaxima_RNase_0.5, 2, maximanumber)
+
+# Plotting some random protein with threshold in x-axis and number of maxima in y-axis
+
+maxima_number_plot = function(input1, input2, input3, input4, input5, row){
+  output = 0
+  output[1] = input1[row]
+  output[2] = input2[row]
+  output[3] = input3[row]
+  output[4] = input4[row]
+  output[5] = input5[row]
+  barplot(output)
+  return(output)
+}
 
 ```
 
