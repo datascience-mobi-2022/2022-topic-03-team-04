@@ -587,26 +587,27 @@ maximafunction = function(input, threshold){
   return(output)
 }
 
+
 # A Vector for Fraction's Names
   fractionnames = 0
   for (i in 1:25) {
     fractionnames[i] = paste("Fraction",i,sep="_")
     }
 
+  
 # Creating Maxima Data Frames with different Threshold
-allmaxima_Ctrl_0.1 = data.frame(apply(tCtrl_Norm, 2, function(x){maximafunction(x,0.1)}), row.names = fractionnames)
-allmaxima_Ctrl_0.2 = data.frame(apply(tCtrl_Norm, 2, function(x){maximafunction(x,0.2)}), row.names = fractionnames)
-allmaxima_Ctrl_0.3 = data.frame(apply(tCtrl_Norm, 2, function(x){maximafunction(x,0.3)}), row.names = fractionnames)
-allmaxima_Ctrl_0.4 = data.frame(apply(tCtrl_Norm, 2, function(x){maximafunction(x,0.4)}), row.names = fractionnames)
-allmaxima_Ctrl_0.5 = data.frame(apply(tCtrl_Norm, 2, function(x){maximafunction(x,0.5)}), row.names = fractionnames)
+for (i in seq(0.1,0.9,0.1)){
+  temp = paste("maxima_Ctrl",i,sep="_")
+  assign(temp, data.frame(apply(tCtrl_Norm, 2, function(x){maximafunction(x,i)}), row.names = fractionnames))
+} # Output: maxima_Ctrl_i (0.1 <= i <= 0.9)
+  
+for (i in seq(0.1,0.9,0.1)){
+  temp = paste("maxima_RNase",i,sep="_")
+  assign(temp, data.frame(apply(tRNase_Norm, 2, function(x){maximafunction(x,i)}), row.names = fractionnames))
+} # Output: maxima_RNase_i (0.1 <= i <= 0.9)
 
-allmaxima_RNase_0.1 = data.frame(apply(tRNase_Norm, 2, function(x){maximafunction(x,0.1)}), row.names = fractionnames)
-allmaxima_RNase_0.2 = data.frame(apply(tRNase_Norm, 2, function(x){maximafunction(x,0.2)}), row.names = fractionnames)
-allmaxima_RNase_0.3 = data.frame(apply(tRNase_Norm, 2, function(x){maximafunction(x,0.3)}), row.names = fractionnames)
-allmaxima_RNase_0.4 = data.frame(apply(tRNase_Norm, 2, function(x){maximafunction(x,0.4)}), row.names = fractionnames)
-allmaxima_RNase_0.5 = data.frame(apply(tRNase_Norm, 2, function(x){maximafunction(x,0.5)}), row.names = fractionnames)
 
-# Data Frame with number of Maxima from each threshold
+# Function to get numbers of maxima
 maximanumber = function(input){
   output = 0
   temp = 0
@@ -619,35 +620,52 @@ maximanumber = function(input){
   output = sum(temp)
   return(output)
 }
-  
-max_number_Ctrl_0.1 = apply(allmaxima_Ctrl_0.1, 2, maximanumber)
-max_number_Ctrl_0.2 = apply(allmaxima_Ctrl_0.2, 2, maximanumber)
-max_number_Ctrl_0.3 = apply(allmaxima_Ctrl_0.3, 2, maximanumber)
-max_number_Ctrl_0.4 = apply(allmaxima_Ctrl_0.4, 2, maximanumber)
-max_number_Ctrl_0.5 = apply(allmaxima_Ctrl_0.5, 2, maximanumber)
 
-max_number_RNase_0.1 = apply(allmaxima_RNase_0.1, 2, maximanumber)
-max_number_RNase_0.2 = apply(allmaxima_RNase_0.2, 2, maximanumber)
-max_number_RNase_0.3 = apply(allmaxima_RNase_0.3, 2, maximanumber)
-max_number_RNase_0.4 = apply(allmaxima_RNase_0.4, 2, maximanumber)
-max_number_RNase_0.5 = apply(allmaxima_RNase_0.5, 2, maximanumber)
 
-# Plotting some random protein with threshold in x-axis and number of maxima in y-axis
+# Creating Data Frames with numbers of Maxima
+for (i in seq(0.1,0.9,0.1)){
+  temp1 = paste("maxnum_Ctrl",i,sep="_")
+  temp2 = get(paste("maxima_Ctrl",i,sep="_"))
+  assign(temp1, apply(temp2, 2, maximanumber))
+} # Output: maxnum_Ctrl_i (0.1 <= i <= 0.9)
 
-maxima_number_plot = function(input1, input2, input3, input4, input5, row){
+for (i in seq(0.1,0.9,0.1)){
+  temp1 = paste("maxnum_RNase",i,sep="_")
+  temp2 = get(paste("maxima_RNase",i,sep="_"))
+  assign(temp1, apply(temp2, 2, maximanumber))
+} # Output: maxnum_RNase_i (0.1 <= i <= 0.9)
+
+
+# Function to plot random protein with threshold in x-axis and number of maxima in y-axis
+
+maxnum_plot = function(input, row){
+  if (length(unique(input)) == length(unique(maxnum_Ctrl_0.1))){
   output = 0
-  output[1] = input1[row]
-  output[2] = input2[row]
-  output[3] = input3[row]
-  output[4] = input4[row]
-  output[5] = input5[row]
-  barplot(output)
-  return(output)
+  output[1] = input[row]
+  for (i in seq(0.2,0.9,0.1)){
+    output[i*10] = get(paste(gsub("_0.*","","maxnum_Ctrl"),i,sep="_"))[row]
+  }
+  plot(seq(0.1,0.9,0.1), output, main = "Ctrl Protein", xlab="Threshold", ylab="Maxima Number", type="l")
+  }
+  
+  
+  else if (length(unique(input)) == length(unique(maxnum_RNase_0.1))){
+  output = 0
+  output[1] = input[row]
+  for (i in seq(0.2,0.9,0.1)){
+    output[i*10] = get(paste(gsub("_0.*","","maxnum_RNase"),i,sep="_"))[row]
+  }
+  plot(seq(0.1,0.9,0.1), output, main = "RNase Protein", xlab="Threshold", ylab="Maxima Number", type="l")
+  }
 }
 
-```
 
-how to define a maximum in order to allow the program to find the right fraction 
+# Function only correctly works with input either maxnum_Ctrl_0.1 or "maxnum_RNase_0.1", nonetheless with any desired rows
+
+maxnum_plot(maxnum_Ctrl_0.1, 10) #Example
+maxnum_plot(maxnum_RNase_0.1, 10) #Example
+
+```
 t-test 
 ## 4. Fit of the protein profiles
 ## 5. 
