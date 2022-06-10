@@ -622,7 +622,7 @@ maximanumber = function(input){
 }
 
 
-# Creating Data Frames with numbers of Maxima
+# Creating Vectors with numbers of Maxima
 for (i in seq(0.1,0.9,0.1)){
   temp1 = paste("maxnum_Ctrl",i,sep="_")
   temp2 = get(paste("maxima_Ctrl",i,sep="_"))
@@ -648,7 +648,6 @@ maxnum_plot = function(input, row){
   plot(seq(0.1,0.9,0.1), output, main = "Ctrl Protein", xlab="Threshold", ylab="Maxima Number", type="l")
   }
   
-  
   else if (all(input == maxnum_RNase_0.1)){
   output = 0
   output[1] = input[row]
@@ -657,7 +656,6 @@ maxnum_plot = function(input, row){
   }
   plot(seq(0.1,0.9,0.1), output, main = "RNase Protein", xlab="Threshold", ylab="Maxima Number", type="l")
   }
-  
   
   else {print("Invalid Input")}
   }
@@ -670,5 +668,46 @@ maxnum_plot(maxnum_RNase_0.1, 10) #Example
 
 ```
 t-test 
+
+
+```{r}
+
+# Function to make data frame where absolute maxima of 3 Reps of a protein are inserted in a column (Threshold hasn't been determined)
+abmax = function(input){
+  output = data.frame()
+  i = 1
+  j = 0
+  while (i < dim(input)[2]){
+    rep1 = max(input[,i])
+    rep2 = max(input[,i+1])
+    rep3 = max(input[,i+2])
+    output[1:3,i-j] = c(rep1, rep2, rep3)
+    colnames(output)[i-j] = gsub("_Rep_1", "", colnames(input)[i]) 
+    i = i + 3
+    j = j + 2
+  }
+  rownames(output) = c("Rep1", "Rep2","Rep3")
+  return(output)
+}
+
+abmax_Ctrl = abmax(maxima_Ctrl_0.3)
+abmax_RNase = abmax(maxima_RNase_0.3)
+
+# T-Test comparing each corresponding Protein Rep of Ctrl and RNase (need to adjust the alpha value through Multiple Tests: Bonferroni Correction?)
+ttest = function(input1, input2, alpha){
+  output = data.frame()
+  for (i in 1:dim(input1)[2]){
+    p = t.test(input1[,i], input2[,i], var.equal = FALSE)$p.value
+    output[i,1] = p < alpha
+  }
+  rownames(output) = colnames(input1)
+  colnames(output) = "RNA Dependency"
+  return(output)
+}
+
+test = ttest(abmax_Ctrl, abmax_RNase, 0.05/2)
+test
+
+```
 ## 4. Fit of the protein profiles
 ## 5. 
