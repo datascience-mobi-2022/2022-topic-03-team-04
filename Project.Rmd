@@ -19,6 +19,7 @@ library(ggiraph)
 library(ggiraphExtra)
 library(ggplot2)
 library(qqplotr)
+library(circlize)
 ```
 
 
@@ -227,7 +228,6 @@ Possible causes for this fluctuation of the protein amounts lay in the experimen
 
 
 ```{r}
-
 Rep_1_Ctrl <- Ctrl %>% select(contains("Rep_1"))
 Rep_1_Ctrl_sums = colSums(Rep_1_Ctrl) 
 Rep_2_Ctrl <- Ctrl %>% select(contains("Rep_2"))
@@ -252,8 +252,17 @@ Total_Protein_amount
 
 value = Total_Protein_amount
 plotdata = data.frame(value, names=c("Ctrl1", "Ctrl2", "Ctrl3", "RNase1", "RNase2", "RNase3"))
-ggplot(data = plotdata, aes(x = names, y = value)) + geom_bar(stat = "identity")   
+```
 
+
+```{r}
+ggplot(data = plotdata, aes(x = names , y = value)) + geom_bar(stat = "identity") 
+
+#by Madleen 
+colour  = c("maroon1", "orchid3", "skyblue", "hotpink", "plum1", "skyblue1")
+ggplot(plotdata, aes(names, value)) +
+  geom_bar(stat = "identity", fill = colour) +
+  labs( title = "Before Normalization", y = "protein value", x = "Replicates")
 ```
 
 
@@ -296,7 +305,15 @@ Total_Protein_amount_norm = rowSums(Total_Protein_norm)
 
 Total_Protein_amount_norm
 plotdata_norm = data.frame(Total_Protein_amount_norm, Replicates = c("Ctrl1", "Ctrl2", "Ctrl3", "RNase1", "RNase2", "RNase3"))
-ggplot(data = plotdata_norm, aes(x = Replicates, y = Total_Protein_amount_norm)) + geom_bar(stat = "identity")                      
+ggplot(data = plotdata_norm, aes(x = Replicates, y = Total_Protein_amount_norm)) + geom_bar(stat = "identity") 
+
+#by Madleen 
+colour1  = c("maroon1", "orchid3", "skyblue", "hotpink", "plum1", "skyblue1")
+ggplot(plotdata_norm, aes(Replicates, Total_Protein_amount_norm )) +
+  geom_bar(stat = "identity", fill = colour) +
+  labs( title = "After Normalization 1", y = "Total protein amout", x = "Replicates")
+
+
                           
 
 ## same concept but in general function 
@@ -333,15 +350,29 @@ Rep_1_RNase_Norm = select(tRNase_Norm, contains("Rep_1"))
 Rep_2_RNase_Norm = select(tRNase_Norm, contains("Rep_2"))
 Rep_3_RNase_Norm = select(tRNase_Norm, contains("Rep_3")) 
 
+
+
+
 ```
 
 
 
-```{r Fraction-wise total protein amounts Ctrl, echo=FALSE}
+```{r Fraction-wise total protein amounts Ctrl, echo=FALSE, fig.width=10, fig.height=7}
 
-barplot(rowSums(Rep_1_Ctrl_Norm), las=2)
-barplot(rowSums(Rep_2_Ctrl_Norm), las=2)
-barplot(rowSums(Rep_3_Ctrl_Norm), las=2)
+#by Madleen
+
+barplot(rowSums(Rep_1_Ctrl_Norm), names.arg = c(1:25), col= "maroon1",space=0.5 ,main= "After Normalization 1 - Rep_1_Ctrl", xlab = "Fractions" , ylab = "Protein Amount",axisnames=T	, las=1)
+barplot(rowSums(Rep_2_Ctrl_Norm), names.arg = c(1:25), col= "orchid3",space=0.5 ,main= "After Normalization 1 - Rep_2_Ctrl", xlab = "Fractions" , ylab = "Protein Amount",axisnames=T	, las=1)
+barplot(rowSums(Rep_3_Ctrl_Norm),names.arg = c(1:25), col= "skyblue",space=0.5 ,main= "After Normalization 1 - Rep_3_Ctrl", xlab = "Fractions" , ylab = "Protein Amount",axisnames=T	, las=1) 
+
+
+barplot(rowSums(Rep_1_RNase_Norm),names.arg = c(1:25), col= "lightgreen",space=0.5 ,main= "After Normalization 1 - Rep_1_RNase_Norm", xlab = "Fractions" , ylab = "Protein Amount",axisnames=T	, las=1)
+barplot(rowSums(Rep_2_RNase_Norm),names.arg = c(1:25), col= "purple",space=0.5 ,main= "After Normalization 1 - Rep_2_RNase_Norm", xlab = "Fractions" , ylab = "Protein Amount",axisnames=T	, las=1)
+barplot(rowSums(Rep_3_RNase_Norm),names.arg = c(1:25), col= "salmon",space=0.5 ,main= "After Normalization 1 - Rep_3_RNase_Norm", xlab = "Fractions" , ylab = "Protein Amount",axisnames=T	, las=1)
+
+
+
+
 
 ```
 
@@ -666,12 +697,43 @@ maxnum_plot = function(input, row){
 maxnum_plot(maxnum_Ctrl_0.1, 10) #Example
 maxnum_plot(maxnum_RNase_0.1, 10) #Example
 
+
+```
+```{r}
+
+#By Madleen 
+##Richard's code, with a couple embellishments
+
+maxnum_plot_col = function(input, row){
+  if (all(input == maxnum_Ctrl_0.1)){
+  output = 0
+  output[1] = input[row]
+  for (i in seq(0.2,0.9,0.1)){
+    output[i*10] = get(paste(gsub("_0.*","","maxnum_Ctrl"),i,sep="_"))[row]
+  }
+  plot(seq(0.1,0.9,0.1),col = c(rand_color(n=1)),output, main = "Ctrl Protein", xlab="Threshold", ylab="Maxima Number", type="l", lwd=5)
+  }
+  
+  else if (all(input == maxnum_RNase_0.1)){
+  output = 0
+  output[1] = input[row]
+  for (i in seq(0.2,0.9,0.1)){
+    output[i*10] = get(paste(gsub("_0.*","","maxnum_RNase"),i,sep="_"))[row]
+  }
+  plot(seq(0.1,0.9,0.1),col = c(rand_color(n=1)) ,output, main = "RNase Protein", xlab="Threshold", ylab="Maxima Number", type="l", lwd=5)
+  }
+  
+  else {print("Invalid Input")}
+}
+
+maxnum_plot_col(maxnum_Ctrl_0.1, 10)
+maxnum_plot_col(maxnum_RNase_0.1, 10)
+
 ```
 t-test 
 
 
 ```{r}
-
 # Function to make data frame where absolute maxima of 3 Reps of a protein are inserted in a column (Threshold hasn't been determined)
 abmax = function(input){
   output = data.frame()
@@ -707,7 +769,6 @@ ttest = function(input1, input2, alpha){
 
 test = ttest(abmax_Ctrl, abmax_RNase, 0.05/2)
 test
-
 ```
 ## 4. Fit of the protein profiles
 ## 5. 
