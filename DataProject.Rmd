@@ -1,0 +1,774 @@
+---
+title: "Project Topic 3 Team 4"
+author: "Khalida Dushimova, Madleen Piegsa, Greata Karathanos und Richard Langi Efraim"
+date: "4/27/2022"
+output: html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(heatmaply)
+library(scales)
+library(gganimate)
+library(dplyr) ##for the select function 
+library(tibble)
+library(ggiraph)
+library(ggiraphExtra)
+library(ggplot2)
+library(qqplotr)
+library(circlize)
+```
+
+
+## 1. Description of dataset (Raw data)
+
+
+```{r 1.1 loading data}
+
+#MS_Table <- read.table("~/Desktop/2022-topic-03-team-04/RDeeP_A549_NS.csv", header=TRUE, row.names=1, sep = ";")
+#Richard's folder location for convenience sake :D (C:/Users/Archid Knighton/Documents/GitHub/2022-topic-03-team-04/RDeeP_A549_NS.csv)
+
+#loading "RDeeP_A549_NS.csv" into Data.raw data frame
+Data.raw <- read.table("C:/Users/Guest_1/Downloads/RDeeP_A549_NS.csv", header=TRUE, row.names=1, sep = ";")
+
+#creating a copy of Data.raw and saving it as Data.copy
+Data.copy = Data.raw
+
+```
+
+
+
+```{r}
+
+head(Data.copy)
+dim(Data.copy)
+# the data set has 150 columns and 3680 rows
+# restructuring needed 
+# we want to restructure the data set by fractions and divide it in two data sets, one for RNase and one for Ctrl
+# we need to write a function that restructures the data set
+## Therefor we pick by repetitions and create Rep1, Rep2 and Rep3 vectors:starting with 1 (Ctrl) or with 2 (RNase) 
+## every six columns there is a new fraction 
+
+```
+
+
+
+```{r 1.2 Raw data reorganization}
+
+restructure_func = function(input_df,start){ #start = 1 for Ctrl and start = 2 for RNase.
+  Vector.Rep1 <- c(seq(from =start, to = 150, by = 6)) # by 6 to reach the next fraction 
+  Vector.Rep2 <- c(seq(from =start+2, to = 150, by = 6))
+  Vector.Rep3 <- c(seq(from =start+4, to = 150, by = 6))
+  output_df = as.data.frame(matrix(nrow = 3*3680, ncol=25)) 
+  
+  
+  #Naming the fractions 
+  for (i in 1:25) {
+    s = paste("Fraction",i,sep="_")
+   colnames(output_df)[i] = s
+  }
+  
+  
+  #Assignment of values and row names
+  
+  k = 1 #Row number of the old dataframe
+  i = 1 #Row number of the new dataframe
+  while (i <= dim(output_df)[1]) { # All Rows of the new dataframes will be selected
+    output_df[i,] = input_df[k,Vector.Rep1] #The values of Rep 1 are assigned to the row
+    row.names(output_df)[i] = paste(rownames(input_df)[k],"Rep",1,sep="_") #The row is given a name of Protein_Rep_1
+    i = i + 1
+    
+    output_df[i,] = input_df[k,Vector.Rep2] # Repeat for Rep 2
+    row.names(output_df)[i] = paste(rownames(input_df)[k],"Rep",2,sep="_")
+    i = i + 1
+    
+    output_df[i,] = input_df[k,Vector.Rep3] # Repeat for Rep 3
+    row.names(output_df)[i] = paste(rownames(input_df)[k],"Rep",3,sep="_")
+    i = i + 1
+    
+    k = k + 1 # The row of the old dataframe is advanced by 1
+  }
+  return(output_df)
+}
+Ctrl = restructure_func(Data.copy,1)
+RNase = restructure_func(Data.copy,2)
+
+```
+
+
+
+```{r}
+
+Ctrl = t(Ctrl)
+Ctrl = data.frame(Ctrl) ## In order to be able to use the select function
+
+RNase = t(RNase)
+RNase = data.frame(RNase)
+
+```
+
+
+
+```{r Plots for SPB6_Human_Protein}
+
+Fractions = c(1:25)
+SPB6_Human_Protein_Ctrl = ggplot() + 
+  geom_line(data = select(Ctrl,1),  aes(x = Fractions, y = SPB6_HUMAN_Rep_1, color= 'Ctrl_Rep1')) + 
+  
+  geom_line(data = select(Ctrl,2),  aes(x = Fractions, y = SPB6_HUMAN_Rep_2 , color= 'Ctrl_Rep2')) + 
+  
+  geom_line(data = select(Ctrl,3),  aes(x = Fractions, y = SPB6_HUMAN_Rep_3 , color= 'Ctrl_Rep3')) +
+  
+  scale_colour_manual(name="legend",values=c(Ctrl_Rep1="blue2",Ctrl_Rep2="cyan3", Ctrl_Rep3="violetred4")) +
+  
+  labs(title="SPB6_HUMAN_Ctrl", y= "Protein Amount") 
+ SPB6_Human_Protein_Ctrl + scale_x_continuous(breaks = seq(1, 25, by = 1))
+  
+  
+SPB6_Human_Protein_RNase = ggplot() + 
+  geom_line(data = select(RNase,1),  aes(x = Fractions, y = SPB6_HUMAN_Rep_1 , color= 'RNase_Rep1')) + 
+  
+  geom_line(data = select(RNase,2), aes(x = Fractions, y = SPB6_HUMAN_Rep_2, color= 'RNase_Rep2')) +
+  
+  geom_line(data = select(RNase,3), aes(x = Fractions, y = SPB6_HUMAN_Rep_3, color= 'RNase_Rep3')) +
+  
+   scale_colour_manual(name="legend",values=c(RNase_Rep1="blue2",RNase_Rep2="cyan3", RNase_Rep3= "violetred4")) +
+  
+  labs(title="SPB6_HUMAN_RNase", y= "Protein Amount") 
+  SPB6_Human_Protein_RNase + scale_x_continuous(breaks = seq(1, 25, by = 1))
+  
+
+  
+SPB6_Human_Protein = ggplot() +
+ geom_line(data = select(Ctrl,1),  aes(x = Fractions, y = SPB6_HUMAN_Rep_1, color= 'Ctrl_Rep1')) + 
+  
+  geom_line(data = select(Ctrl,2),  aes(x = Fractions, y = SPB6_HUMAN_Rep_2 , color= 'Ctrl_Rep2')) + 
+  
+  geom_line(data = select(Ctrl,3),  aes(x = Fractions, y = SPB6_HUMAN_Rep_3 , color= 'Ctrl_Rep3')) +
+  
+  geom_line(data = select(RNase,1),  aes(x = Fractions, y = SPB6_HUMAN_Rep_1 , color= 'RNase_Rep1')) + 
+  
+  geom_line(data = select(RNase,2), aes(x = Fractions, y = SPB6_HUMAN_Rep_2, color= 'RNase_Rep2')) +
+  
+  geom_line(data = select(RNase,3), aes(x = Fractions, y = SPB6_HUMAN_Rep_3 , color= 'RNase_Rep3')) +
+  
+  scale_colour_manual(name="legend",values=c(Ctrl_Rep1="blue2",RNase_Rep1="cyan3", Ctrl_Rep2="violetred4", RNase_Rep2="tomato1",Ctrl_Rep3="darkviolet", RNase_Rep3="pink")) +
+  
+  labs(title="SPB6_HUMAN", y= "Protein Amount") 
+  SPB6_Human_Protein + scale_x_continuous(breaks = seq(1, 25, by = 1))
+ 
+# RNA associates with proteins to form RNA-Protein complexes that play key regulatory roles in cellular processes --> RNA metabolism and the regulation of gene expression 
+# concept of RNA dependence (R-DeeP) describes proteins and protein complexes whose interactions are directly or indirectly dependent on the presence of RNA 
+# aim: identify RNA-dependent proteins from the position of the proteins in an untreated cell lysate as t
+  
+```
+
+
+
+```{r}
+
+Fractions = c(1:25)
+MICA_HUMAN_Protein  = ggplot() +
+ geom_line(data = select(Ctrl, contains("MICA_HUMAN_Rep_1")),  aes(x = Fractions, y = MICA_HUMAN_Rep_1, color= 'Ctrl_Rep1')) + 
+  
+  geom_line(data = select(Ctrl, contains("MICA_HUMAN_Rep_2")),  aes(x = Fractions, y = MICA_HUMAN_Rep_2, color= 'Ctrl_Rep2')) + 
+  
+  geom_line(data = select(Ctrl, contains("MICA_HUMAN_Rep_3")),  aes(x = Fractions, y = MICA_HUMAN_Rep_3 , color= 'Ctrl_Rep3')) +
+  
+  geom_line(data = select(RNase, contains("MICA_HUMAN_Rep_1")),  aes(x = Fractions, y = MICA_HUMAN_Rep_1 , color= 'RNase_Rep1')) + 
+  
+  geom_line(data = select(RNase, contains("MICA_HUMAN_Rep_2")), aes(x = Fractions, y = MICA_HUMAN_Rep_2, color= 'RNase_Rep2')) +
+  
+  geom_line(data = select(RNase, contains("MICA_HUMAN_Rep_3")), aes(x = Fractions, y = MICA_HUMAN_Rep_3 , color= 'RNase_Rep3')) +
+  
+  scale_colour_manual(name="legend",values=c(Ctrl_Rep1="blue2",RNase_Rep1="green4", Ctrl_Rep2="magenta1", RNase_Rep2="tomato1",Ctrl_Rep3="darkviolet", RNase_Rep3="turquoise4")) +
+  
+  labs(title="MICA_HUMAN_Protein", y= "Protein Amount") 
+  MICA_HUMAN_Protein + scale_x_continuous(breaks = seq(1, 25, by = 1))
+  
+MICA_HUMAN_Protein_Ctrl = ggplot() + 
+  geom_line(data = select(Ctrl, contains("MICA_HUMAN_Rep_1")),  aes(x = Fractions, y = MICA_HUMAN_Rep_1, color= 'Ctrl_Rep1')) + 
+  
+  geom_line(data = select(Ctrl, contains("MICA_HUMAN_Rep_2")),  aes(x = Fractions, y = MICA_HUMAN_Rep_2 , color= 'Ctrl_Rep2')) + 
+  
+  geom_line(data = select(Ctrl, contains("MICA_HUMAN_Rep_3")),  aes(x = Fractions, y = MICA_HUMAN_Rep_3 , color= 'Ctrl_Rep3')) +
+  
+  scale_colour_manual(name="legend",values=c(Ctrl_Rep1="blue2",Ctrl_Rep2="purple4", Ctrl_Rep3="magenta1")) +
+  
+  labs(title="MICA_HUMAN_Ctrl", y= "Protein Amount") 
+ MICA_HUMAN_Protein_Ctrl + scale_x_continuous(breaks = seq(1, 25, by = 1))
+  
+  
+MICA_Human_Protein_RNase = ggplot() + 
+  geom_line(data = select(RNase, contains("MICA_HUMAN_Rep_1")),  aes(x = Fractions, y = MICA_HUMAN_Rep_1 , color= 'RNase_Rep1')) + 
+  
+  geom_line(data = select(RNase,contains("MICA_HUMAN_Rep_2")), aes(x = Fractions, y = MICA_HUMAN_Rep_2, color= 'RNase_Rep2')) +
+  
+  geom_line(data = select(RNase,contains("MICA_HUMAN_Rep_3")), aes(x = Fractions, y = MICA_HUMAN_Rep_3, color= 'RNase_Rep3')) +
+  
+   scale_colour_manual(name="legend",values=c(RNase_Rep1="blue2",RNase_Rep2="green4", RNase_Rep3= "magenta1")) +
+  
+  labs(title="MICA_HUMAN_RNase", y= "Protein Amount") 
+  MICA_Human_Protein_RNase + scale_x_continuous(breaks = seq(1, 25, by = 1))  
+  
+```
+
+
+
+## 1. Evaluation of the reproducibility of the experiments 
+
+To investigate the protein amount of the replicates further we sum up the total protein amount of all genes per sample replicate and plot them side by side in a bar plot. We can see that there is a huge difference between the RNase samples and also the Ctrl samples do not align.
+
+In conclusion the protein amounts differ and are not well comparable. 
+
+Possible causes for this fluctuation of the protein amounts lay in the experimental design of the data generation. The sucrose gradients were all produced in one step to minimize the variations. But had to be transported to the ultracentrifugation and were then fractioned by hand. And as we see the lysates can differ in their containing protein amount.
+
+
+```{r}
+Rep_1_Ctrl <- Ctrl %>% select(contains("Rep_1"))
+Rep_1_Ctrl_sums = colSums(Rep_1_Ctrl) 
+Rep_2_Ctrl <- Ctrl %>% select(contains("Rep_2"))
+Rep_2_Ctrl_sums = colSums(Rep_2_Ctrl) 
+Rep_3_Ctrl <- Ctrl %>% select(contains("Rep_3"))
+Rep_3_Ctrl_sums = colSums(Rep_3_Ctrl) 
+
+Rep_1_RNase <- RNase %>% select(contains("Rep_1"))
+Rep_1_RNase_sums = colSums(Rep_1_RNase)
+Rep_2_RNase <- RNase %>% select(contains("Rep_2"))
+Rep_2_RNase_sums = colSums(Rep_2_RNase)
+Rep_3_RNase <- RNase %>% select(contains("Rep_3"))
+Rep_3_RNase_sums = colSums(Rep_3_RNase)
+
+Ctrl_sums = cbind(Rep_1_Ctrl_sums, Rep_2_Ctrl_sums, Rep_3_Ctrl_sums)
+RNase_sums = cbind(Rep_1_RNase_sums, Rep_2_RNase_sums, Rep_3_RNase_sums)
+
+Ctrl_RNase_sums = cbind(Ctrl_sums, RNase_sums)
+
+Total_Protein_amount = colSums(Ctrl_RNase_sums)
+Total_Protein_amount
+
+value = Total_Protein_amount
+plotdata = data.frame(value, names=c("Ctrl1", "Ctrl2", "Ctrl3", "RNase1", "RNase2", "RNase3"))
+```
+
+
+```{r}
+ggplot(data = plotdata, aes(x = names , y = value)) + geom_bar(stat = "identity") 
+
+#by Madleen 
+colour  = c("maroon1", "orchid3", "skyblue", "hotpink", "plum1", "skyblue1")
+ggplot(plotdata, aes(names, value)) +
+  geom_bar(stat = "identity", fill = colour) +
+  labs( title = "Before Normalization", y = "protein value", x = "Replicates")
+```
+
+
+
+## 2.1 Normalization (Fractionwise)
+
+
+```{r}
+
+Rep_1_Ctrl_f = t(Rep_1_Ctrl)
+Rep_1_Ctrl_fsums = colSums(Rep_1_Ctrl_f)
+
+
+Rep_2_Ctrl_f = t(Rep_2_Ctrl)
+Rep_2_Ctrl_fsums = colSums(Rep_2_Ctrl_f)
+
+
+Rep_3_Ctrl_f = t(Rep_3_Ctrl)
+Rep_3_Ctrl_fsums = colSums(Rep_3_Ctrl_f)
+
+
+Rep_1_RNase_f = t(Rep_1_RNase)
+Rep_1_RNase_fsums =colSums(Rep_1_RNase_f)
+
+Rep_2_RNase_f = t(Rep_2_RNase)
+Rep_2_RNase_fsums = colSums(Rep_2_RNase_f)
+
+Rep_3_RNase_f = t(Rep_3_RNase)
+Rep_3_RNase_fsums = colSums(Rep_3_RNase_f)
+
+Total_Protein_by_fractions = cbind(Rep_1_Ctrl_fsums,Rep_2_Ctrl_fsums, Rep_3_Ctrl_fsums, Rep_1_RNase_fsums, Rep_2_RNase_fsums, Rep_3_RNase_fsums)
+
+
+Total_Protein_norm = t(Total_Protein_by_fractions)/Total_Protein_amount
+Total_Protein_norm = as.data.frame(Total_Protein_norm)
+Total_Protein_norm
+
+Total_Protein_amount_norm = rowSums(Total_Protein_norm)
+
+
+Total_Protein_amount_norm
+plotdata_norm = data.frame(Total_Protein_amount_norm, Replicates = c("Ctrl1", "Ctrl2", "Ctrl3", "RNase1", "RNase2", "RNase3"))
+ggplot(data = plotdata_norm, aes(x = Replicates, y = Total_Protein_amount_norm)) + geom_bar(stat = "identity") 
+
+#by Madleen 
+colour1  = c("maroon1", "orchid3", "skyblue", "hotpink", "plum1", "skyblue1")
+ggplot(plotdata_norm, aes(Replicates, Total_Protein_amount_norm )) +
+  geom_bar(stat = "identity", fill = colour) +
+  labs( title = "After Normalization 1", y = "Total protein amout", x = "Replicates")
+
+
+                          
+
+## same concept but in general function 
+norm_func = function(x) { 
+  x/sum(x) 
+}
+# Applying the normalization to the data
+RNase_Data_norm = data.frame(apply(RNase, 1, norm_func))
+
+
+Ctrl_Data_norm = data.frame(apply(Ctrl, 1, norm_func))
+
+
+#Remove the NAs that result from some proteins having 0 Protein amount in certain repetitions.
+Ctrl_Data_norm[is.na(Ctrl_Data_norm)] <- 0
+Ctrl_Data_norm
+tCtrl_Norm <- as.data.frame(t(Ctrl_Data_norm))
+tCtrl_Norm
+
+RNase_Data_norm[is.na(RNase_Data_norm)] <- 0
+RNase_Data_norm
+
+tRNase_Norm <- as.data.frame(t(RNase_Data_norm))
+tRNase_Norm
+
+
+
+#Normalized 
+Rep_1_Ctrl_Norm = select(tCtrl_Norm, contains("Rep_1"))
+Rep_2_Ctrl_Norm = select(tCtrl_Norm, contains("Rep_2"))
+Rep_3_Ctrl_Norm = select(tCtrl_Norm, contains("Rep_3"))
+  
+Rep_1_RNase_Norm = select(tRNase_Norm, contains("Rep_1"))
+Rep_2_RNase_Norm = select(tRNase_Norm, contains("Rep_2"))
+Rep_3_RNase_Norm = select(tRNase_Norm, contains("Rep_3")) 
+
+
+
+
+```
+
+
+
+```{r Fraction-wise total protein amounts Ctrl, echo=FALSE, fig.width=10, fig.height=7}
+
+#by Madleen
+
+barplot(rowSums(Rep_1_Ctrl_Norm), names.arg = c(1:25), col= "maroon1",space=0.5 ,main= "After Normalization 1 - Rep_1_Ctrl", xlab = "Fractions" , ylab = "Protein Amount",axisnames=T	, las=1)
+barplot(rowSums(Rep_2_Ctrl_Norm), names.arg = c(1:25), col= "orchid3",space=0.5 ,main= "After Normalization 1 - Rep_2_Ctrl", xlab = "Fractions" , ylab = "Protein Amount",axisnames=T	, las=1)
+barplot(rowSums(Rep_3_Ctrl_Norm),names.arg = c(1:25), col= "skyblue",space=0.5 ,main= "After Normalization 1 - Rep_3_Ctrl", xlab = "Fractions" , ylab = "Protein Amount",axisnames=T	, las=1) 
+
+
+barplot(rowSums(Rep_1_RNase_Norm),names.arg = c(1:25), col= "lightgreen",space=0.5 ,main= "After Normalization 1 - Rep_1_RNase_Norm", xlab = "Fractions" , ylab = "Protein Amount",axisnames=T	, las=1)
+barplot(rowSums(Rep_2_RNase_Norm),names.arg = c(1:25), col= "purple",space=0.5 ,main= "After Normalization 1 - Rep_2_RNase_Norm", xlab = "Fractions" , ylab = "Protein Amount",axisnames=T	, las=1)
+barplot(rowSums(Rep_3_RNase_Norm),names.arg = c(1:25), col= "salmon",space=0.5 ,main= "After Normalization 1 - Rep_3_RNase_Norm", xlab = "Fractions" , ylab = "Protein Amount",axisnames=T	, las=1)
+
+
+
+
+
+```
+
+
+
+```{r}
+
+Fractions = c(1:25)
+
+MICA_HUMAN_Protein_Ctrl = ggplot() + 
+  geom_line(data = select(Ctrl, contains("MICA_HUMAN_Rep_1")),  aes(x = Fractions, y = MICA_HUMAN_Rep_1, color= 'Ctrl_Rep1')) + 
+  
+  geom_line(data = select(Ctrl, contains("MICA_HUMAN_Rep_2")),  aes(x = Fractions, y = MICA_HUMAN_Rep_2 , color= 'Ctrl_Rep2')) + 
+  
+  geom_line(data = select(Ctrl, contains("MICA_HUMAN_Rep_3")),  aes(x = Fractions, y = MICA_HUMAN_Rep_3 , color= 'Ctrl_Rep3')) +
+  
+  scale_colour_manual(name="legend",values=c(Ctrl_Rep1="blue2",Ctrl_Rep2="purple4", Ctrl_Rep3="magenta1")) +
+  
+  labs(title="MICA_HUMAN_Ctrl", y= "Protein Amount") 
+ MICA_HUMAN_Protein_Ctrl + scale_x_continuous(breaks = seq(1, 25, by = 1))
+    
+    
+  
+  MICA_HUMAN_Protein_Ctrl_Norm = ggplot() + 
+  geom_line(data = select(tCtrl_Norm, contains("MICA_HUMAN_Rep_1")),  aes(x = Fractions, y = MICA_HUMAN_Rep_1, color= 'Ctrl_Rep1')) + 
+  
+  geom_line(data = select(tCtrl_Norm, contains("MICA_HUMAN_Rep_2")),  aes(x = Fractions, y = MICA_HUMAN_Rep_2 , color= 'Ctrl_Rep2')) + 
+  
+  geom_line(data = select(tCtrl_Norm, contains("MICA_HUMAN_Rep_3")),  aes(x = Fractions, y = MICA_HUMAN_Rep_3 , color= 'Ctrl_Rep3')) +
+  
+  scale_colour_manual(name="legend",values=c(Ctrl_Rep1="blue2",Ctrl_Rep2="purple4", Ctrl_Rep3="magenta1")) +
+  
+  labs(title="MICA_HUMAN_Ctrl_Norm", y= "Protein Amount") 
+ MICA_HUMAN_Protein_Ctrl_Norm + scale_x_continuous(breaks = seq(1, 25, by = 1))
+ 
+```
+
+
+
+## 2.2 Second Normalization (by Greta)
+
+
+```{r}
+
+#aim is to eliminate outliers in our dataset, we try to create our own function
+
+anti_outlier_function<- function(input){
+#creating the new df  
+new_df_anti_outliers<- as.data.frame(matrix(nrow = (dim(input)[1]/3), ncol = dim(input)[2]))
+rownames(new_df_anti_outliers) <- rownames(Data.copy)
+colnames(new_df_anti_outliers) <- colnames(RNase_Data_norm)
+
+r<- 1   #r are the rows
+while(r <= dim(input)[1]){  
+  for (c in 1:dim(input)[2]){    #c are the columns
+     rep1 <- input[r,c]   
+     rep2 <- input[r+1,c] 
+     rep3 <- input[r+2,c]
+     if( (abs(rep1-rep2)<abs(rep1-rep3)) && (abs(rep1-rep2)<abs(rep2-rep3)) ) {
+        mean <- mean(c(rep1,rep2))
+        }
+     else if( (abs(rep1-rep3)<abs(rep1-rep2)) && (abs(rep1-rep3)<abs(rep2-rep3)) ) {
+       mean <- mean(c(rep1,rep3))  
+            }
+     else {
+       mean <- mean(c(rep2,rep3))
+       }
+     new_df_anti_outliers[(r/3)+1,(c)] <- mean   
+     }
+  r <- r + 3
+}
+
+new_df_anti_outliers = new_df_anti_outliers[-dim(new_df_anti_outliers)[1],]
+
+return(new_df_anti_outliers)
+}
+
+Ctrl_anti_outlier_df = anti_outlier_function(Ctrl_Data_norm)
+RNase_anti_outlier_df = anti_outlier_function(RNase_Data_norm)
+
+
+
+#dataframe combi of mean and two remaining original replicates
+
+df_combi_function<- function(input){
+#creating the new df  
+new_df_combi<- as.data.frame(matrix(nrow = (dim(input)[1]), ncol = dim(input)[2])) 
+rownames(new_df_combi) <- rownames(Ctrl_Data_norm)
+colnames(new_df_combi) <- colnames(RNase_Data_norm)
+
+r<- 1   #r are the rows
+while(r<=dim(input)[1]) {  
+  for (c in 1:dim(input)[2]) {    #c are the columns
+     rep1 <- input[r,c]   
+     rep2 <- input[r+1,c] 
+     rep3 <- input[r+2,c]
+     if( (abs(rep1-rep2)<abs(rep1-rep3)) && (abs(rep1-rep2)<abs(rep2-rep3)) ) {
+       mean <- mean(c(rep1,rep2))
+       new_df_combi[r,(c)] <- mean
+       new_df_combi[r+1,(c)] <- rep1
+       new_df_combi[r+2,(c)] <- rep2
+       }
+     else if( (abs(rep1-rep3)<abs(rep1-rep2)) && (abs(rep1-rep3)<abs(rep2-rep3)) ) {
+       mean <- mean(c(rep1,rep3)) 
+       new_df_combi[r,(c)] <- mean
+       new_df_combi[r+1,(c)] <- rep1
+       new_df_combi[r+2,(c)] <- rep3
+       }
+     else {
+       mean <- mean(c(rep2,rep3))
+       new_df_combi[r,(c)] <- mean
+       new_df_combi[r+1,(c)] <- rep2
+       new_df_combi[r+2,(c)] <- rep3
+       }
+     }
+  r <- r + 3
+  }
+#new_df_combi = new_df_combi[-dim(new_df_combi)[1],]
+
+return(new_df_combi)
+}
+
+Ctrl_combi_df = df_combi_function(Ctrl_Data_norm)
+RNase_combi_df = df_combi_function(RNase_Data_norm)
+Ctrl_combi_df
+
+tCtrl_combi_df = as.data.frame(t(Ctrl_combi_df))
+tRNase_combi_df = as.data.frame(t(RNase_combi_df))
+
+# Changed: rows of last 3 loops and adds # to row 462
+```
+
+```{r}
+Fractions = c(1:25)
+
+MICA_HUMAN_Protein_Ctrl = ggplot() + 
+  geom_line(data = select(Ctrl, contains("MICA_HUMAN_Rep_1")),  aes(x = Fractions, y = MICA_HUMAN_Rep_1, color= 'Ctrl_Rep1')) + 
+  
+  geom_line(data = select(Ctrl, contains("MICA_HUMAN_Rep_2")),  aes(x = Fractions, y = MICA_HUMAN_Rep_2 , color= 'Ctrl_Rep2')) + 
+  
+  geom_line(data = select(Ctrl, contains("MICA_HUMAN_Rep_3")),  aes(x = Fractions, y = MICA_HUMAN_Rep_3 , color= 'Ctrl_Rep3')) +
+  
+  scale_colour_manual(name="legend",values=c(Ctrl_Rep1="blue2",Ctrl_Rep2="purple4", Ctrl_Rep3="magenta1")) +
+  
+  labs(title="MICA_HUMAN_Ctrl", y= "Protein Amount") 
+ MICA_HUMAN_Protein_Ctrl + scale_x_continuous(breaks = seq(1, 25, by = 1))
+    
+    
+  
+  MICA_HUMAN_Protein_Ctrl_Norm = ggplot() + 
+  geom_line(data = select(tCtrl_Norm, contains("MICA_HUMAN_Rep_1")),  aes(x = Fractions, y = MICA_HUMAN_Rep_1, color= 'Ctrl_Rep1')) + 
+  
+  geom_line(data = select(tCtrl_Norm, contains("MICA_HUMAN_Rep_2")),  aes(x = Fractions, y = MICA_HUMAN_Rep_2 , color= 'Ctrl_Rep2')) + 
+  
+  geom_line(data = select(tCtrl_Norm, contains("MICA_HUMAN_Rep_3")),  aes(x = Fractions, y = MICA_HUMAN_Rep_3 , color= 'Ctrl_Rep3')) +
+  
+  scale_colour_manual(name="legend",values=c(Ctrl_Rep1="blue2",Ctrl_Rep2="purple4", Ctrl_Rep3="magenta1")) +
+  
+  labs(title="MICA_HUMAN_Ctrl_Norm", y= "Protein Amount") 
+ MICA_HUMAN_Protein_Ctrl_Norm + scale_x_continuous(breaks = seq(1, 25, by = 1))
+ 
+ 
+ 
+ MICA_HUMAN_Protein_Ctrl_Norm_Second = ggplot() + 
+  geom_line(data = select(tCtrl_combi_df, contains("MICA_HUMAN_Rep_1")),  aes(x = Fractions, y = MICA_HUMAN_Rep_1, color= 'Ctrl_Rep1')) + 
+  
+  geom_line(data = select(tCtrl_combi_df, contains("MICA_HUMAN_Rep_2")),  aes(x = Fractions, y = MICA_HUMAN_Rep_2 , color= 'Ctrl_Rep2')) + 
+  
+  geom_line(data = select(tCtrl_combi_df, contains("MICA_HUMAN_Rep_3")),  aes(x = Fractions, y = MICA_HUMAN_Rep_3 , color= 'Ctrl_Rep3')) +
+  
+  scale_colour_manual(name="legend",values=c(Ctrl_Rep1="blue2",Ctrl_Rep2="purple4", Ctrl_Rep3="magenta1")) +
+  
+  labs(title="MICA_HUMAN_Ctrl_Norm_Second", y= "Protein Amount") 
+ MICA_HUMAN_Protein_Ctrl_Norm_Second + scale_x_continuous(breaks = seq(1, 25, by = 1))
+ 
+ 
+```
+
+## 3. Peaks Identification 
+
+We define a threshold
+
+Proteins which depend on RNA are expected to migrate to different positions in the RNase treated sample in comparison to the Ctrl sample. To identify whether a protein is a RBP or not we need to detect the maxima in both samples. We want to detect both local and global maxima because even a shift of a local maximum could hold relevant biological information.
+We defined a maximum as a point x whose neighboring values are smaller than it and who exceeds a threshold value of 20% of the global maximum. 
+
+Defining a maximum the way we did successfully results in detecting local peaks. The threshold allows us to only detect maxima with a certain significance. However, a threshold of 20% protein value is not enough to really get only significant maxima. The significance could be further increased by comparing the values of +2  fractions from the maxima or by fitting the curve. 
+
+After we execute the fraction-wise normalization the protein amount between all three Ctrl 
+replicates as well as between the three RNase replicates should be equal.
+In order to check if this is the case the "bar.total.prot"-function sums all normalized columns for the three Ctrl and RNase replicates and gives out a bar plot with the respective protein amount.
+
+The bar plot shows that the amount of proteins between the three Ctrl replicate are identical. The same applies for the three RNase sample. The protein amounts between Ctrl and RNase differ from each other.
+
+Main motivation is to determine the role of RNA or non coding RNA in the cell, as RNA molecules are much more than a template for protein production
+screen RNA --> molecular mechanisms 
+screen proteins and protein complexes (with known functions) which are interacting with RNA  --> new funcions RNA
+RBPs --> RNA binding Proteins (Cancer, Neurological disorder, muscular atrophies)
+IDEA: identify proteins and complexes affected by RNA
+The concept of RNA dependence
+A protein is definied as RNA dependent if its molecular interactions are dependent on RNA presence 
+RNA dependent protein = RNA binding Proteins (RBP) + RBP-binding proteins (if RBP bound to RNA)
+protein wide screen based on succrose density gradient 
+Control 
+proteins envolved in RNA dependent complex --> same fraction migartion
+RNAse
+RNA dependent protein complex  will dissociate and individual proteins will migrate in different fractions--> different fractions
+Analisis of the protein content of fractions by comparing Control and RNAse samples allows identifacation of RNA dependent shifts 
+Normalization is needed in order to compare the data in RNase treted and Control samples 
+
+distribution of protein in 25 fractions of both samples, Control and RNase
+find global and local maxima for both 
+```{r}
+
+# Global and Maxima Detection (need to add threshold in if function)
+maximafunction = function(input, threshold){
+  output = 0
+  for (i in 1:(length(input))){
+    # 1st Fraction
+    if (i == 1){
+      if(input[i] > input[i+1] && input[i] >= threshold*max(input)){
+        output[i] = input[i]}
+      else{
+        output[i] = 0}
+    }
+
+    # 2nd-24th Fraction
+    if (i > 1 && i < length(input)){
+      if(input[i] > input[i+1] && input[i] > input[i-1] && input[i] >= threshold*max(input)){
+        output[i] = input[i]}
+      else{
+        output[i] = 0}
+    }
+
+    # 25th Fraction
+    if (i == length(input)){
+      if(input[i] > input[i-1] && input[i] >= threshold*max(input)){
+        output[i] = input[i]
+      }
+      else{
+        output[i] = 0}
+    }
+  }
+  return(output)
+}
+
+
+# A Vector for Fraction's Names
+  fractionnames = 0
+  for (i in 1:25) {
+    fractionnames[i] = paste("Fraction",i,sep="_")
+    }
+
+  
+# Creating Maxima Data Frames with different Threshold
+for (i in seq(0.1,0.9,0.1)){
+  temp = paste("maxima_Ctrl",i,sep="_")
+  assign(temp, data.frame(apply(tCtrl_combi_df, 2, function(x){maximafunction(x,i)}), row.names = fractionnames))
+} # Output: maxima_Ctrl_i (0.1 <= i <= 0.9)
+  
+for (i in seq(0.1,0.9,0.1)){
+  temp = paste("maxima_RNase",i,sep="_")
+  assign(temp, data.frame(apply(tRNase_combi_df, 2, function(x){maximafunction(x,i)}), row.names = fractionnames))
+} # Output: maxima_RNase_i (0.1 <= i <= 0.9)
+
+
+# Function to get numbers of maxima
+maximanumber = function(input){
+  output = 0
+  temp = 0
+  for (i in 1:length(input)){
+    if (input[i] != 0){
+      temp[i] = 1}
+      else{
+        temp[i] = 0}
+  }
+  output = sum(temp)
+  return(output)
+}
+
+
+# Creating Vectors with numbers of Maxima
+for (i in seq(0.1,0.9,0.1)){
+  temp1 = paste("maxnum_Ctrl",i,sep="_")
+  temp2 = get(paste("maxima_Ctrl",i,sep="_"))
+  assign(temp1, apply(temp2, 2, maximanumber))
+} # Output: maxnum_Ctrl_i (0.1 <= i <= 0.9)
+
+for (i in seq(0.1,0.9,0.1)){
+  temp1 = paste("maxnum_RNase",i,sep="_")
+  temp2 = get(paste("maxima_RNase",i,sep="_"))
+  assign(temp1, apply(temp2, 2, maximanumber))
+} # Output: maxnum_RNase_i (0.1 <= i <= 0.9)
+
+
+# Function to plot random protein with threshold in x-axis and number of maxima in y-axis
+
+maxnum_plot = function(input, row){
+  if (all(input == maxnum_Ctrl_0.1)){
+  output = 0
+  output[1] = input[row]
+  for (i in seq(0.2,0.9,0.1)){
+    output[i*10] = get(paste(gsub("_0.*","","maxnum_Ctrl"),i,sep="_"))[row]
+  }
+  plot(seq(0.1,0.9,0.1), output, main = "Ctrl Protein", xlab="Threshold", ylab="Maxima Number", type="l")
+  }
+  
+  else if (all(input == maxnum_RNase_0.1)){
+  output = 0
+  output[1] = input[row]
+  for (i in seq(0.2,0.9,0.1)){
+    output[i*10] = get(paste(gsub("_0.*","","maxnum_RNase"),i,sep="_"))[row]
+  }
+  plot(seq(0.1,0.9,0.1), output, main = "RNase Protein", xlab="Threshold", ylab="Maxima Number", type="l")
+  }
+  
+  else {print("Invalid Input")}
+  }
+
+
+# Function only correctly works with input either maxnum_Ctrl_0.1 or "maxnum_RNase_0.1", nonetheless with any desired rows
+
+maxnum_plot(maxnum_Ctrl_0.1, 10) #Example
+maxnum_plot(maxnum_RNase_0.1, 10) #Example
+
+
+```
+```{r}
+
+#By Madleen 
+##Richard's code, with a couple embellishments
+
+maxnum_plot_col = function(input, row){
+  if (all(input == maxnum_Ctrl_0.1)){
+  output = 0
+  output[1] = input[row]
+  for (i in seq(0.2,0.9,0.1)){
+    output[i*10] = get(paste(gsub("_0.*","","maxnum_Ctrl"),i,sep="_"))[row]
+  }
+  plot(seq(0.1,0.9,0.1),col = c(rand_color(n=1)),output, main = "Ctrl Protein", xlab="Threshold", ylab="Maxima Number", type="l", lwd=5)
+  }
+  
+  else if (all(input == maxnum_RNase_0.1)){
+  output = 0
+  output[1] = input[row]
+  for (i in seq(0.2,0.9,0.1)){
+    output[i*10] = get(paste(gsub("_0.*","","maxnum_RNase"),i,sep="_"))[row]
+  }
+  plot(seq(0.1,0.9,0.1),col = c(rand_color(n=1)) ,output, main = "RNase Protein", xlab="Threshold", ylab="Maxima Number", type="l", lwd=5)
+  }
+  
+  else {print("Invalid Input")}
+}
+
+maxnum_plot_col(maxnum_Ctrl_0.1, 10)
+maxnum_plot_col(maxnum_RNase_0.1, 10)
+
+```
+t-test 
+
+
+```{r}
+# Function to make data frame where absolute maxima of 3 Reps of a protein are inserted in a column (Threshold hasn't been determined)
+abmax = function(input){
+  output = data.frame()
+  i = 1
+  j = 0
+  while (i < dim(input)[2]){
+    rep1 = max(input[,i])
+    rep2 = max(input[,i+1])
+    rep3 = max(input[,i+2])
+    output[1:3,i-j] = c(rep1, rep2, rep3)
+    colnames(output)[i-j] = gsub("_Rep_1", "", colnames(input)[i]) 
+    i = i + 3
+    j = j + 2
+  }
+  rownames(output) = c("Rep1", "Rep2","Rep3")
+  return(output)
+}
+
+abmax_Ctrl = abmax(maxima_Ctrl_0.3)
+abmax_RNase = abmax(maxima_RNase_0.3)
+
+# T-Test comparing each corresponding Protein Rep of Ctrl and RNase (need to adjust the alpha value through Multiple Tests: Bonferroni Correction?)
+ttest = function(input1, input2, alpha){
+  output = data.frame()
+  for (i in 1:dim(input1)[2]){
+    p = t.test(input1[,i], input2[,i], var.equal = FALSE)$p.value
+    output[i,1] = p < alpha
+  }
+  rownames(output) = colnames(input1)
+  colnames(output) = "RNA Dependency"
+  return(output)
+}
+
+test = ttest(abmax_Ctrl, abmax_RNase, 0.05/2)
+test
+```
+## 4. Fit of the protein profiles
+## 5. 
