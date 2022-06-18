@@ -729,7 +729,7 @@ maxnum_plot_col()
 # After seeing some proteins, it seems Threshold 0.5 is the best, where the number of maxima doesn't exceed 3
 
 ```
-t-test 
+## 4. T-Test 
 
 
 ```{r}
@@ -769,5 +769,72 @@ ttest = function(input1, input2, alpha){
 test = ttest(abmax_Ctrl, abmax_RNase, 0.05/dim(abmax_Ctrl)[2])
 test
 ```
-## 4. Fit of the protein profiles
-## 5. 
+
+
+
+## 5. K-Means Clustering
+
+
+```{r}
+
+# Y Shift
+y_shift = apply(abmax_Ctrl - abmax_RNase, 2, mean)
+
+# X Shift
+rowmax_Ctrl = apply(maxima_Ctrl_0.5, 2, which.max)
+rowmax_RNase = apply(maxima_RNase_0.5, 2, which.max)
+
+meanrowmax = function(input){
+  output = 0
+  i = 1
+  j = 0
+  while (i < length(input)){
+    output[i-j] = (input[i]+input[i+1]+input[i+2])/3
+    names(output)[i-j] = gsub("_Rep_1", "", names(input)[i])
+    i = i + 3
+    j = j + 2
+  }
+  return(output)
+}
+
+x_shift = meanrowmax(rowmax_Ctrl) - meanrowmax(rowmax_RNase)
+
+# P Value
+pvalue = function(input1, input2){
+  output = numeric()
+  for (i in 1:dim(input1)[2]){
+    output[i] = t.test(input1[,i], input2[,i], var.equal = FALSE)$p.value
+  }
+  names(output) = colnames(input1)
+  return(output)
+}
+
+p_value = pvalue(abmax_Ctrl, abmax_RNase)
+
+# Combine Y-Shift, X-Shift and P Value in a Data Frame
+pxy = data.frame(P_Value = p_value, X_Shift = x_shift, Y_Shift = y_shift)
+pxy = pxy[-which(is.na(pxy)),]
+
+# Elbow Method
+wss = sapply(2:8,function(x){ 
+  kmeans(pxy, x)$tot.withinss
+})
+plot(2:8,wss,type='l',xlab="Number of Clusters", ylab="Total within-clusters Sum of Squares")
+
+# Plot K Means with 3 Clusters
+library(cluster)
+library(factoextra)
+fviz_cluster(kmeans(pxy, 3), data = pxy, geom = c("point"), main = "K Means Clustering with 3 Clusters")
+
+```
+
+
+
+## 6. Linear Regression
+
+
+```{r}
+
+
+
+```
