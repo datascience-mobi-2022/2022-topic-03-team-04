@@ -1,6 +1,6 @@
 ---
 title: "Project Topic 3 Team 4"
-author: "Khalida Dushimova, Madleen Piegsa, Greata Karathanos und Richard Langi Efraim"
+author: "Khalida Dushimova, Madleen Piegsa, Greata Karathanos und Richard Efraim Langi"
 date: "4/27/2022"
 output: html_document
 ---
@@ -703,38 +703,37 @@ maxnum_plot(maxnum_RNase_0.1, 10) #Example
 
 #By Madleen 
 ##Richard's code, with a couple embellishments
+###Additional edit by Richard to make the code more compact (2 graphs in a plot)
 
-maxnum_plot_col = function(input, row){
-  if (all(input == maxnum_Ctrl_0.1)){
-  output = 0
-  output[1] = input[row]
+maxnum_plot_col = function(){
+  row = sample(1:length(maxnum_Ctrl_0.1),1)
+  output1 = 0
+  output1[1] = maxnum_Ctrl_0.1[row]
   for (i in seq(0.2,0.9,0.1)){
-    output[i*10] = get(paste(gsub("_0.*","","maxnum_Ctrl"),i,sep="_"))[row]
-  }
-  plot(seq(0.1,0.9,0.1),col = c(rand_color(n=1)),output, main = "Ctrl Protein", xlab="Threshold", ylab="Maxima Number", type="l", lwd=5)
+    output1[i*10] = get(paste(gsub("_0.*","","maxnum_Ctrl"),i,sep="_"))[row]
   }
   
-  else if (all(input == maxnum_RNase_0.1)){
-  output = 0
-  output[1] = input[row]
+  output2 = 0
+  output2[1] = maxnum_RNase_0.1[row]
   for (i in seq(0.2,0.9,0.1)){
-    output[i*10] = get(paste(gsub("_0.*","","maxnum_RNase"),i,sep="_"))[row]
-  }
-  plot(seq(0.1,0.9,0.1),col = c(rand_color(n=1)) ,output, main = "RNase Protein", xlab="Threshold", ylab="Maxima Number", type="l", lwd=5)
+    output2[i*10] = get(paste(gsub("_0.*","","maxnum_RNase"),i,sep="_"))[row]
   }
   
-  else {print("Invalid Input")}
+  plot(seq(0.1,0.9,0.1),col = "red",output1, main = names(maxnum_Ctrl_0.1)[row], xlab="Threshold", ylab="Maxima Number", type="l", lwd=5)
+  lines(seq(0.1,0.9,0.1),col = "blue",output2, type="l", lwd=5)
+  legend("topright", legend = c("Ctrl", "RNase"), col = c("red", "blue"), lwd = c(5,5), cex = 0.75)
+  
 }
 
-maxnum_plot_col(maxnum_Ctrl_0.1, 10)
-maxnum_plot_col(maxnum_RNase_0.1, 10)
+maxnum_plot_col()
+# After seeing some proteins, it seems Threshold 0.5 is the best, where the number of maxima doesn't exceed 3
 
 ```
 t-test 
 
 
 ```{r}
-# Function to make data frame where absolute maxima of 3 Reps of a protein are inserted in a column (Threshold hasn't been determined)
+# Function to make data frame where absolute maxima of 3 Reps of a protein are inserted in a column
 abmax = function(input){
   output = data.frame()
   i = 1
@@ -752,10 +751,10 @@ abmax = function(input){
   return(output)
 }
 
-abmax_Ctrl = abmax(maxima_Ctrl_0.3)
-abmax_RNase = abmax(maxima_RNase_0.3)
+abmax_Ctrl = abmax(maxima_Ctrl_0.5)
+abmax_RNase = abmax(maxima_RNase_0.5)
 
-# T-Test comparing each corresponding Protein Rep of Ctrl and RNase (need to adjust the alpha value through Multiple Tests: Bonferroni Correction?)
+# T-Test comparing each corresponding Protein Rep of Ctrl and RNase with Bonferroni Correction
 ttest = function(input1, input2, alpha){
   output = data.frame()
   for (i in 1:dim(input1)[2]){
@@ -767,7 +766,7 @@ ttest = function(input1, input2, alpha){
   return(output)
 }
 
-test = ttest(abmax_Ctrl, abmax_RNase, 0.05/2)
+test = ttest(abmax_Ctrl, abmax_RNase, 0.05/dim(abmax_Ctrl)[2])
 test
 ```
 ## 4. Fit of the protein profiles
