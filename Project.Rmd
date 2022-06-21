@@ -1,6 +1,6 @@
 ---
 title: "Project Topic 3 Team 4"
-author: "Khalida Dushimova, Madleen Piegsa, Greata Karathanos und Richard Langi Efraim"
+author: "Khalida Dushimova, Madleen Piegsa, Greata Karathanos und Richard Efraim Langi"
 date: "4/27/2022"
 output: html_document
 ---
@@ -28,24 +28,19 @@ library(plyr)
 
 
 ```{r 1.1 loading data}
-
 #MS_Table <- read.table("~/Desktop/2022-topic-03-team-04/RDeeP_A549_NS.csv", header=TRUE, row.names=1, sep = ";")
 #Richard's folder location for convenience sake :D (C:/Users/Archid Knighton/Documents/GitHub/2022-topic-03-team-04/RDeeP_A549_NS.csv)
-
 #loading "RDeeP_A549_NS.csv" into Data.raw data frame
 
-
-Data.raw <- read.table("~/Desktop/2022-topic-03-team-04/RDeeP_A549_NS.csv", header=TRUE, row.names=1, sep = ";")
+Data.raw <- read.table("C:/Users/Archid Knighton/Documents/GitHub/2022-topic-03-team-04/RDeeP_A549_NS.csv", header=TRUE, row.names=1, sep = ";")
 
 #creating a copy of Data.raw and saving it as Data.copy
 Data.copy = Data.raw
-
 ```
 
 
 
 ```{r}
-
 head(Data.copy)
 dim(Data.copy)
 # the data set has 150 columns and 3680 rows
@@ -54,13 +49,11 @@ dim(Data.copy)
 # we need to write a function that restructures the data set
 ## Therefor we pick by repetitions and create Rep1, Rep2 and Rep3 vectors:starting with 1 (Ctrl) or with 2 (RNase) 
 ## every six columns there is a new fraction 
-
 ```
 
 
 
 ```{r 1.2 Raw data reorganization}
-
 restructure_func = function(input_df,start){ #start = 1 for Ctrl and start = 2 for RNase.
   Vector.Rep1 <- c(seq(from =start, to = 150, by = 6)) # by 6 to reach the next fraction 
   Vector.Rep2 <- c(seq(from =start+2, to = 150, by = 6))
@@ -76,7 +69,6 @@ restructure_func = function(input_df,start){ #start = 1 for Ctrl and start = 2 f
   
   
   #Assignment of values and row names
-  
   k = 1 #Row number of the old dataframe
   i = 1 #Row number of the new dataframe
   while (i <= dim(output_df)[1]) { # All Rows of the new dataframes will be selected
@@ -98,25 +90,21 @@ restructure_func = function(input_df,start){ #start = 1 for Ctrl and start = 2 f
 }
 Ctrl = restructure_func(Data.copy,1)
 RNase = restructure_func(Data.copy,2)
-
 ```
 
 
 
 ```{r}
-
 Ctrl = t(Ctrl)
 Ctrl = data.frame(Ctrl) ## In order to be able to use the select function
 
 RNase = t(RNase)
 RNase = data.frame(RNase)
-
 ```
 
 
 
 ```{r Plots for SPB6_Human_Protein}
-
 Fractions = c(1:25)
 SPB6_Human_Protein_Ctrl = ggplot() + 
   geom_line(data = select(Ctrl,1),  aes(x = Fractions, y = SPB6_HUMAN_Rep_1, color= 'Ctrl_Rep1')) + 
@@ -144,7 +132,6 @@ SPB6_Human_Protein_RNase = ggplot() +
   SPB6_Human_Protein_RNase + scale_x_continuous(breaks = seq(1, 25, by = 1))
   
 
-  
 SPB6_Human_Protein = ggplot() +
  geom_line(data = select(Ctrl,1),  aes(x = Fractions, y = SPB6_HUMAN_Rep_1, color= 'Ctrl_Rep1')) + 
   
@@ -166,13 +153,11 @@ SPB6_Human_Protein = ggplot() +
 # RNA associates with proteins to form RNA-Protein complexes that play key regulatory roles in cellular processes --> RNA metabolism and the regulation of gene expression 
 # concept of RNA dependence (R-DeeP) describes proteins and protein complexes whose interactions are directly or indirectly dependent on the presence of RNA 
 # aim: identify RNA-dependent proteins from the position of the proteins in an untreated cell lysate as t
-  
 ```
 
 
 
 ```{r}
-
 Fractions = c(1:25)
 MICA_HUMAN_Protein  = ggplot() +
  geom_line(data = select(Ctrl, contains("MICA_HUMAN_Rep_1")),  aes(x = Fractions, y = MICA_HUMAN_Rep_1, color= 'Ctrl_Rep1')) + 
@@ -204,7 +189,6 @@ MICA_HUMAN_Protein_Ctrl = ggplot() +
   labs(title="MICA_HUMAN_Ctrl", y= "Protein Amount") 
  MICA_HUMAN_Protein_Ctrl + scale_x_continuous(breaks = seq(1, 25, by = 1))
   
-  
 MICA_Human_Protein_RNase = ggplot() + 
   geom_line(data = select(RNase, contains("MICA_HUMAN_Rep_1")),  aes(x = Fractions, y = MICA_HUMAN_Rep_1 , color= 'RNase_Rep1')) + 
   
@@ -216,12 +200,11 @@ MICA_Human_Protein_RNase = ggplot() +
   
   labs(title="MICA_HUMAN_RNase", y= "Protein Amount") 
   MICA_Human_Protein_RNase + scale_x_continuous(breaks = seq(1, 25, by = 1))  
-  
 ```
 
 
-
 ## 1. Evaluation of the reproducibility of the experiments 
+
 
 To investigate the protein amount of the replicates further we sum up the total protein amount of all genes per sample replicate and plot them side by side in a bar plot. We can see that there is a huge difference between the RNase samples and also the Ctrl samples do not align.
 
@@ -268,13 +251,10 @@ ggplot(plotdata, aes(names, value)) +
 ```
 
 
-
-
 ## 2.1 Normalization (Fractionwise, first try) by Khalida 
 
 
 ```{r}
-
 Rep_1_Ctrl_f = t(Rep_1_Ctrl)
 Rep_1_Ctrl_fsums = colSums(Rep_1_Ctrl_f)
 
@@ -299,7 +279,6 @@ Rep_3_RNase_fsums = colSums(Rep_3_RNase_f)
 Total_Protein_by_fractions = cbind(Rep_1_Ctrl_fsums,Rep_2_Ctrl_fsums, Rep_3_Ctrl_fsums, Rep_1_RNase_fsums, Rep_2_RNase_fsums, Rep_3_RNase_fsums)
 
 
-
 Total_Protein_norm = t(Total_Protein_by_fractions)/Total_Protein_amount
 Total_Protein_norm = as.data.frame(Total_Protein_norm)
 Total_Protein_norm
@@ -317,12 +296,11 @@ ggplot(plotdata_norm, aes(Replicates, Total_Protein_amount_norm )) +
   labs( title = "After Normalization 1", y = "Total protein amout", x = "Replicates")
 
 
-                          
-
 ## same concept but in general function 
 norm_func = function(x) { 
   x/sum(x) 
 }
+
 # Applying the normalization to the data
 RNase_Data_norm = data.frame(apply(RNase, 1, norm_func))
 
@@ -340,34 +318,33 @@ RNase_Data_norm[is.na(RNase_Data_norm)] <- 0
 RNase_Data_norm
 tRNase_Norm <- as.data.frame(t(RNase_Data_norm))
 tRNase_Norm
-
-
 ```
 
 
-
 Working with ratio --> not practical 
+The same fraction amount of 2 proteins can differ in ratio because it depends on the total amount
 
 Goal: all Replicates have the same amount of protein, but we are working with protein number and not ratio 
 
 
-
 ```{r}
-
 Total_Protein_sums = as.data.frame(colSums(Total_Protein_by_fractions))
 Total_Protein_sums
 ```
 
 
+ Theoretically, the three replicates of each fraction are equal, due to them being the results of the same experiment. However, due to experimental differences, this usually is not the case. Therefore, we normalize the replicates in order to make them comparable. To do so, we normalize every three replicates of a given fraction and condition by computing their sums and then computing the mean value of the two closest sums. The quotients of this mean sum and the three sums of the replicates will give us the normalization factors for the three replicates.
 
 ```{r}
+
+
 Total_Protein_by_fractions_Ctrl =  cbind(Rep_1_Ctrl_fsums, Rep_2_Ctrl_fsums, Rep_3_Ctrl_fsums)
 Total_Protein_by_fractions_RNase =   cbind(Rep_1_RNase_fsums, Rep_2_RNase_fsums, Rep_3_RNase_fsums)
   
 Total_Protein_sums_Ctrl = as.data.frame(Total_Protein_sums[1:3,])
 Total_Protein_sums_RNase = as.data.frame(Total_Protein_sums[4:6,])
 mean_sums = function(x) {
-
+  
      rep1 <- x[1,1]   
      rep2 <- x[2,1] 
      rep3 <- x[3,1]
@@ -380,13 +357,12 @@ mean_sums = function(x) {
      else {
        mean_sums <- mean(c(rep2,rep3))
      }
-
+     
 }     
      
 mean_sums_Ctrl = mean_sums(Total_Protein_sums_Ctrl)
 mean_sums_RNase = mean_sums(Total_Protein_sums_RNase)
     
-
 
 norm_factor_ctrl <- mean_sums_Ctrl / Total_Protein_by_fractions_Ctrl
 
@@ -400,12 +376,10 @@ Rep_1_norm_Ctrl_sums = rowSums(Rep_1_norm_Ctrl)
 Rep_2_norm_Ctrl = as.data.frame(t(Rep_2_Ctrl_f)) * norm_factor_ctrl[,2]
 Rep_2_norm_Ctrl_sums = rowSums(Rep_2_norm_Ctrl)
 
-
 Rep_3_norm_Ctrl = as.data.frame(t(Rep_3_Ctrl_f)) * norm_factor_ctrl[,3]
 Rep_3_norm_Ctrl_sums = rowSums(Rep_3_norm_Ctrl)
 
 Norm_Ctrl = data.frame(cbind(Rep_1_norm_Ctrl, Rep_2_norm_Ctrl, Rep_3_norm_Ctrl))
-
 
 
 Rep_1_norm_RNase = as.data.frame(t(Rep_1_RNase_f)) * norm_factor_rnase[,1]
@@ -419,9 +393,12 @@ Rep_3_norm_RNase_sums = rowSums(Rep_3_norm_RNase)
 
 Norm_RNase = data.frame(cbind(Rep_1_norm_RNase, Rep_2_norm_RNase, Rep_3_norm_RNase))
 Norm_RNase
-
 ```
 
+
+<<<<<<< HEAD
+
+=======
 
 ```{r}
 Rep_1_norm_RNase_sums = rowSums(Rep_1_norm_RNase)
@@ -437,17 +414,12 @@ Rep_2_norm_RNase_sums = rowSums(Rep_2_norm_RNase)
 Rep_2_norm_RNase_sums
 Rep_3_norm_RNase_sums = rowSums(Rep_3_norm_RNase)
 Rep_3_norm_RNase_sums
-
-
-
-
 ```
+>>>>>>> 48fc91a75a6bed970431d54dfabdaf16caa36b7d
 
 
 
 ```{r}
-
-
 Fractions = c(1:25)
 
 MICA_HUMAN_Protein_Ctrl_Norm_1 = ggplot() + 
@@ -474,11 +446,8 @@ MICA_HUMAN_Protein_RNase_Norm_1 = ggplot() +
   
   labs(title="MICA_HUMAN_RNase_Norm_1", y= "Protein Amount") 
  MICA_HUMAN_Protein_RNase_Norm_1 + scale_x_continuous(breaks = seq(1, 25, by = 1))
-    
- 
-     
-    
 ```
+
 
 
 ```{r Fraction-wise total protein amounts Ctrl, echo=FALSE, fig.width=10, fig.height=7}
@@ -493,15 +462,11 @@ barplot(rowSums(Rep_3_Ctrl_Norm),names.arg = c(1:25), col= "skyblue",space=0.5 ,
 barplot(rowSums(Rep_1_RNase_Norm),names.arg = c(1:25), col= "lightgreen",space=0.5 ,main= "After Normalization 1 - Rep_1_RNase_Norm", xlab = "Fractions" , ylab = "Protein Amount",axisnames=T	, las=1)
 barplot(rowSums(Rep_2_RNase_Norm),names.arg = c(1:25), col= "purple",space=0.5 ,main= "After Normalization 1 - Rep_2_RNase_Norm", xlab = "Fractions" , ylab = "Protein Amount",axisnames=T	, las=1)
 barplot(rowSums(Rep_3_RNase_Norm),names.arg = c(1:25), col= "salmon",space=0.5 ,main= "After Normalization 1 - Rep_3_RNase_Norm", xlab = "Fractions" , ylab = "Protein Amount",axisnames=T	, las=1)
-
-
-
-
-
 ```
 
 
 ## 2.2 Second Normalization (by Greta)
+
 
 ```{r by Khalida }
 # in order that Gretas function works the normalized Datasets have to reordered
@@ -510,11 +475,11 @@ Norm_Ctrl = as.data.frame(t(Norm_Ctrl))
 Norm_Ctrl = Norm_Ctrl [order(rownames(Norm_Ctrl)), ]
 
 
-
 Norm_RNase = as.data.frame(t(Norm_RNase)) 
 Norm_RNase = Norm_RNase [order(rownames(Norm_RNase)), ]
-
 ```
+
+
 
 ```{r}
 Norm_Ctrl
@@ -526,12 +491,7 @@ saveRDS(Norm_RNase, file = "Norm_RNase.rds")
 
 
 
-
-
-
 ```{r}
-
-
 #aim is to eliminate outliers in our dataset, we try to create our own function
 
 anti_outlier_function<- function(input){
@@ -569,9 +529,7 @@ Ctrl_anti_outlier_df = anti_outlier_function(Norm_Ctrl)
 RNase_anti_outlier_df = anti_outlier_function(Norm_RNase)
 
 
-
 #dataframe combi of mean and two remaining original replicates
-
 df_combi_function<- function(input){
 #creating the new df  
 new_df_combi<- as.data.frame(matrix(nrow = (dim(input)[1]), ncol = dim(input)[2])) 
@@ -606,7 +564,6 @@ while(r<=dim(input)[1]) {
   r <- r + 3
   }
 #new_df_combi = new_df_combi[-dim(new_df_combi)[1],]
-
 return(new_df_combi)
 }
 
@@ -622,9 +579,7 @@ tRNase_combi_df = as.data.frame(t(RNase_combi_df))
 
 
 
-
 ```{r}
-
 Fractions = c(1:25)
 
 MICA_HUMAN_Protein_Ctrl = ggplot() + 
@@ -639,8 +594,6 @@ MICA_HUMAN_Protein_Ctrl = ggplot() +
   labs(title="MICA_HUMAN_Ctrl", y= "Protein Amount") 
  MICA_HUMAN_Protein_Ctrl + scale_x_continuous(breaks = seq(1, 25, by = 1))
     
-    
- 
  
 MICA_HUMAN_Protein_Ctrl_Norm_Second = ggplot() + 
   geom_line(data = select(tCtrl_combi_df, contains("MICA_HUMAN_Rep_1")),  aes(x = Fractions, y = MICA_HUMAN_Rep_1, color= 'Ctrl_Rep1')) + 
@@ -653,10 +606,7 @@ MICA_HUMAN_Protein_Ctrl_Norm_Second = ggplot() +
   
   labs(title="MICA_HUMAN_Ctrl_Norm_Second", y= "Protein Amount") 
  MICA_HUMAN_Protein_Ctrl_Norm_Second + scale_x_continuous(breaks = seq(1, 25, by = 1))
- 
- 
 ```
-
 
 
 ## 3. Peaks Identification 
@@ -692,8 +642,9 @@ Normalization is needed in order to compare the data in RNase treted and Control
 
 distribution of protein in 25 fractions of both samples, Control and RNase
 find global and local maxima for both 
-```{r}
 
+
+```{r}
 # Global and Maxima Detection (need to add threshold in if function)
 maximafunction = function(input, threshold){
   output = 0
@@ -773,76 +724,56 @@ for (i in seq(0.1,0.9,0.1)){
   temp2 = get(paste("maxima_RNase",i,sep="_"))
   assign(temp1, apply(temp2, 2, maximanumber))
 } # Output: maxnum_RNase_i (0.1 <= i <= 0.9)
-
-
-# Function to plot random protein with threshold in x-axis and number of maxima in y-axis
-
-maxnum_plot = function(input, row){
-  if (all(input == maxnum_Ctrl_0.1)){
-  output = 0
-  output[1] = input[row]
-  for (i in seq(0.2,0.9,0.1)){
-    output[i*10] = get(paste(gsub("_0.*","","maxnum_Ctrl"),i,sep="_"))[row]
-  }
-  plot(seq(0.1,0.9,0.1), output, main = "Ctrl Protein", xlab="Threshold", ylab="Maxima Number", type="l")
-  }
-  
-  else if (all(input == maxnum_RNase_0.1)){
-  output = 0
-  output[1] = input[row]
-  for (i in seq(0.2,0.9,0.1)){
-    output[i*10] = get(paste(gsub("_0.*","","maxnum_RNase"),i,sep="_"))[row]
-  }
-  plot(seq(0.1,0.9,0.1), output, main = "RNase Protein", xlab="Threshold", ylab="Maxima Number", type="l")
-  }
-  
-  else {print("Invalid Input")}
-  }
-
-
-# Function only correctly works with input either maxnum_Ctrl_0.1 or "maxnum_RNase_0.1", nonetheless with any desired rows
-
-maxnum_plot(maxnum_Ctrl_0.1, 10) #Example
-maxnum_plot(maxnum_RNase_0.1, 10) #Example
-
-
 ```
-```{r}
 
+
+
+```{r}
+# Function to plot random protein with threshold in x-axis and number of maxima in y-axis (only correctly works with input either maxnum_Ctrl_0.1 or "maxnum_RNase_0.1", nonetheless with any desired rows
+# Richard's code with a couple embellishments by Madleen
+
+<<<<<<< HEAD
 #By Madleen 
 ##Richard's code, with a couple embellishments
+###Additional edit by Richard to make the code more compact (2 graphs in a plot)
 
-maxnum_plot_col = function(input, row){
-  if (all(input == maxnum_Ctrl_0.1)){
-  output = 0
-  output[1] = input[row]
+=======
+>>>>>>> 48fc91a75a6bed970431d54dfabdaf16caa36b7d
+maxnum_plot_col = function(){
+  row = sample(1:length(maxnum_Ctrl_0.1),1)
+  output1 = 0
+  output1[1] = maxnum_Ctrl_0.1[row]
   for (i in seq(0.2,0.9,0.1)){
-    output[i*10] = get(paste(gsub("_0.*","","maxnum_Ctrl"),i,sep="_"))[row]
-  }
-  plot(seq(0.1,0.9,0.1),col = c(rand_color(n=1)),output, main = "Ctrl Protein", xlab="Threshold", ylab="Maxima Number", type="l", lwd=5)
+    output1[i*10] = get(paste(gsub("_0.*","","maxnum_Ctrl"),i,sep="_"))[row]
   }
   
-  else if (all(input == maxnum_RNase_0.1)){
-  output = 0
-  output[1] = input[row]
+  output2 = 0
+  output2[1] = maxnum_RNase_0.1[row]
   for (i in seq(0.2,0.9,0.1)){
-    output[i*10] = get(paste(gsub("_0.*","","maxnum_RNase"),i,sep="_"))[row]
-  }
-  plot(seq(0.1,0.9,0.1),col = c(rand_color(n=1)) ,output, main = "RNase Protein", xlab="Threshold", ylab="Maxima Number", type="l", lwd=5)
+    output2[i*10] = get(paste(gsub("_0.*","","maxnum_RNase"),i,sep="_"))[row]
   }
   
-  else {print("Invalid Input")}
+  plot(seq(0.1,0.9,0.1),col = "red",output1, main = names(maxnum_Ctrl_0.1)[row], xlab="Threshold", ylab="Maxima Number", type="l", lwd=5)
+  lines(seq(0.1,0.9,0.1),col = "blue",output2, type="l", lwd=5)
+  legend("topright", legend = c("Ctrl", "RNase"), col = c("red", "blue"), lwd = c(5,5), cex = 0.75)
+  
 }
 
-maxnum_plot_col(maxnum_Ctrl_0.1, 10)
-maxnum_plot_col(maxnum_RNase_0.1, 10)
+maxnum_plot_col()
+<<<<<<< HEAD
+# After seeing some proteins, it seems Threshold 0.5 is the best, where the number of maxima doesn't exceed 3
 
 ```
-t-test 
+=======
+```
+
+
+>>>>>>> 48fc91a75a6bed970431d54dfabdaf16caa36b7d
+## 4. T-Test 
 
 
 ```{r}
-# Function to make data frame where absolute maxima of 3 Reps of a protein are inserted in a column (Threshold hasn't been determined)
+# Function to make data frame where absolute maxima of 3 Reps of a protein are inserted in a column
 abmax = function(input){
   output = data.frame()
   i = 1
@@ -860,10 +791,10 @@ abmax = function(input){
   return(output)
 }
 
-abmax_Ctrl = abmax(maxima_Ctrl_0.3)
-abmax_RNase = abmax(maxima_RNase_0.3)
+abmax_Ctrl = abmax(maxima_Ctrl_0.5)
+abmax_RNase = abmax(maxima_RNase_0.5)
 
-# T-Test comparing each corresponding Protein Rep of Ctrl and RNase (need to adjust the alpha value through Multiple Tests: Bonferroni Correction?)
+# T-Test comparing each corresponding Protein Rep of Ctrl and RNase with Bonferroni Correction
 ttest = function(input1, input2, alpha){
   output = data.frame()
   for (i in 1:dim(input1)[2]){
@@ -875,8 +806,90 @@ ttest = function(input1, input2, alpha){
   return(output)
 }
 
-test = ttest(abmax_Ctrl, abmax_RNase, 0.05/2)
+test = ttest(abmax_Ctrl, abmax_RNase, 0.05/dim(abmax_Ctrl)[2])
 test
 ```
-## 4. Fit of the protein profiles
-## 5. 
+
+
+<<<<<<< HEAD
+
+=======
+>>>>>>> 48fc91a75a6bed970431d54dfabdaf16caa36b7d
+## 5. K-Means Clustering
+
+
+```{r}
+<<<<<<< HEAD
+
+=======
+>>>>>>> 48fc91a75a6bed970431d54dfabdaf16caa36b7d
+# Y Shift
+y_shift = apply(abmax_Ctrl - abmax_RNase, 2, mean)
+
+# X Shift
+rowmax_Ctrl = apply(maxima_Ctrl_0.5, 2, which.max)
+rowmax_RNase = apply(maxima_RNase_0.5, 2, which.max)
+
+meanrowmax = function(input){
+  output = 0
+  i = 1
+  j = 0
+  while (i < length(input)){
+    output[i-j] = (input[i]+input[i+1]+input[i+2])/3
+    names(output)[i-j] = gsub("_Rep_1", "", names(input)[i])
+    i = i + 3
+    j = j + 2
+  }
+  return(output)
+}
+
+x_shift = meanrowmax(rowmax_Ctrl) - meanrowmax(rowmax_RNase)
+
+# P Value
+pvalue = function(input1, input2){
+  output = numeric()
+  for (i in 1:dim(input1)[2]){
+    output[i] = t.test(input1[,i], input2[,i], var.equal = FALSE)$p.value
+  }
+  names(output) = colnames(input1)
+  return(output)
+}
+
+p_value = pvalue(abmax_Ctrl, abmax_RNase)
+
+# Combine Y-Shift, X-Shift and P Value in a Data Frame
+pxy = data.frame(P_Value = p_value, X_Shift = x_shift, Y_Shift = y_shift)
+pxy = pxy[-which(is.na(pxy)),]
+
+# Elbow Method
+wss = sapply(2:8,function(x){ 
+  kmeans(pxy, x)$tot.withinss
+})
+plot(2:8,wss,type='l',xlab="Number of Clusters", ylab="Total within-clusters Sum of Squares")
+
+# Plot K Means with 3 Clusters
+library(cluster)
+library(factoextra)
+fviz_cluster(kmeans(pxy, 3), data = pxy, geom = c("point"), main = "K Means Clustering with 3 Clusters")
+<<<<<<< HEAD
+
+```
+
+
+
+=======
+```
+
+
+>>>>>>> 48fc91a75a6bed970431d54dfabdaf16caa36b7d
+## 6. Linear Regression
+
+
+```{r}
+
+<<<<<<< HEAD
+
+
+=======
+>>>>>>> 48fc91a75a6bed970431d54dfabdaf16caa36b7d
+```
