@@ -20,6 +20,7 @@ library(ggiraphExtra)
 library(ggplot2)
 library(qqplotr)
 library(circlize)
+library(plyr)
 ```
 
 
@@ -32,7 +33,9 @@ library(circlize)
 #Richard's folder location for convenience sake :D (C:/Users/Archid Knighton/Documents/GitHub/2022-topic-03-team-04/RDeeP_A549_NS.csv)
 
 #loading "RDeeP_A549_NS.csv" into Data.raw data frame
-Data.raw <- read.table("C:/Users/Archid Knighton/Documents/GitHub/2022-topic-03-team-04/RDeeP_A549_NS.csv", header=TRUE, row.names=1, sep = ";")
+
+
+Data.raw <- read.table("~/Desktop/2022-topic-03-team-04/RDeeP_A549_NS.csv", header=TRUE, row.names=1, sep = ";")
 
 #creating a copy of Data.raw and saving it as Data.copy
 Data.copy = Data.raw
@@ -255,9 +258,8 @@ plotdata = data.frame(value, names=c("Ctrl1", "Ctrl2", "Ctrl3", "RNase1", "RNase
 ```
 
 
-```{r}
-ggplot(data = plotdata, aes(x = names , y = value)) + geom_bar(stat = "identity") 
 
+```{r}
 #by Madleen 
 colour  = c("maroon1", "orchid3", "skyblue", "hotpink", "plum1", "skyblue1")
 ggplot(plotdata, aes(names, value)) +
@@ -267,7 +269,8 @@ ggplot(plotdata, aes(names, value)) +
 
 
 
-## 2.1 Normalization (Fractionwise)
+
+## 2.1 Normalization (Fractionwise, first try) by Khalida 
 
 
 ```{r}
@@ -296,6 +299,7 @@ Rep_3_RNase_fsums = colSums(Rep_3_RNase_f)
 Total_Protein_by_fractions = cbind(Rep_1_Ctrl_fsums,Rep_2_Ctrl_fsums, Rep_3_Ctrl_fsums, Rep_1_RNase_fsums, Rep_2_RNase_fsums, Rep_3_RNase_fsums)
 
 
+
 Total_Protein_norm = t(Total_Protein_by_fractions)/Total_Protein_amount
 Total_Protein_norm = as.data.frame(Total_Protein_norm)
 Total_Protein_norm
@@ -305,7 +309,6 @@ Total_Protein_amount_norm = rowSums(Total_Protein_norm)
 
 Total_Protein_amount_norm
 plotdata_norm = data.frame(Total_Protein_amount_norm, Replicates = c("Ctrl1", "Ctrl2", "Ctrl3", "RNase1", "RNase2", "RNase3"))
-ggplot(data = plotdata_norm, aes(x = Replicates, y = Total_Protein_amount_norm)) + geom_bar(stat = "identity") 
 
 #by Madleen 
 colour1  = c("maroon1", "orchid3", "skyblue", "hotpink", "plum1", "skyblue1")
@@ -335,20 +338,105 @@ tCtrl_Norm
 
 RNase_Data_norm[is.na(RNase_Data_norm)] <- 0
 RNase_Data_norm
-
 tRNase_Norm <- as.data.frame(t(RNase_Data_norm))
 tRNase_Norm
 
 
+```
 
-#Normalized 
-Rep_1_Ctrl_Norm = select(tCtrl_Norm, contains("Rep_1"))
-Rep_2_Ctrl_Norm = select(tCtrl_Norm, contains("Rep_2"))
-Rep_3_Ctrl_Norm = select(tCtrl_Norm, contains("Rep_3"))
+
+
+Working with ratio --> not practical 
+
+Goal: all Replicates have the same amount of protein, but we are working with protein number and not ratio 
+
+
+
+```{r}
+
+Total_Protein_sums = as.data.frame(colSums(Total_Protein_by_fractions))
+Total_Protein_sums
+```
+
+
+
+```{r}
+Total_Protein_by_fractions_Ctrl =  cbind(Rep_1_Ctrl_fsums, Rep_2_Ctrl_fsums, Rep_3_Ctrl_fsums)
+Total_Protein_by_fractions_RNase =   cbind(Rep_1_RNase_fsums, Rep_2_RNase_fsums, Rep_3_RNase_fsums)
   
-Rep_1_RNase_Norm = select(tRNase_Norm, contains("Rep_1"))
-Rep_2_RNase_Norm = select(tRNase_Norm, contains("Rep_2"))
-Rep_3_RNase_Norm = select(tRNase_Norm, contains("Rep_3")) 
+Total_Protein_sums_Ctrl = as.data.frame(Total_Protein_sums[1:3,])
+Total_Protein_sums_RNase = as.data.frame(Total_Protein_sums[4:6,])
+mean_sums = function(x) {
+
+     rep1 <- x[1,1]   
+     rep2 <- x[2,1] 
+     rep3 <- x[3,1]
+     if( (abs(rep1-rep2)<abs(rep1-rep3)) && (abs(rep1-rep2)<abs(rep2-rep3)) ) {
+        mean_sums <- mean(c(rep1,rep2))
+        }
+     else if( (abs(rep1-rep3)<abs(rep1-rep2)) && (abs(rep1-rep3)<abs(rep2-rep3)) ) {
+       mean_sums <- mean(c(rep1,rep3))  
+            }
+     else {
+       mean_sums <- mean(c(rep2,rep3))
+     }
+
+}     
+     
+mean_sums_Ctrl = mean_sums(Total_Protein_sums_Ctrl)
+mean_sums_RNase = mean_sums(Total_Protein_sums_RNase)
+    
+
+
+norm_factor_ctrl <- mean_sums_Ctrl / Total_Protein_by_fractions_Ctrl
+
+
+norm_factor_rnase <- mean_sums_RNase / Total_Protein_by_fractions_RNase
+
+
+Rep_1_norm_Ctrl = as.data.frame(t(Rep_1_Ctrl_f)) * norm_factor_ctrl[,1]
+Rep_1_norm_Ctrl_sums = rowSums(Rep_1_norm_Ctrl)
+
+Rep_2_norm_Ctrl = as.data.frame(t(Rep_2_Ctrl_f)) * norm_factor_ctrl[,2]
+Rep_2_norm_Ctrl_sums = rowSums(Rep_2_norm_Ctrl)
+
+
+Rep_3_norm_Ctrl = as.data.frame(t(Rep_3_Ctrl_f)) * norm_factor_ctrl[,3]
+Rep_3_norm_Ctrl_sums = rowSums(Rep_3_norm_Ctrl)
+
+Norm_Ctrl = data.frame(cbind(Rep_1_norm_Ctrl, Rep_2_norm_Ctrl, Rep_3_norm_Ctrl))
+
+
+
+Rep_1_norm_RNase = as.data.frame(t(Rep_1_RNase_f)) * norm_factor_rnase[,1]
+Rep_1_norm_RNase_sums = rowSums(Rep_1_norm_RNase)
+
+Rep_2_norm_RNase = as.data.frame(t(Rep_2_RNase_f)) * norm_factor_rnase[,2]
+Rep_2_norm_RNase_sums = rowSums(Rep_2_norm_RNase)
+
+Rep_3_norm_RNase = as.data.frame(t(Rep_3_RNase_f)) * norm_factor_rnase[,3]
+Rep_3_norm_RNase_sums = rowSums(Rep_3_norm_RNase)
+
+Norm_RNase = data.frame(cbind(Rep_1_norm_RNase, Rep_2_norm_RNase, Rep_3_norm_RNase))
+Norm_RNase
+
+```
+
+
+```{r}
+Rep_1_norm_RNase_sums = rowSums(Rep_1_norm_RNase)
+Rep_1_norm_RNase_sums
+Rep_2_norm_RNase_sums = rowSums(Rep_2_norm_RNase)
+Rep_2_norm_RNase_sums
+Rep_3_norm_RNase_sums = rowSums(Rep_3_norm_RNase)
+Rep_3_norm_RNase_sums
+
+Rep_1_norm_Ctrl_sums = rowSums(Rep_1_norm_RNase)
+Rep_1_norm_RNase_sums
+Rep_2_norm_RNase_sums = rowSums(Rep_2_norm_RNase)
+Rep_2_norm_RNase_sums
+Rep_3_norm_RNase_sums = rowSums(Rep_3_norm_RNase)
+Rep_3_norm_RNase_sums
 
 
 
@@ -357,9 +445,45 @@ Rep_3_RNase_Norm = select(tRNase_Norm, contains("Rep_3"))
 
 
 
+```{r}
+
+
+Fractions = c(1:25)
+
+MICA_HUMAN_Protein_Ctrl_Norm_1 = ggplot() + 
+  geom_line(data = select(Rep_1_norm_Ctrl, contains("MICA_HUMAN_Rep_1")),  aes(x = Fractions, y = MICA_HUMAN_Rep_1, color= 'Ctrl_Rep1')) + 
+  
+  geom_line(data = select(Rep_2_norm_Ctrl, contains("MICA_HUMAN_Rep_2")),  aes(x = Fractions, y = MICA_HUMAN_Rep_2 , color= 'Ctrl_Rep2')) + 
+  
+  geom_line(data = select(Rep_3_norm_Ctrl, contains("MICA_HUMAN_Rep_3")),  aes(x = Fractions, y = MICA_HUMAN_Rep_3 , color= 'Ctrl_Rep3')) +
+  
+  scale_colour_manual(name="legend",values=c(Ctrl_Rep1="blue2",Ctrl_Rep2="purple4", Ctrl_Rep3="magenta1")) +
+  
+  labs(title="MICA_HUMAN_Ctrl_Norm_1", y= "Protein Amount") 
+ MICA_HUMAN_Protein_Ctrl_Norm_1 + scale_x_continuous(breaks = seq(1, 25, by = 1))
+ 
+    
+MICA_HUMAN_Protein_RNase_Norm_1 = ggplot() + 
+  geom_line(data = select(Rep_1_norm_RNase, contains("MICA_HUMAN_Rep_1")),  aes(x = Fractions, y = MICA_HUMAN_Rep_1, color= 'Ctrl_Rep1')) + 
+  
+  geom_line(data = select(Rep_2_norm_RNase, contains("MICA_HUMAN_Rep_2")),  aes(x = Fractions, y = MICA_HUMAN_Rep_2 , color= 'Ctrl_Rep2')) + 
+  
+  geom_line(data = select(Rep_3_norm_RNase, contains("MICA_HUMAN_Rep_3")),  aes(x = Fractions, y = MICA_HUMAN_Rep_3 , color= 'Ctrl_Rep3')) +
+  
+  scale_colour_manual(name="legend",values=c(Ctrl_Rep1="blue2",Ctrl_Rep2="purple4", Ctrl_Rep3="magenta1")) +
+  
+  labs(title="MICA_HUMAN_RNase_Norm_1", y= "Protein Amount") 
+ MICA_HUMAN_Protein_RNase_Norm_1 + scale_x_continuous(breaks = seq(1, 25, by = 1))
+    
+ 
+     
+    
+```
+
+
 ```{r Fraction-wise total protein amounts Ctrl, echo=FALSE, fig.width=10, fig.height=7}
 
-#by Madleen
+#by Madleen --> muss an die neue Normalisierung angwpasst werden!!!
 
 barplot(rowSums(Rep_1_Ctrl_Norm), names.arg = c(1:25), col= "maroon1",space=0.5 ,main= "After Normalization 1 - Rep_1_Ctrl", xlab = "Fractions" , ylab = "Protein Amount",axisnames=T	, las=1)
 barplot(rowSums(Rep_2_Ctrl_Norm), names.arg = c(1:25), col= "orchid3",space=0.5 ,main= "After Normalization 1 - Rep_2_Ctrl", xlab = "Fractions" , ylab = "Protein Amount",axisnames=T	, las=1)
@@ -377,45 +501,36 @@ barplot(rowSums(Rep_3_RNase_Norm),names.arg = c(1:25), col= "salmon",space=0.5 ,
 ```
 
 
+## 2.2 Second Normalization (by Greta)
+
+```{r by Khalida }
+# in order that Gretas function works the normalized Datasets have to reordered
+
+Norm_Ctrl = as.data.frame(t(Norm_Ctrl))
+Norm_Ctrl = Norm_Ctrl [order(rownames(Norm_Ctrl)), ]
+
+
+
+Norm_RNase = as.data.frame(t(Norm_RNase)) 
+Norm_RNase = Norm_RNase [order(rownames(Norm_RNase)), ]
+
+```
 
 ```{r}
+Norm_Ctrl
 
-Fractions = c(1:25)
+saveRDS(Norm_Ctrl, file = "Norm_Ctrl.rds")
 
-MICA_HUMAN_Protein_Ctrl = ggplot() + 
-  geom_line(data = select(Ctrl, contains("MICA_HUMAN_Rep_1")),  aes(x = Fractions, y = MICA_HUMAN_Rep_1, color= 'Ctrl_Rep1')) + 
-  
-  geom_line(data = select(Ctrl, contains("MICA_HUMAN_Rep_2")),  aes(x = Fractions, y = MICA_HUMAN_Rep_2 , color= 'Ctrl_Rep2')) + 
-  
-  geom_line(data = select(Ctrl, contains("MICA_HUMAN_Rep_3")),  aes(x = Fractions, y = MICA_HUMAN_Rep_3 , color= 'Ctrl_Rep3')) +
-  
-  scale_colour_manual(name="legend",values=c(Ctrl_Rep1="blue2",Ctrl_Rep2="purple4", Ctrl_Rep3="magenta1")) +
-  
-  labs(title="MICA_HUMAN_Ctrl", y= "Protein Amount") 
- MICA_HUMAN_Protein_Ctrl + scale_x_continuous(breaks = seq(1, 25, by = 1))
-    
-    
-  
-  MICA_HUMAN_Protein_Ctrl_Norm = ggplot() + 
-  geom_line(data = select(tCtrl_Norm, contains("MICA_HUMAN_Rep_1")),  aes(x = Fractions, y = MICA_HUMAN_Rep_1, color= 'Ctrl_Rep1')) + 
-  
-  geom_line(data = select(tCtrl_Norm, contains("MICA_HUMAN_Rep_2")),  aes(x = Fractions, y = MICA_HUMAN_Rep_2 , color= 'Ctrl_Rep2')) + 
-  
-  geom_line(data = select(tCtrl_Norm, contains("MICA_HUMAN_Rep_3")),  aes(x = Fractions, y = MICA_HUMAN_Rep_3 , color= 'Ctrl_Rep3')) +
-  
-  scale_colour_manual(name="legend",values=c(Ctrl_Rep1="blue2",Ctrl_Rep2="purple4", Ctrl_Rep3="magenta1")) +
-  
-  labs(title="MICA_HUMAN_Ctrl_Norm", y= "Protein Amount") 
- MICA_HUMAN_Protein_Ctrl_Norm + scale_x_continuous(breaks = seq(1, 25, by = 1))
- 
+saveRDS(Norm_RNase, file = "Norm_RNase.rds")
 ```
 
 
 
-## 2.2 Second Normalization (by Greta)
+
 
 
 ```{r}
+
 
 #aim is to eliminate outliers in our dataset, we try to create our own function
 
@@ -423,7 +538,7 @@ anti_outlier_function<- function(input){
 #creating the new df  
 new_df_anti_outliers<- as.data.frame(matrix(nrow = (dim(input)[1]/3), ncol = dim(input)[2]))
 rownames(new_df_anti_outliers) <- rownames(Data.copy)
-colnames(new_df_anti_outliers) <- colnames(RNase_Data_norm)
+colnames(new_df_anti_outliers) <- colnames(Norm_RNase)
 
 r<- 1   #r are the rows
 while(r <= dim(input)[1]){  
@@ -450,8 +565,8 @@ new_df_anti_outliers = new_df_anti_outliers[-dim(new_df_anti_outliers)[1],]
 return(new_df_anti_outliers)
 }
 
-Ctrl_anti_outlier_df = anti_outlier_function(Ctrl_Data_norm)
-RNase_anti_outlier_df = anti_outlier_function(RNase_Data_norm)
+Ctrl_anti_outlier_df = anti_outlier_function(Norm_Ctrl)
+RNase_anti_outlier_df = anti_outlier_function(Norm_RNase)
 
 
 
@@ -460,8 +575,8 @@ RNase_anti_outlier_df = anti_outlier_function(RNase_Data_norm)
 df_combi_function<- function(input){
 #creating the new df  
 new_df_combi<- as.data.frame(matrix(nrow = (dim(input)[1]), ncol = dim(input)[2])) 
-rownames(new_df_combi) <- rownames(Ctrl_Data_norm)
-colnames(new_df_combi) <- colnames(RNase_Data_norm)
+rownames(new_df_combi) <- rownames(Norm_Ctrl)
+colnames(new_df_combi) <- colnames(Norm_RNase)
 
 r<- 1   #r are the rows
 while(r<=dim(input)[1]) {  
@@ -495,8 +610,8 @@ while(r<=dim(input)[1]) {
 return(new_df_combi)
 }
 
-Ctrl_combi_df = df_combi_function(Ctrl_Data_norm)
-RNase_combi_df = df_combi_function(RNase_Data_norm)
+Ctrl_combi_df = df_combi_function(Norm_Ctrl)
+RNase_combi_df = df_combi_function(Norm_RNase)
 Ctrl_combi_df
 
 tCtrl_combi_df = as.data.frame(t(Ctrl_combi_df))
@@ -505,7 +620,11 @@ tRNase_combi_df = as.data.frame(t(RNase_combi_df))
 # Changed: rows of last 3 loops and adds # to row 462
 ```
 
+
+
+
 ```{r}
+
 Fractions = c(1:25)
 
 MICA_HUMAN_Protein_Ctrl = ggplot() + 
@@ -521,22 +640,9 @@ MICA_HUMAN_Protein_Ctrl = ggplot() +
  MICA_HUMAN_Protein_Ctrl + scale_x_continuous(breaks = seq(1, 25, by = 1))
     
     
-  
-  MICA_HUMAN_Protein_Ctrl_Norm = ggplot() + 
-  geom_line(data = select(tCtrl_Norm, contains("MICA_HUMAN_Rep_1")),  aes(x = Fractions, y = MICA_HUMAN_Rep_1, color= 'Ctrl_Rep1')) + 
-  
-  geom_line(data = select(tCtrl_Norm, contains("MICA_HUMAN_Rep_2")),  aes(x = Fractions, y = MICA_HUMAN_Rep_2 , color= 'Ctrl_Rep2')) + 
-  
-  geom_line(data = select(tCtrl_Norm, contains("MICA_HUMAN_Rep_3")),  aes(x = Fractions, y = MICA_HUMAN_Rep_3 , color= 'Ctrl_Rep3')) +
-  
-  scale_colour_manual(name="legend",values=c(Ctrl_Rep1="blue2",Ctrl_Rep2="purple4", Ctrl_Rep3="magenta1")) +
-  
-  labs(title="MICA_HUMAN_Ctrl_Norm", y= "Protein Amount") 
- MICA_HUMAN_Protein_Ctrl_Norm + scale_x_continuous(breaks = seq(1, 25, by = 1))
  
  
- 
- MICA_HUMAN_Protein_Ctrl_Norm_Second = ggplot() + 
+MICA_HUMAN_Protein_Ctrl_Norm_Second = ggplot() + 
   geom_line(data = select(tCtrl_combi_df, contains("MICA_HUMAN_Rep_1")),  aes(x = Fractions, y = MICA_HUMAN_Rep_1, color= 'Ctrl_Rep1')) + 
   
   geom_line(data = select(tCtrl_combi_df, contains("MICA_HUMAN_Rep_2")),  aes(x = Fractions, y = MICA_HUMAN_Rep_2 , color= 'Ctrl_Rep2')) + 
@@ -550,6 +656,8 @@ MICA_HUMAN_Protein_Ctrl = ggplot() +
  
  
 ```
+
+
 
 ## 3. Peaks Identification 
 
