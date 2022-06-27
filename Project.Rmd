@@ -333,10 +333,7 @@ Total_Protein_sums
 ```
 
 
-We normalize the replicates in order to make them comparable.
-
-Normalize every three replicates of a given fraction and condition by computing their sums and then computing the mean value of the two closest sums. The quotients of this mean sum and the three sums of the replicates will give us the normalization factors for the three replicates.
-
+We compute the sums fractionwise and find the two closest sums in order to define normalization factors fot the replicates. The quotients of the mean sums and sums of replicates are the noramlization factors.
 ```{r}
 
 
@@ -828,21 +825,9 @@ meanrowmax = function(input){
 
 x_shift = meanrowmax(rowmax_Ctrl) - meanrowmax(rowmax_RNase)
 
-# P Value
-pvalue = function(input1, input2){
-  output = numeric()
-  for (i in 1:dim(input1)[2]){
-    output[i] = t.test(input1[,i], input2[,i], var.equal = FALSE)$p.value
-  }
-  names(output) = colnames(input1)
-  return(output)
-}
-
-p_value = pvalue(abmax_Ctrl, abmax_RNase)
 
 # Combine Y-Shift, X-Shift and P Value in a Data Frame
-pxy = data.frame(P_Value = p_value, X_Shift = x_shift, Y_Shift = y_shift)
-pxy = pxy[-which(is.na(pxy)),]
+pxy = data.frame(X_Shift = x_shift, Y_Shift = y_shift)
 
 # Elbow Method
 wss = sapply(2:8,function(x){ 
@@ -850,10 +835,6 @@ wss = sapply(2:8,function(x){
 })
 plot(2:8,wss,type='l',xlab="Number of Clusters", ylab="Total within-clusters Sum of Squares")
 
-# Plot K Means with 3 Clusters
-library(cluster)
-library(factoextra)
-fviz_cluster(kmeans(pxy, 3), data = pxy, geom = c("point"), main = "K Means Clustering with 3 Clusters")
 ```
 
 
