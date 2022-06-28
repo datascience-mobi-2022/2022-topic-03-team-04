@@ -853,7 +853,7 @@ plot(2:8,wss,type='l',xlab="Number of Clusters", ylab="Total within-clusters Sum
 # Plotting the Clusters
 library(cluster)
 library(factoextra)
-fviz_cluster(kmeans(pxy, 3, 100), data = pxy, geom = c("point"), main = "K Means Clustering with 3 Clusters")
+fviz_cluster(kmeans(pxy, 3, 100,100), data = pxy, geom = c("point"), main = "K Means Clustering with 3 Clusters")
 ```
 
 
@@ -861,5 +861,14 @@ fviz_cluster(kmeans(pxy, 3, 100), data = pxy, geom = c("point"), main = "K Means
 
 
 ```{r}
-
+# P Value
+pvalue = function(input1, input2){
+output = numeric()
+for (i in 1:dim(input1)[2]){
+output[i] = t.test(input1[,i], input2[,i], var.equal = FALSE)$p.value
+}
+names(output) = colnames(input1)
+return(output)
+}
+p_value = pvalue(abmax_Ctrl, abmax_RNase)
 ```
