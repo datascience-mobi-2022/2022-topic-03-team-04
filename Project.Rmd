@@ -404,14 +404,28 @@ Rep_2_norm_RNase_sums
 Rep_3_norm_RNase_sums = rowSums(Rep_3_norm_RNase)
 Rep_3_norm_RNase_sums
 
-Rep_1_norm_Ctrl_sums = rowSums(Rep_1_norm_RNase)
-Rep_1_norm_RNase_sums
-Rep_2_norm_RNase_sums = rowSums(Rep_2_norm_RNase)
-Rep_2_norm_RNase_sums
-Rep_3_norm_RNase_sums = rowSums(Rep_3_norm_RNase)
-Rep_3_norm_RNase_sums
+Rep_1_norm_Ctrl_sums = rowSums(Rep_1_norm_Ctrl)
+Rep_1_norm_Ctrl_sums
+Rep_2_norm_Ctrl_sums = rowSums(Rep_2_norm_Ctrl)
+Rep_2_norm_Ctrl_sums
+Rep_3_norm_Ctrl_sums = rowSums(Rep_3_norm_Ctrl)
+Rep_3_norm_Ctrl_sums
+
+
 ```
 
+```{r}
+Rep_3_norm_RNase_sums
+Rep_2_norm_RNase_sums
+Rep_1_norm_RNase_sums
+
+Rep_3_norm_Ctrl_sums
+Rep_2_norm_Ctrl_sums
+Rep_1_norm_Ctrl_sums
+
+
+
+```
 
 
 
