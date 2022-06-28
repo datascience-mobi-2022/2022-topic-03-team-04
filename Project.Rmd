@@ -793,8 +793,8 @@ abmax = function(input){
   return(output)
 }
 
-abmax_Ctrl = abmax(maxima_Ctrl_0.5)
-abmax_RNase = abmax(maxima_RNase_0.5)
+abmax_Ctrl = abmax(maxima_Ctrl_0.4)
+abmax_RNase = abmax(maxima_RNase_0.4)
 
 # T-Test comparing each corresponding Protein Rep of Ctrl and RNase with Bonferroni Correction
 ttest = function(input1, input2, alpha){
@@ -809,6 +809,7 @@ ttest = function(input1, input2, alpha){
 }
 
 test = ttest(abmax_Ctrl, abmax_RNase, 0.05/dim(abmax_Ctrl)[2])
+length(which(test == TRUE))
 test
 ```
 
@@ -821,8 +822,8 @@ test
 y_shift = apply(abmax_Ctrl - abmax_RNase, 2, mean)
 
 # X Shift
-rowmax_Ctrl = apply(maxima_Ctrl_0.5, 2, which.max)
-rowmax_RNase = apply(maxima_RNase_0.5, 2, which.max)
+rowmax_Ctrl = apply(maxima_Ctrl_0.4, 2, which.max)
+rowmax_RNase = apply(maxima_RNase_0.4, 2, which.max)
 
 meanrowmax = function(input){
   output = 0
@@ -845,10 +846,14 @@ pxy = data.frame(X_Shift = x_shift, Y_Shift = y_shift)
 
 # Elbow Method
 wss = sapply(2:8,function(x){ 
-  kmeans(pxy, x)$tot.withinss
+  kmeans(pxy, x, 100)$tot.withinss
 })
 plot(2:8,wss,type='l',xlab="Number of Clusters", ylab="Total within-clusters Sum of Squares")
 
+# Plotting the Clusters
+library(cluster)
+library(factoextra)
+fviz_cluster(kmeans(pxy, 3, 100), data = pxy, geom = c("point"), main = "K Means Clustering with 3 Clusters")
 ```
 
 
