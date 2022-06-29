@@ -773,6 +773,7 @@ maxnum_plot_col()
 
 ## 4. T-Test 
 
+T Test shows us if the global maxima of each of the proteins (all repetitions) between Ctrl and RNase group has a significance difference. A significanct difference between the 2 group will be categorized as RNA dependent and it will be our first criteria for RNA dependency.
 
 ```{r}
 # Function to make data frame where absolute maxima of 3 Reps of a protein are inserted in a column
@@ -809,6 +810,7 @@ ttest = function(input1, input2, alpha){
 }
 
 test = ttest(abmax_Ctrl, abmax_RNase, 0.05/dim(abmax_Ctrl)[2])
+test[which(is.na(test[,1])),1] = FALSE
 length(which(test == TRUE))
 test
 ```
@@ -816,10 +818,12 @@ test
 
 ## 5. K-Means Clustering
 
+Through K-Means Clustering and comparing our t test results, we define selection criteria (Y Shift and X Shift) for determining RNA dependent Proteins. Y Shift is the difference of protein amount between the global maxima of Ctrl and RNase Group. X Shift is the difference of locations of global maxima (fraction) between the global maxima of Ctrl and RNase Group. If the X and Y Shift has positive values (left and down Shift), we define the protein as RNA dependent. If the X and Y Shift has negative values or close to zero (right and up Shift), we define the protein as RNA independent. These shifts will be our second criteria for RNA dependency.
 
 ```{r}
 # Y Shift
 y_shift = apply(abmax_Ctrl - abmax_RNase, 2, mean)
+
 
 # X Shift
 rowmax_Ctrl = apply(maxima_Ctrl_0.4, 2, which.max)
@@ -841,8 +845,10 @@ meanrowmax = function(input){
 x_shift = meanrowmax(rowmax_Ctrl) - meanrowmax(rowmax_RNase)
 
 
-# Combine Y-Shift, X-Shift and P Value in a Data Frame
+
+# Combine Y-Shift and X-Shift in a Data Frame
 pxy = data.frame(X_Shift = x_shift, Y_Shift = y_shift)
+
 
 # Elbow Method
 wss = sapply(2:8,function(x){ 
@@ -850,10 +856,143 @@ wss = sapply(2:8,function(x){
 })
 plot(2:8,wss,type='l',xlab="Number of Clusters", ylab="Total within-clusters Sum of Squares")
 
+
 # Plotting the Clusters
 library(cluster)
 library(factoextra)
-fviz_cluster(kmeans(pxy, 3, 100,100), data = pxy, geom = c("point"), main = "K Means Clustering with 3 Clusters")
+km = kmeans(pxy, centers = 3, nstart = 100, iter.max = 100)
+fviz_cluster(km, data = pxy, geom = c("point"), main = "K Means Clustering with 3 Clusters")
+
+
+# Comparing RNA Dependency from both T Test and K Means
+compare = pxy
+compare[,3] = test
+compare$Cluster = km$cluster
+
+match = integer(dim(compare)[1])
+names(match) = row.names(compare)
+if(length(which(compare[,4] == 1)) == 63){
+  for(x in 1:dim(compare)[1]){
+    if(compare[x,3] == TRUE && compare[x,4] == 1){
+      match[x] = TRUE
+    }
+    else if(compare[x,3] == FALSE && compare[x,4] == 2){
+      match[x] = TRUE
+    }
+    else if(compare[x,3] == FALSE && compare[x,4] == 3){
+      match[x] = TRUE
+    }
+    else{
+      match[x] = FALSE
+    }
+  }
+}
+
+if(length(which(compare[,4] == 2)) == 63){
+  for(x in 1:dim(compare)[1]){
+    if(compare[x,3] == FALSE && compare[x,4] == 1){
+      match[x] = TRUE
+    }
+    else if(compare[x,3] == TRUE && compare[x,4] == 2){
+      match[x] = TRUE
+    }
+    else if(compare[x,3] == FALSE && compare[x,4] == 3){
+      match[x] = TRUE
+    }
+    else{
+      match[x] = FALSE
+    }
+  }
+}
+  
+if(length(which(compare[,4] == 3)) == 63){
+  for(x in 1:dim(compare)[1]){
+    if(compare[x,3] == FALSE && compare[x,4] == 1){
+      match[x] = TRUE
+    }
+    else if(compare[x,3] == FALSE && compare[x,4] == 2){
+      match[x] = TRUE
+    }
+    else if(compare[x,3] == TRUE && compare[x,4] == 3){
+      match[x] = TRUE
+    }
+    else{
+      match[x] = FALSE
+    }
+  }
+}
+
+
+# Protein that is RNA dependent according to T Test and K Means Clustering (2 Criteria must be fulfilled ). A value 1 in "match" means that the Results from T-Test and K-Means are the same.
+row_rnadep_2 = c()
+for (i in 1:length(match)){
+  if(match[i] == test[i,1]){
+    row_rnadep_2 = append(row_rnadep_2, i)
+  }
+}
+length(row_rnadep_2)
+
+
+# Protein that is RNA dependent according to T Test and K Means Clustering (only 1 of the 2 Criteria must be satisfied). A value 1 in "match" means that the Results from T-Test and K-Means are the same.
+rnacluster = 0
+if(length(which(compare[,4] == 1)) == 63){
+  rnacluster = 1
+}
+if(length(which(compare[,4] == 2)) == 63){
+  rnacluster = 2
+}
+if(length(which(compare[,4] == 3)) == 63){
+  rnacluster = 3
+}
+
+row_rnadep_1 = unique(sort(c(which(compare[,4] == rnacluster), which(test == TRUE))))
+length(row_rnadep_1)
+
+
+# Function to get which row/column of Proteins INCLUDING REPS
+whichrow = function(input){
+  output = c()
+  for (i in 1:length(input)){
+    output = append(output, (input[i]*3)-2)
+    output = append(output, (input[i]*3)-1)
+    output = append(output, input[i]*3)
+  }
+  return(output)
+}
+
+
+# Data Frames for each RNA dependent and independent proteins (Both Conditions Fulfilled)
+Ctrl_Dependent_2 = tCtrl_combi_df[,whichrow(row_rnadep_2)]
+Ctrl_Independent_2 = tCtrl_combi_df[,-whichrow(row_rnadep_2)]
+RNase_Dependent_2 = tRNase_combi_df[,whichrow(row_rnadep_2)]
+RNase_Independent_2 = tRNase_combi_df[,-whichrow(row_rnadep_2)]
+
+Ctrl_Dependent_Abmax_2 = abmax_Ctrl[,row_rnadep_2]
+Ctrl_Independent_Abmax_2 = abmax_Ctrl[,-row_rnadep_2]
+RNase_Dependent_Abmax_2 = abmax_RNase[,row_rnadep_2]
+RNase_Independent_Abmax_2 = abmax_RNase[,-row_rnadep_2]
+
+Ctrl_Dependent_Allmax_2 = maxima_Ctrl_0.4[,whichrow(row_rnadep_2)]
+Ctrl_Independent_Allmax_2 = maxima_Ctrl_0.4[,-whichrow(row_rnadep_2)]
+RNase_Dependent_Allmax_2 = maxima_RNase_0.4[,whichrow(row_rnadep_2)]
+RNase_Independent_Allmax_2 = maxima_RNase_0.4[,-whichrow(row_rnadep_2)]
+
+
+# Data Frames for each RNA dependent and independent proteins (Either Conditions Fulfilled)
+Ctrl_Dependent_1 = tCtrl_combi_df[,whichrow(row_rnadep_1)]
+Ctrl_Independent_1 = tCtrl_combi_df[,-whichrow(row_rnadep_1)]
+RNase_Dependent_1 = tRNase_combi_df[,whichrow(row_rnadep_1)]
+RNase_Independent_1 = tRNase_combi_df[,-whichrow(row_rnadep_1)]
+
+Ctrl_Dependent_Abmax_1 = abmax_Ctrl[,row_rnadep_1]
+Ctrl_Independent_Abmax_1 = abmax_Ctrl[,-row_rnadep_1]
+RNase_Dependent_Abmax_1 = abmax_RNase[,row_rnadep_1]
+RNase_Independent_Abmax_1 = abmax_RNase[,-row_rnadep_1]
+
+Ctrl_Dependent_Allmax_1 = maxima_Ctrl_0.4[,whichrow(row_rnadep_1)]
+Ctrl_Independent_Allmax_1 = maxima_Ctrl_0.4[,-whichrow(row_rnadep_1)]
+RNase_Dependent_Allmax_1 = maxima_RNase_0.4[,whichrow(row_rnadep_1)]
+RNase_Independent_Allmax_1 = maxima_RNase_0.4[,-whichrow(row_rnadep_1)]
 ```
 
 
