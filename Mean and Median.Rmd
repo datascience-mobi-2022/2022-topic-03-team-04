@@ -1,0 +1,96 @@
+---
+title: "Mean and Median"
+author: "Greta"
+date: '2022-06-12'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Median (by Greta)
+```{r}
+median_func<- function(input){
+#creating the new df  
+new_df_median<- as.data.frame(matrix(nrow = 3680, ncol = dim(input)[2])) 
+rownames(new_df_median) <- rownames(Data.copy)
+colnames(new_df_median) <- colnames(RNase_Data_norm)
+
+r<- 1   #r are the rows
+while(r <= dim(input)[1]) {  
+  for (c in 1:dim(input)[2]) {   
+    rep1 <- input[r,c]   
+     rep2 <- input[r+1,c] 
+     rep3 <- input[r+2,c]
+     
+        median <- median(c(rep1,rep2,rep3))
+        
+        new_df_median[(r/3),(c)] <- median
+  }
+        
+        r = r + 3
+  }
+        
+        return(new_df_median)
+}
+
+     
+RNase_median_df = median_func(RNase_Data_norm)    
+    RNase_median_df
+    
+Ctrl_median_df = median_func(Ctrl_Data_norm)    
+    Ctrl_median_df
+```
+
+Mean (by Greta)
+```{r}
+mean_func<- function(input){
+#creating the new df  
+new_df_mean<- as.data.frame(matrix(nrow = 3680, ncol = dim(input)[2])) 
+rownames(new_df_mean) <- rownames(Data.copy)
+colnames(new_df_mean) <- colnames(RNase_Data_norm)
+
+r<- 1   #r are the rows
+while(r <= dim(input)[1]) {  
+  for (c in 1:dim(input)[2]) {   
+    rep1 <- input[r,c]   
+     rep2 <- input[r+1,c] 
+     rep3 <- input[r+2,c]
+     
+        mean <- mean(c(rep1,rep2,rep3))
+        
+        new_df_mean[(r/3),(c)] <- mean
+  }
+        
+        r = r + 3
+  }
+        
+        return(new_df_mean)
+}
+
+     
+RNase_mean_df = mean_func(RNase_Data_norm)    
+    RNase_mean_df
+    
+Ctrl_mean_df = mean_func(Ctrl_Data_norm)    
+    Ctrl_mean_df
+```
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
