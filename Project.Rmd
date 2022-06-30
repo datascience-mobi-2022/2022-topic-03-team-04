@@ -1038,6 +1038,17 @@ RNase_Independent_Allmax_1 = maxima_RNase_0.4[,-whichrow(row_rnadep_1)]
 ```
 
 
+
+```{r}
+
+
+Data.RBPResearch <- read.table("~/Desktop/2022-topic-03-team-04/table_RBP_lists.csv")
+
+```
+
+
+
+
 ## 6. Linear Regression
 
 
