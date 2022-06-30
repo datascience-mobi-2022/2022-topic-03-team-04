@@ -32,7 +32,7 @@ library(plyr)
 #Richard's folder location for convenience sake :D (C:/Users/Archid Knighton/Documents/GitHub/2022-topic-03-team-04/RDeeP_A549_NS.csv)
 #loading "RDeeP_A549_NS.csv" into Data.raw data frame
 
-Data.raw <- read.table("C:/Users/Archid Knighton/Documents/GitHub/2022-topic-03-team-04/RDeeP_A549_NS.csv", header=TRUE, row.names=1, sep = ";")
+Data.raw <- read.table("~/Desktop/2022-topic-03-team-04/RDeeP_A549_NS.csv", header=TRUE, row.names=1, sep = ";")
 
 #creating a copy of Data.raw and saving it as Data.copy
 Data.copy = Data.raw
@@ -400,18 +400,13 @@ Norm_RNase
 #Daten zum Ploten New Normalization
 
 Rep_1_norm_RNase_sums = rowSums(Rep_1_norm_RNase)
-Rep_1_norm_RNase_sums
 Rep_2_norm_RNase_sums = rowSums(Rep_2_norm_RNase)
-Rep_2_norm_RNase_sums
 Rep_3_norm_RNase_sums = rowSums(Rep_3_norm_RNase)
-Rep_3_norm_RNase_sums
+
 
 Rep_1_norm_Ctrl_sums = rowSums(Rep_1_norm_Ctrl)
-Rep_1_norm_Ctrl_sums
 Rep_2_norm_Ctrl_sums = rowSums(Rep_2_norm_Ctrl)
-Rep_2_norm_Ctrl_sums
 Rep_3_norm_Ctrl_sums = rowSums(Rep_3_norm_Ctrl)
-Rep_3_norm_Ctrl_sums
 
 
 #by Madleen
@@ -428,67 +423,7 @@ ggplot(plotdata_norm_new, aes(Replicates, Total_Protein_amount_norm_new )) +
   labs( title = "After Normalization 1 new", y = "Total protein amout", x = "Replicates")
 ```
 
-```{r}
-Rep_3_norm_RNase_sums
-Rep_2_norm_RNase_sums
-Rep_1_norm_RNase_sums
 
-Rep_3_norm_Ctrl_sums
-Rep_2_norm_Ctrl_sums
-Rep_1_norm_Ctrl_sums
-
-
-
-```
-
-
-
-```{r}
-Fractions = c(1:25)
-
-MICA_HUMAN_Protein_Ctrl_Norm_1 = ggplot() + 
-  geom_line(data = select(Rep_1_norm_Ctrl, contains("MICA_HUMAN_Rep_1")),  aes(x = Fractions, y = MICA_HUMAN_Rep_1, color= 'Ctrl_Rep1')) + 
-  
-  geom_line(data = select(Rep_2_norm_Ctrl, contains("MICA_HUMAN_Rep_2")),  aes(x = Fractions, y = MICA_HUMAN_Rep_2 , color= 'Ctrl_Rep2')) + 
-  
-  geom_line(data = select(Rep_3_norm_Ctrl, contains("MICA_HUMAN_Rep_3")),  aes(x = Fractions, y = MICA_HUMAN_Rep_3 , color= 'Ctrl_Rep3')) +
-  
-  scale_colour_manual(name="legend",values=c(Ctrl_Rep1="blue2",Ctrl_Rep2="purple4", Ctrl_Rep3="magenta1")) +
-  
-  labs(title="MICA_HUMAN_Ctrl_Norm_1", y= "Protein Amount") 
- MICA_HUMAN_Protein_Ctrl_Norm_1 + scale_x_continuous(breaks = seq(1, 25, by = 1))
- 
-#By Madleen    
-MICA_HUMAN_Protein_RNase_Norm_1 = ggplot() + 
-  geom_line(data = select(Rep_1_norm_RNase, contains("MICA_HUMAN_Rep_1")), lwd=0.2,  aes(x = Fractions, y = MICA_HUMAN_Rep_1, color= 'Ctrl_Rep1')) +
-  theme(panel.background = element_rect(fill='white', colour='black'))+
-  theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(size = 0.5, linetype = "solid", colour = "black"))+
-
-  geom_line(data = select(Rep_2_norm_RNase, contains("MICA_HUMAN_Rep_2")), lwd=0.2,  aes(x = Fractions, y = MICA_HUMAN_Rep_2 , color= 'Ctrl_Rep2')) + 
-  
-  geom_line(data = select(Rep_3_norm_RNase, contains("MICA_HUMAN_Rep_3")), lwd=0.2,   aes(x = Fractions, y = MICA_HUMAN_Rep_3 , color= 'Ctrl_Rep3')) +
-  
-  scale_colour_manual(name="legend",values=c(Ctrl_Rep1="blue2",Ctrl_Rep2="purple4", Ctrl_Rep3="magenta1")) +
-  
-  labs(title="MICA_HUMAN_RNase_Norm_1", y= "Protein Amount") 
- MICA_HUMAN_Protein_RNase_Norm_1 + scale_x_continuous(breaks = seq(1, 25, by = 1))
-```
-
-
-
-```{r Fraction-wise total protein amounts Ctrl, echo=FALSE, fig.width=10, fig.height=7}
-
-#by Madleen --> muss an die neue Normalisierung angwpasst werden!!!
-
-barplot(rowSums(Rep_1_Ctrl_Norm), names.arg = c(1:25), col= "maroon1",space=0.5 ,main= "After Normalization 1 - Rep_1_Ctrl", xlab = "Fractions" , ylab = "Protein Amount",axisnames=T	, las=1)
-barplot(rowSums(Rep_2_Ctrl_Norm), names.arg = c(1:25), col= "orchid3",space=0.5 ,main= "After Normalization 1 - Rep_2_Ctrl", xlab = "Fractions" , ylab = "Protein Amount",axisnames=T	, las=1)
-barplot(rowSums(Rep_3_Ctrl_Norm),names.arg = c(1:25), col= "skyblue",space=0.5 ,main= "After Normalization 1 - Rep_3_Ctrl", xlab = "Fractions" , ylab = "Protein Amount",axisnames=T	, las=1) 
-
-
-barplot(rowSums(Rep_1_RNase_Norm),names.arg = c(1:25), col= "lightgreen",space=0.5 ,main= "After Normalization 1 - Rep_1_RNase_Norm", xlab = "Fractions" , ylab = "Protein Amount",axisnames=T	, las=1)
-barplot(rowSums(Rep_2_RNase_Norm),names.arg = c(1:25), col= "purple",space=0.5 ,main= "After Normalization 1 - Rep_2_RNase_Norm", xlab = "Fractions" , ylab = "Protein Amount",axisnames=T	, las=1)
-barplot(rowSums(Rep_3_RNase_Norm),names.arg = c(1:25), col= "salmon",space=0.5 ,main= "After Normalization 1 - Rep_3_RNase_Norm", xlab = "Fractions" , ylab = "Protein Amount",axisnames=T	, las=1)
-```
 
 
 ## 2.2 Second Normalization (by Greta)
@@ -851,6 +786,9 @@ test
 
 Through K-Means Clustering and comparing our t test results, we define selection criteria (Y Shift and X Shift) for determining RNA dependent Proteins. Y Shift is the difference of protein amount between the global maxima of Ctrl and RNase Group. X Shift is the difference of locations of global maxima (fraction) between the global maxima of Ctrl and RNase Group. If the X and Y Shift has positive values (left and down Shift), we define the protein as RNA dependent. If the X and Y Shift has negative values or close to zero (right and up Shift), we define the protein as RNA independent. These shifts will be our second criteria for RNA dependency.
 
+
+
+
 ```{r}
 # Y Shift
 y_shift = apply(abmax_Ctrl - abmax_RNase, 2, mean)
@@ -1040,12 +978,58 @@ RNase_Independent_Allmax_1 = maxima_RNase_0.4[,-whichrow(row_rnadep_1)]
 
 
 ```{r}
+Data.RBPResearch <- read.table("~/Desktop/2022-topic-03-team-04/table_RBP_lists.csv", header = TRUE, sep = ",", fill = TRUE)
 
 
-Data.RBPResearch <- read.table("~/Desktop/2022-topic-03-team-04/table_RBP_lists.csv")
+Data.RBPResearch
+```
+Wichtig Kriteria 3!!!!!!!!!!
+
+Ctrl and RNase should have lower correlation for RDeep than non-RDeep
+
+
+
+
+
+```{r}
+cor(Ctrl_Dependent_2$ACLY_HUMAN_Rep_, RNase_Dependent_2$ACLY_HUMAN_Rep_1)  # RDeeP
+
+linear_model <- lm(y-shift ~ correlation, data =   )
+
+
+cor(RNase_Dependent_Allmax_2, Ctrl_Dependent_Allmax_2)
+
+cor(RNase_Independent_Allmax_2, Ctrl_Independent_Allmax_2)
+
+
+
+
 
 ```
 
+
+
+```{r}
+# normal distribution of residuals?
+hist(linear_model$residuals, breaks = 20)
+qqnorm(linear_model$residuals)
+qqline(linear_model$residuals)
+## correlation residuals x-values?
+cor(df_lm$correlation, linear_model$residuals)
+plot(df_lm$correlation, linear_model$residuals, pch = 20)
+```
+
+```{r}
+plot(
+  df_lm$shift,
+  linear_model$fitted.values,
+  pch = 20,
+  col = 'blue',
+  xlab = 'Real values',
+  ylab = 'Predicted values'
+)
+```
+```
 
 
 
@@ -1064,7 +1048,9 @@ return(output)
 }
 p_value = pvalue(abmax_Ctrl, abmax_RNase)
 
+cor(RNase_Dependent_Allmax_2, Ctrl_Dependent_Allmax_2)
 
+cor(RNase_Independent_Allmax_2, Ctrl_Independent_Allmax_2)
 ```
 
 
