@@ -32,7 +32,7 @@ library(plyr)
 #Richard's folder location for convenience sake :D (C:/Users/Archid Knighton/Documents/GitHub/2022-topic-03-team-04/RDeeP_A549_NS.csv)
 #loading "RDeeP_A549_NS.csv" into Data.raw data frame
 
-Data.raw <- read.table("~/Desktop/2022-topic-03-team-04/RDeeP_A549_NS.csv", header=TRUE, row.names=1, sep = ";")
+Data.raw <- read.table("C:/Users/Archid Knighton/Documents/GitHub/2022-topic-03-team-04/RDeeP_A549_NS.csv", header=TRUE, row.names=1, sep = ";")
 
 #creating a copy of Data.raw and saving it as Data.copy
 Data.copy = Data.raw
@@ -839,6 +839,9 @@ fviz_cluster(km, data = pxy, geom = c("point"), main = "K Means Clustering with 
 ```
 
 
+## Comparing RNA Dependency from both T Test and K Means
+
+"Match" shows 1 (True) and 0 (False). True means that the results from T-Test in terms of RNA (in)dependency is the same as K-Means and the other way around for False.
 
 ```{r}
 # Comparing RNA Dependency from both T Test and K Means
@@ -901,6 +904,8 @@ if(length(which(compare[,4] == 3)) == 63){
 ```
 
 
+## We have defined 2 Criteria for RNA dependency. The first is the result from T Test where a significant difference of Absolute Maxima means RNA dependent. The second one is the result from K Means Clustering where Proteins that are grouped in a cluster which the majority has positive Y-Shift as RNA depedent. Below we consider 2 cases. First when both criteria are fulfilled and the other one when either criteria is satisfied.
+
 
 ```{r}
 # Protein that is RNA dependent according to T Test and K Means Clustering (2 Criteria must be fulfilled ). A value 1 in "match" means that the Results from T-Test and K-Means are the same.
@@ -939,8 +944,11 @@ whichrow = function(input){
   }
   return(output)
 }
+```
 
 
+
+```{r}
 # Data Frames for each RNA dependent and independent proteins (Both Conditions Fulfilled)
 Ctrl_Dependent_2 = tCtrl_combi_df[,whichrow(row_rnadep_2)]
 Ctrl_Independent_2 = tCtrl_combi_df[,-whichrow(row_rnadep_2)]
@@ -976,13 +984,24 @@ RNase_Independent_Allmax_1 = maxima_RNase_0.4[,-whichrow(row_rnadep_1)]
 ```
 
 
+## Comparing with Data Bank 
 
 ```{r}
-Data.RBPResearch <- read.table("~/Desktop/2022-topic-03-team-04/table_RBP_lists.csv", header = TRUE, sep = ",", fill = TRUE)
+# Edited Version is Data.bank
+Data.RBPResearch <- read.csv("C:/Users/Archid Knighton/Documents/GitHub/2022-topic-03-team-04/table_RBP_lists.csv", header=T, quote="")
 
+temp = Data.RBPResearch[-c(1:5),1]
+Data.bank = data.frame(V1=integer(24))
+rownames(Data.bank) = temp[1:24]
 
-Data.RBPResearch
+i=1
+while (i<length(temp)){
+  Data.bank[,(i/24)] = temp[(i):(i+23)]
+  i = i+24
+}
 ```
+
+
 Wichtig Kriteria 3!!!!!!!!!!
 
 Ctrl and RNase should have lower correlation for RDeep than non-RDeep
