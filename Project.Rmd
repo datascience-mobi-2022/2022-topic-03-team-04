@@ -1010,4 +1010,15 @@ names(output) = colnames(input1)
 return(output)
 }
 p_value = pvalue(abmax_Ctrl, abmax_RNase)
+
+
+
+
+Ideas for Linear Regression 
+
+--> Predict the RDeep with only one selection criteria and compare the results with the results we get when we apply both selection criterias
+
+--> Perform multiple linear regression with both criterias and predict if data (additional data) belongs to RDeep or not and compare with actual results (additional data known to be RDeep or not)
+
+
 ```
