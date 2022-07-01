@@ -988,9 +988,9 @@ RNase_Independent_Allmax_1 = maxima_RNase_0.4[,-whichrow(row_rnadep_1)]
 
 ```{r}
 # Edited Version is Data.bank
-Data.RBPResearch <- read.csv("C:/Users/Archid Knighton/Documents/GitHub/2022-topic-03-team-04/table_RBP_lists.csv", header=T, quote="")
+Data.RBPResearch <- read.table("C:/Users/Archid Knighton/Documents/GitHub/2022-topic-03-team-04/table_RBP_lists.csv", header=F, sep = ",")
 
-temp = Data.RBPResearch[-c(1:5),1]
+temp = Data.RBPResearch[-c(1:6),1]
 Data.bank = data.frame(V1=integer(24))
 rownames(Data.bank) = temp[1:24]
 
