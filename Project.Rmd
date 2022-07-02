@@ -990,13 +990,14 @@ RNase_Independent_Allmax_1 = maxima_RNase_0.4[,-whichrow(row_rnadep_1)]
 # Edited Version is Data.bank
 Data.RBPResearch <- read.table("C:/Users/Archid Knighton/Documents/GitHub/2022-topic-03-team-04/table_RBP_lists.csv", header=F, sep = ",")
 
-temp = Data.RBPResearch[-c(1:6),1]
-Data.bank = data.frame(V1=integer(24))
-rownames(Data.bank) = temp[1:24]
+databank = data.frame(matrix(nrow=5004, ncol=2))
 
-i=1
-while (i<length(temp)){
-  Data.bank[,(i/24)] = temp[(i):(i+23)]
+i=31
+j=1
+while (i<dim(Data.RBPResearch)[1]){
+  databank[((i-(24*j))/7*j),1] = Data.RBPResearch[i,1]
+  databank[((i-(24*j))/7*j),2] = Data.RBPResearch[i+3,1]
+  j= j +1
   i = i+24
 }
 ```
