@@ -1000,6 +1000,9 @@ while (i<dim(Data.RBPResearch)[1]){
   j= j +1
   i = i+24
 }
+temp_name = databank[,1]
+databank = as.integer(databank[,2])
+names(databank) = temp_name
 ```
 
 
