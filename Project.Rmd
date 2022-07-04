@@ -851,6 +851,8 @@ compare$Cluster = km$cluster
 
 match = integer(dim(compare)[1])
 names(match) = row.names(compare)
+
+# 3 If's are made because the RNA dependent cluster's number is different every time the kmeans function runs. The number of Proteins that is categorized in the RNA dependent cluster are still the same (63).
 if(length(which(compare[,4] == 1)) == 63){
   for(x in 1:dim(compare)[1]){
     if(compare[x,3] == TRUE && compare[x,4] == 1){
@@ -904,7 +906,7 @@ if(length(which(compare[,4] == 3)) == 63){
 ```
 
 
-## We have defined 2 Criteria for RNA dependency. The first is the result from T Test where a significant difference of Absolute Maxima means RNA dependent. The second one is the result from K Means Clustering where Proteins that are grouped in a cluster which the majority has positive Y-Shift as RNA depedent. Below we consider 2 cases. First when both criteria are fulfilled and the other one when either criteria is satisfied.
+We have defined 2 Criteria for RNA dependency. The first is the result from T Test where a significant difference of Absolute Maxima means RNA dependent. The second one is the result from K Means Clustering where Proteins that are grouped in a cluster which the majority has positive Y-Shift as RNA depedent. Below we consider 2 cases. First when both criteria are fulfilled and the other one when either criteria is satisfied.
 
 
 ```{r}
@@ -984,10 +986,11 @@ RNase_Independent_Allmax_1 = maxima_RNase_0.4[,-whichrow(row_rnadep_1)]
 ```
 
 
-## Comparing with Data Bank 
+## Comparing with Data Bank
+
 
 ```{r}
-# Edited Version is Data.bank
+# Protein names and number of times listed as RBP from data bank is taken and put into new data frame
 Data.RBPResearch <- read.table("C:/Users/Archid Knighton/Documents/GitHub/2022-topic-03-team-04/table_RBP_lists.csv", header=F, sep = ",")
 
 databank = data.frame(matrix(nrow=5004, ncol=2))
@@ -1003,60 +1006,31 @@ while (i<dim(Data.RBPResearch)[1]){
 temp_name = databank[,1]
 databank = as.integer(databank[,2])
 names(databank) = temp_name
+
+# Take only proteins that are at least one time identified as RBP from databank
+databank_value = databank[-which(databank == 0)]
+
+
+# Check how many RNA dependent proteins (2 conditions fulfilled) that are identified through our code and from data bank
+temporary_2 = colnames(Ctrl_Dependent_Abmax_2)
+temporary_2 = append(temporary_2, numeric(length(databank_value - length(temporary_2))))
+
+RDeep_2 = intersect(names(databank_value), temporary_2)
+length(RDeep_2)
+
+
+# Check how many RNA dependent proteins (either condition fulfilled) that are identified through our code and from data bank
+temporary_1 = colnames(Ctrl_Dependent_Abmax_1)
+temporary_1 = append(temporary_1, numeric(length(databank_value - length(temporary_1))))
+
+RDeep_1 = intersect(names(databank_value), temporary_1)
+length(RDeep_1)
 ```
-
-
-Wichtig Kriteria 3!!!!!!!!!!
-
-Ctrl and RNase should have lower correlation for RDeep than non-RDeep
-
-
-
-
-
-```{r}
-cor(Ctrl_Dependent_2$ACLY_HUMAN_Rep_, RNase_Dependent_2$ACLY_HUMAN_Rep_1)  # RDeeP
-
-linear_model <- lm(y-shift ~ correlation, data =   )
-
-
-cor(RNase_Dependent_Allmax_2, Ctrl_Dependent_Allmax_2)
-
-cor(RNase_Independent_Allmax_2, Ctrl_Independent_Allmax_2)
-
-
-
-
-
-```
-
-
-
-```{r}
-# normal distribution of residuals?
-hist(linear_model$residuals, breaks = 20)
-qqnorm(linear_model$residuals)
-qqline(linear_model$residuals)
-## correlation residuals x-values?
-cor(df_lm$correlation, linear_model$residuals)
-plot(df_lm$correlation, linear_model$residuals, pch = 20)
-```
-
-```{r}
-plot(
-  df_lm$shift,
-  linear_model$fitted.values,
-  pch = 20,
-  col = 'blue',
-  xlab = 'Real values',
-  ylab = 'Predicted values'
-)
-```
-```
-
 
 
 ## 6. Linear Regression
+
+Ctrl and RNase should have lower correlation for RNA dependent than RNA indepedent.
 
 
 ```{r}
@@ -1071,9 +1045,73 @@ return(output)
 }
 p_value = pvalue(abmax_Ctrl, abmax_RNase)
 
-cor(RNase_Dependent_Allmax_2, Ctrl_Dependent_Allmax_2)
 
-cor(RNase_Independent_Allmax_2, Ctrl_Independent_Allmax_2)
+# Function to get the mean of 3 Reps
+mean_rep = function(input){
+  output = data.frame(matrix(nrow=25, ncol=3680))
+  colnames(output) = colnames(abmax_Ctrl)
+  j = 0
+  i = 1
+  temp = 0
+  while (i<=dim(input)[2]){
+    temp = (input[,i] + input[,i+1] + input[,i+2])/3
+    output[,i-j] = temp
+    i = i+3
+    j = j+2
+    
+  }
+  return(output)
+}
+
+Ctrl_mean = mean_rep(tRNase_combi_df)
+RNase_mean = mean_rep(tCtrl_combi_df)
+
+
+# Remove proteins that have constant value from Ctrl- and RNase_mean
+const_row = which(sapply(1:dim(Ctrl_mean)[2], function(x){length(unique(Ctrl_mean[,x])) == 1})) # Only use from Ctrl because RNase have 1 constant protein and also the same in Ctrl
+
+Ctrl_mean = Ctrl_mean[,-const_row]
+RNase_mean = RNase_mean[,-const_row]
+
+
+# Correlation between Ctrl and RNase Group
+cor = c()
+for (i in 1:dim(Ctrl_mean)[2]){
+  cor[i] = cor(Ctrl_mean[,i], RNase_mean[,i]) 
+}
+names(cor) = colnames(Ctrl_mean)
+
+
+# Remove proteins that have constant value from Y-Shift
+y_shift_no_const = y_shift[-const_row]
+
+
+# Linear Regression between correlation (X Axis) and Y-Shift (Y Axis)
+df_lm = data.frame(Y_Shift = y_shift_no_const, Correlation = cor)
+lm = lm(Y_Shift ~ Correlation, data = df_lm)
+summary(lm)
+
+
+# Plot Linear Regression (The error is the result of logarithmic transformation of negative values and can be ignored. Logarithmic transformation of the values are chosen to better present the results graphically)
+ggplot(data = df_lm, aes(x = Correlation, y = Y_Shift)) +
+  geom_point(color="blue") +
+  geom_smooth(method="lm", color="red") +
+  scale_x_continuous(trans = "log10") +
+  scale_y_continuous(trans = "log10")
+
+
+# Plot Residuals
+hist(lm$residuals, breaks = 20)
+qqnorm(lm$residuals)
+qqline(lm$residuals)
+
+
+# Linear Regression first Prerequisite (Correlation between residuals and x values is 0)
+cor(df_lm$Correlation, lm$residuals)
+
+
+# Linear Regression second Prerequisite (Correlation between expected y and x values is 1)
+cor(df_lm$Correlation*lm$coefficients[2] + lm$coefficients[1], df_lm$Correlation)
 ```
 
 
