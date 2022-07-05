@@ -32,7 +32,7 @@ library(plyr)
 #Richard's folder location for convenience sake :D (C:/Users/Archid Knighton/Documents/GitHub/2022-topic-03-team-04/RDeeP_A549_NS.csv)
 #loading "RDeeP_A549_NS.csv" into Data.raw data frame
 
-Data.raw <- read.table("~/Desktop/2022-topic-03-team-04/RDeeP_A549_NS.csv", header=TRUE, row.names=1, sep = ";")
+Data.raw <- read.table("C:/Users/Archid Knighton/Documents/GitHub/2022-topic-03-team-04/RDeeP_A549_NS.csv", header=TRUE, row.names=1, sep = ";")
 #creating a copy of Data.raw and saving it as Data.copy
 Data.copy = Data.raw
 ```
@@ -736,6 +736,49 @@ maxnum_plot_col()
 ```
 
 
+```{r}
+# Function to get list with only local maxima (the local maxima of all 3 reps are combined in Rep1. Rep2 and Rep3 are useless)
+localmax = function(input){
+  temp = list()
+  for (i in 1:dim(input)[2]){
+    v = input[,i]
+    v = v[v < max(v)]
+    temp[[i]] = v[which(v!=0)]
+  }
+  newtemp = list()
+  j = 1
+  while(j<length(temp)){
+    newtemp[[j]] = c(temp[[j]],temp[[j+1]],temp[[j+2]])
+    if(length(newtemp[[j]]) == 0){
+      newtemp[[j]] = NA
+    }
+    j=j+3
+  }
+  # 2 dummy zeros for the last 2 elements of the list so numbers of elements are still 11040 and can use colnames from other variable without problem
+  newtemp[[length(input)-1]] = 0
+  newtemp[[length(input)]] = 0
+  names(newtemp) = colnames(input)
+  return(newtemp)
+}
+
+
+# List of local maxima of all threshold 
+for (i in seq(0.1,0.9,0.1)){
+  temp1 = paste("local_maxima_Ctrl",i,sep="_")
+  temp2 = paste("maxima_Ctrl",i,sep="_")
+  temp3 = localmax(get(temp2))
+  assign(temp1, temp3)
+} # Result: local_maxima_Ctrl_i
+
+for (i in seq(0.1,0.9,0.1)){
+  temp1 = paste("local_maxima_RNase",i,sep="_")
+  temp2 = paste("maxima_RNase",i,sep="_")
+  temp3 = localmax(get(temp2))
+  assign(temp1, temp3)
+  } # Result: local_maxima_RNase_i
+```
+
+
 ## 4. T-Test 
 
 T Test shows us if the global maxima of each of the proteins (all repetitions) between Ctrl and RNase group has a significance difference. A significanct difference between the 2 group will be categorized as RNA dependent and it will be our first criteria for RNA dependency.
@@ -778,6 +821,59 @@ test = ttest(abmax_Ctrl, abmax_RNase, 0.05/dim(abmax_Ctrl)[2])
 test[which(is.na(test[,1])),1] = FALSE
 length(which(test == TRUE))
 test
+```
+
+
+
+```{r}
+# T-Test function for local maxima
+localtest = function(input1, input2){
+  i = 1
+  j = 0
+  p = c()
+  output = c()
+  while(i < length(input1)){
+  # if NA or only one local maxima exists, it is impossible to do T-Test because there is no standard deviation
+    if(all(is.na(input1[[i]])) || all(is.na(input2[[i]])) || length(input1[[i]])<2 || length(input2[[i]])<2){
+      p[i-j] = NA
+      i = i+3
+      j = j+2
+      }
+    else{
+    p[i-j] = t.test(input1[[i]], input2[[i]], var.equal = F)$p.value
+    i = i+3
+    j = j+2
+    }
+  }
+  # Bonferonni Correction
+  output = p < 0.05/(length(p)-length(which(is.na(p))))
+  # Dummy NA for last proteins with no result from t-test. R somehow remove all last NA. 
+  if(length(output) != length(colnames(abmax_Ctrl))){
+    output = append(output, rep(NA, length(colnames(abmax_Ctrl)) - length(output)))
+  }
+  names(output) = colnames(abmax_Ctrl)
+  output = as.data.frame(output)
+  return(output)
+}
+
+
+# T Test results from different threshold
+for (i in seq(0.1, 0.9, 0.1)){
+  temp1 = paste("local_maxima_Ctrl",i,sep="_")
+  temp2 = paste("local_maxima_RNase",i,sep="_")
+  temp3 = paste("test",i,sep="_")
+  assign(temp3, localtest(get(temp1), get(temp2)))
+} # Result: test_i
+
+
+# Check which threshold identifies the most RNA dependent proteins
+true_num = c()
+for (i in seq(0.1, 0.9, 0.1)){
+  temp = get(paste("test",i,sep="_"))
+  true_num[i*10] = length(which(temp[,1] != 0))
+}
+names(true_num) = c(seq(0.1, 0.9, 0.1))
+which.max(true_num)
 ```
 
 
@@ -992,7 +1088,7 @@ RNase_Independent_Allmax_1 = maxima_RNase_0.4[,-whichrow(row_rnadep_1)]
 # Protein names and number of times listed as RBP from data bank is taken and put into new data frame
 
 
-Data.RBPResearch <- read.table("~/Desktop/2022-topic-03-team-04/table_RBP_lists.csv", header=F, sep = ",")
+Data.RBPResearch <- read.table("C:/Users/Archid Knighton/Documents/GitHub/2022-topic-03-team-04/table_RBP_lists.csv", header=F, sep = ",")
 
 databank = data.frame(matrix(nrow=5004, ncol=2))
 
