@@ -1154,24 +1154,23 @@ Too many RNA dependent proteins were not identified, so we have to try to find m
 --> local maxima detection and applying our criteria on detected values
 
 
+Further Databank 
+```{r}
+load("~/Desktop/HS_RBPs.RData")
+
+load("~/Desktop/HS_non_RBPs.RData")
+
+
+```
+
+
+
 ## 6. Linear Regression
 
 Ctrl and RNase should have lower correlation for RNA dependent than RNA indepedent.
 
 
 ```{r}
-# P Value
-pvalue = function(input1, input2){
-output = numeric()
-for (i in 1:dim(input1)[2]){
-output[i] = t.test(input1[,i], input2[,i], var.equal = FALSE)$p.value
-}
-names(output) = colnames(input1)
-return(output)
-}
-p_value = pvalue(abmax_Ctrl, abmax_RNase)
-
-
 # Function to get the mean of 3 Reps
 mean_rep = function(input){
   output = data.frame(matrix(nrow=25, ncol=3680))
@@ -1240,9 +1239,3 @@ cor(df_lm$Correlation, lm$residuals)
 cor(df_lm$Correlation*lm$coefficients[2] + lm$coefficients[1], df_lm$Correlation)
 ```
 
-
-Ideas for Linear Regression 
-
---> Predict the RDeep with only one selection criteria and compare the results with the results we get when we apply both selection criterias
-
---> Perform multiple linear regression with both criterias and predict if data (additional data) belongs to RDeep or not and compare with actual results (additional data known to be RDeep or not)
