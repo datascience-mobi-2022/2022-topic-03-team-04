@@ -32,7 +32,7 @@ library(plyr)
 #Richard's folder location for convenience sake :D (C:/Users/Archid Knighton/Documents/GitHub/2022-topic-03-team-04/RDeeP_A549_NS.csv)
 #loading "RDeeP_A549_NS.csv" into Data.raw data frame
 
-Data.raw <- read.table("C:/Users/Archid Knighton/Documents/GitHub/2022-topic-03-team-04/RDeeP_A549_NS.csv", header=TRUE, row.names=1, sep = ";")
+Data.raw <- read.table("~/Desktop/2022-topic-03-team-04/RDeeP_A549_NS.csv", header=TRUE, row.names=1, sep = ";")
 #creating a copy of Data.raw and saving it as Data.copy
 Data.copy = Data.raw
 ```
@@ -825,56 +825,7 @@ test
 
 
 
-```{r}
-# T-Test function for local maxima
-localtest = function(input1, input2){
-  i = 1
-  j = 0
-  p = c()
-  output = c()
-  while(i < length(input1)){
-  # if NA or only one local maxima exists, it is impossible to do T-Test because there is no standard deviation
-    if(all(is.na(input1[[i]])) || all(is.na(input2[[i]])) || length(input1[[i]])<2 || length(input2[[i]])<2){
-      p[i-j] = NA
-      i = i+3
-      j = j+2
-      }
-    else{
-    p[i-j] = t.test(input1[[i]], input2[[i]], var.equal = F)$p.value
-    i = i+3
-    j = j+2
-    }
-  }
-  # Bonferonni Correction
-  output = p < 0.05/(length(p)-length(which(is.na(p))))
-  # Dummy NA for last proteins with no result from t-test. R somehow remove all last NA. 
-  if(length(output) != length(colnames(abmax_Ctrl))){
-    output = append(output, rep(NA, length(colnames(abmax_Ctrl)) - length(output)))
-  }
-  names(output) = colnames(abmax_Ctrl)
-  output = as.data.frame(output)
-  return(output)
-}
 
-
-# T Test results from different threshold
-for (i in seq(0.1, 0.9, 0.1)){
-  temp1 = paste("local_maxima_Ctrl",i,sep="_")
-  temp2 = paste("local_maxima_RNase",i,sep="_")
-  temp3 = paste("test",i,sep="_")
-  assign(temp3, localtest(get(temp1), get(temp2)))
-} # Result: test_i
-
-
-# Check which threshold identifies the most RNA dependent proteins
-true_num = c()
-for (i in seq(0.1, 0.9, 0.1)){
-  temp = get(paste("test",i,sep="_"))
-  true_num[i*10] = length(which(temp[,1] != 0))
-}
-names(true_num) = c(seq(0.1, 0.9, 0.1))
-which.max(true_num)
-```
 
 
 ## 5. K-Means Clustering
@@ -1088,7 +1039,7 @@ RNase_Independent_Allmax_1 = maxima_RNase_0.4[,-whichrow(row_rnadep_1)]
 # Protein names and number of times listed as RBP from data bank is taken and put into new data frame
 
 
-Data.RBPResearch <- read.table("C:/Users/Archid Knighton/Documents/GitHub/2022-topic-03-team-04/table_RBP_lists.csv", header=F, sep = ",")
+Data.RBPResearch <- read.table("~/Desktop/2022-topic-03-team-04/table_RBP_lists.csv", header=F, sep = ",")
 
 databank = data.frame(matrix(nrow=5004, ncol=2))
 
@@ -1150,15 +1101,97 @@ Not_identified_RDeep = intersect(names(databank_value), temporary_none)
 length(Not_identified_RDeep)
 ```
 
-Too many RNA dependent proteins were not identified, so we have to try to find more Maxima and more potential dependent proteins, we can apply our criteria on 
+Too many RNA dependent proteins were not identified (2031), so we have to try to find more Maxima and more potential dependent proteins, we can apply our criteria on 
 --> local maxima detection and applying our criteria on detected values
 
-
-Further Databank 
 ```{r}
+# T-Test function for local maxima
+localtest = function(input1, input2){
+  i = 1
+  j = 0
+  p = c()
+  output = c()
+  while(i < length(input1)){
+  # if NA or only one local maxima exists, it is impossible to do T-Test because there is no standard deviation
+    if(all(is.na(input1[[i]])) || all(is.na(input2[[i]])) || length(input1[[i]])<2 || length(input2[[i]])<2){
+      p[i-j] = NA
+      i = i+3
+      j = j+2
+      }
+    else{
+    p[i-j] = t.test(input1[[i]], input2[[i]], var.equal = F)$p.value
+    i = i+3
+    j = j+2
+    }
+  }
+  # Bonferonni Correction
+  output = p < 0.05/(length(p)-length(which(is.na(p))))
+  # Dummy NA for last proteins with no result from t-test. R somehow remove all last NA. 
+  if(length(output) != length(colnames(abmax_Ctrl))){
+    output = append(output, rep(NA, length(colnames(abmax_Ctrl)) - length(output)))
+  }
+  names(output) = colnames(abmax_Ctrl)
+  output = as.data.frame(output)
+  return(output)
+}
+
+
+# T Test results from different threshold
+for (i in seq(0.1, 0.9, 0.1)){
+  temp1 = paste("local_maxima_Ctrl",i,sep="_")
+  temp2 = paste("local_maxima_RNase",i,sep="_")
+  temp3 = paste("test",i,sep="_")
+  assign(temp3, localtest(get(temp1), get(temp2)))
+} # Result: test_i
+
+
+# Check which threshold identifies the most RNA dependent proteins
+true_num = c()
+for (i in seq(0.1, 0.9, 0.1)){
+  temp = get(paste("test",i,sep="_"))
+  true_num[i*10] = length(which(temp[,1] != 0))
+}
+names(true_num) = c(seq(0.1, 0.9, 0.1))
+which.max(true_num)
+
+
+local_maxima_Rdeep = rownames(test_0.4)[which(test_0.4 == TRUE)]
+length(local_maxima_Rdeep)
+```
+
+
+```{r}
+Identified_RDeep_by_local_maxima = intersect(names(databank_value), local_maxima_Rdeep)
+length(Identified_RDeep_by_local_maxima)
+
+```
+
+
+
+Further Databank by Khalida
+```{r}
+
 load("~/Desktop/HS_RBPs.RData")
 
 load("~/Desktop/HS_non_RBPs.RData")
+
+cor(HS_RBPs$Mass_kDa, HS_RBPs$Length_AA)
+
+lm1 = lm(HS_RBPs$Mass_kDa ~ HS_RBPs$Length_AA)
+summary(lm1)
+
+ggplot(data = lm1, aes(x = HS_RBPs$Mass_kDa, y = HS_RBPs$Length_AA)) +
+  geom_point(color="blue") +
+  geom_smooth(method="lm", color="red") +
+  scale_x_continuous(trans = "log10") +
+  scale_y_continuous(trans = "log10")
+
+
+# Plot Residuals
+hist(lm1$residuals, breaks = 20)
+qqnorm(lm1$residuals)
+qqline(lm1$residuals)
+
 
 
 ```
