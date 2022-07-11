@@ -22,8 +22,6 @@ library(ggplot2)
 library(qqplotr)
 library(circlize)
 library(plyr)
-library(rlang)
-library(caret) # short for Classification And REgression Training) is a set of functions that attempt to streamline the process for creating predictive models.
 ```
 
 
@@ -1249,6 +1247,7 @@ y_shift_no_const = y_shift[-const_row]
 
 # Linear Regression between correlation (X Axis) and Y-Shift (Y Axis)
 df_lm = data.frame(Y_Shift = y_shift_no_const, Correlation = cor)
+
 lm = lm(Y_Shift ~ Correlation, data = df_lm)
 summary(lm)
 
@@ -1274,4 +1273,8 @@ cor(df_lm$Correlation, lm$residuals)
 # Linear Regression second Prerequisite (Correlation between expected y and x values is 1)
 cor(df_lm$Correlation*lm$coefficients[2] + lm$coefficients[1], df_lm$Correlation)
 ```
+
+
+
+
 
