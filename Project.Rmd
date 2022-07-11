@@ -1277,4 +1277,25 @@ cor(df_lm$Correlation*lm$coefficients[2] + lm$coefficients[1], df_lm$Correlation
 
 
 
+Non-linear Regression 
+
+```{r}
+#formula = ax^2+bx+c 
+
+lm2 = lm(Y_Shift ~ poly(Correlation, 2, raw = TRUE), data = df_lm)
+summary(lm2)
+ggplot(data = lm2, aes(x = Correlation, y = Y_Shift)) +
+  geom_point(color="blue") +
+  stat_smooth()
+
+
+
+```
+```{r}
+# y = ax^2 +bx +c
+frm = Y_Shift ~ Correlation * x^2 
+mdl = nls(formula = frm,data = df_lm )
+
+```
+
 
