@@ -1281,8 +1281,9 @@ Non-linear Regression
 
 ```{r}
 #formula = ax^2+bx+c 
-
-lm2 = lm(Y_Shift ~ poly(Correlation, 2, raw = TRUE), data = df_lm)
+Correlation = df_lm$Correlation
+Correlation2 = Correlation^2
+lm2 = lm(formula = Y_Shift ~ Correlation + Correlation2, data = df_lm)
 summary(lm2)
 ggplot(data = lm2, aes(x = Correlation, y = Y_Shift)) +
   geom_point(color="blue") +
@@ -1292,9 +1293,7 @@ ggplot(data = lm2, aes(x = Correlation, y = Y_Shift)) +
 
 ```
 ```{r}
-# y = ax^2 +bx +c
-frm = Y_Shift ~ Correlation * x^2 
-mdl = nls(formula = frm,data = df_lm )
+
 
 ```
 
