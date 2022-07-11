@@ -9,7 +9,8 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
-library(tidyverse)
+
+library(tidyverse) # for easy data manipulation and visualization
 library(heatmaply)
 library(scales)
 library(gganimate)
@@ -21,6 +22,8 @@ library(ggplot2)
 library(qqplotr)
 library(circlize)
 library(plyr)
+library(rlang)
+library(caret) # short for Classification And REgression Training) is a set of functions that attempt to streamline the process for creating predictive models.
 ```
 
 
