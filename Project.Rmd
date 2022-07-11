@@ -9,19 +9,10 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
-
-library(tidyverse) # for easy data manipulation and visualization
-library(heatmaply)
-library(scales)
-library(gganimate)
-library(dplyr) ##for the select function 
-library(tibble)
-library(ggiraph)
-library(ggiraphExtra)
+library(cluster) #for plotting k means
+library(tidyverse) #for easy data manipulation and visualization
+library(dplyr) #for the select function 
 library(ggplot2)
-library(qqplotr)
-library(circlize)
-library(plyr)
 ```
 
 
@@ -33,7 +24,7 @@ library(plyr)
 #Richard's folder location for convenience sake :D (C:/Users/Archid Knighton/Documents/GitHub/2022-topic-03-team-04/RDeeP_A549_NS.csv)
 #loading "RDeeP_A549_NS.csv" into Data.raw data frame
 
-Data.raw <- read.table("~/Desktop/2022-topic-03-team-04/RDeeP_A549_NS.csv", header=TRUE, row.names=1, sep = ";")
+Data.raw <- read.table("C:/Users/Archid Knighton/Documents/GitHub/2022-topic-03-team-04/RDeeP_A549_NS.csv", header=TRUE, row.names=1, sep = ";")
 #creating a copy of Data.raw and saving it as Data.copy
 Data.copy = Data.raw
 ```
@@ -875,8 +866,6 @@ plot(2:8,wss,type='l',xlab="Number of Clusters", ylab="Total within-clusters Sum
 
 # Plotting the Clusters
 ## By Madleen
-library(cluster)
-library(factoextra)
 km = kmeans(pxy, centers = 3, nstart = 100, iter.max = 100)
 fviz_cluster(km, data = pxy, geom = c("point"), main = "K Means Clustering with 3 Clusters")+
   theme(panel.background = element_rect(fill='white', colour='black'))+
@@ -1040,7 +1029,7 @@ RNase_Independent_Allmax_1 = maxima_RNase_0.4[,-whichrow(row_rnadep_1)]
 # Protein names and number of times listed as RBP from data bank is taken and put into new data frame
 
 
-Data.RBPResearch <- read.table("~/Desktop/2022-topic-03-team-04/table_RBP_lists.csv", header=F, sep = ",")
+Data.RBPResearch <- read.table("C:/Users/Archid Knighton/Documents/GitHub/2022-topic-03-team-04/table_RBP_lists.csv", header=F, sep = ",")
 
 databank = data.frame(matrix(nrow=5004, ncol=2))
 
@@ -1095,7 +1084,6 @@ length(RDeep_1)
 
 
 # Check how many RNA dependent proteins were not identified 
-
 temporary_none = colnames(Ctrl_Independent_Abmax_2)
 temporary_none = append(temporary_none, numeric(length(databank_value -length(temporary_none))))
 Not_identified_RDeep = intersect(names(databank_value), temporary_none)
@@ -1161,20 +1149,40 @@ length(local_maxima_Rdeep)
 ```
 
 
-```{r}
-Identified_RDeep_by_local_maxima = intersect(names(databank_value), local_maxima_Rdeep)
-length(Identified_RDeep_by_local_maxima)
+## T Test results of local maxima will be the 3rd criteria
 
+
+```{r}
+# Check how many RNA dependent proteins (either of the 3 conditions fulfilled) that are identified through our code and from data bank 
+
+temporary_3 = colnames(Ctrl_Dependent_Abmax_1)
+temporary_3 = unique(sort(append(temporary_3, local_maxima_Rdeep)))
+
+RDeep_3 = intersect(names(databank_value), temporary_3)
+length(RDeep_3)
+
+
+# Find which row of the proteins fulfill either of the 3 conditions
+row_rnadep_3 = row_rnadep_1
+row_rnadep_3 = unique(sort(append(row_rnadep_3, which(test_0.4 == TRUE))))
+
+
+# Find which proteins doesn't fulfill either of the 3 conditions
+row_notrnadep_3 = setdiff(1:3680, row_rnadep_3)
+NotRDeep_3 = rownames(test_0.4)[row_notrnadep_3]
+
+
+# Check how many RNA dependent proteins were not identified 
+Not_identified_RDeep_3 = intersect(names(databank_value), NotRDeep_3)
+length(Not_identified_RDeep_3)
 ```
 
 
-
-Further Databank by Khalida
+## Further Databank by Khalida
 ```{r}
+load("C:/Users/Archid Knighton/Documents/GitHub/HS_RBPs.RData")
 
-load("~/Desktop/HS_RBPs.RData")
-
-load("~/Desktop/HS_non_RBPs.RData")
+load("C:/Users/Archid Knighton/Documents/GitHub/HS_non_RBPs.RData")
 
 cor(HS_RBPs$Mass_kDa, HS_RBPs$Length_AA)
 
@@ -1192,11 +1200,7 @@ ggplot(data = lm1, aes(x = HS_RBPs$Mass_kDa, y = HS_RBPs$Length_AA)) +
 hist(lm1$residuals, breaks = 20)
 qqnorm(lm1$residuals)
 qqline(lm1$residuals)
-
-
-
 ```
-
 
 
 ## 6. Linear Regression
@@ -1247,17 +1251,10 @@ y_shift_no_const = y_shift[-const_row]
 
 # Linear Regression between correlation (X Axis) and Y-Shift (Y Axis)
 df_lm = data.frame(Y_Shift = y_shift_no_const, Correlation = cor)
-
-lm = lm(Y_Shift ~ Correlation, data = df_lm)
+train_df = df_lm[1:round(0.8*dim(df_lm)[1]),]
+test_df = df_lm[(dim(train_df)[1]+1):dim(df_lm)[1],]
+lm = lm(Y_Shift ~ Correlation, data = train_df)
 summary(lm)
-
-
-# Plot Linear Regression (The error is the result of logarithmic transformation of negative values and can be ignored. Logarithmic transformation of the values are chosen to better present the results graphically)
-ggplot(data = df_lm, aes(x = Correlation, y = Y_Shift)) +
-  geom_point(color="blue") +
-  geom_smooth(method="lm", color="red") +
-  scale_x_continuous(trans = "log10") +
-  scale_y_continuous(trans = "log10")
 
 
 # Plot Residuals
@@ -1267,11 +1264,22 @@ qqline(lm$residuals)
 
 
 # Linear Regression first Prerequisite (Correlation between residuals and x values is 0)
-cor(df_lm$Correlation, lm$residuals)
+cor(train_df$Correlation, lm$residuals)
 
 
 # Linear Regression second Prerequisite (Correlation between expected y and x values is 1)
-cor(df_lm$Correlation*lm$coefficients[2] + lm$coefficients[1], df_lm$Correlation)
+cor(train_df$Correlation*lm$coefficients[2] + lm$coefficients[1], train_df$Correlation)
+
+
+# Testing Linear Model
+test_model <- predict.lm(lm, test_df)
+
+
+# Plot actual value (x Axis) against predicted Value (y Axis) 
+compare_df = data.frame(actual_value = test_df$Y_Shift, predicted_value = test_model)
+ggplot(data = compare_df, aes(x = actual_value, y = predicted_value)) +
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1)
 ```
 
 
