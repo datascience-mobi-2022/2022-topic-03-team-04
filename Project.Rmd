@@ -9,10 +9,11 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
-library(cluster) #for plotting k means
+library(cluster)
 library(tidyverse) #for easy data manipulation and visualization
 library(dplyr) #for the select function 
 library(ggplot2)
+library(factoextra) # plotting k means
 ```
 
 
@@ -194,7 +195,7 @@ MICA_Human_Protein_RNase = ggplot() +
 ```
 
 
-## 1. Evaluation of the reproducibility of the experiments 
+## 2. Evaluation of the reproducibility of the experiments
 
 
 To investigate the protein amount of the replicates further we sum up the total protein amount of all genes per sample replicate and plot them side by side in a bar plot. We can see that there is a huge difference between the RNase samples and also the Ctrl samples do not align.
@@ -325,6 +326,8 @@ Total_Protein_sums
 
 
 We compute the sums fractionwise and find the two closest sums in order to define normalization factors fot the replicates. The quotients of the mean sums and sums of replicates are the noramlization factors.
+
+
 ```{r}
 ## New Normalization
 
@@ -413,8 +416,6 @@ ggplot(plotdata_norm_new, aes(Replicates, Total_Protein_amount_norm_new )) +
   geom_bar(stat = "identity", fill = colour) +
   labs( title = "After Normalization 1 new", y = "Total protein amout", x = "Replicates")
 ```
-
-
 
 
 ## 2.2 Second Normalization (by Greta)
@@ -583,6 +584,7 @@ MICA_HUMAN_Protein_Ctrl_Norm_Second = ggplot() +
 
 ## 3. Peaks Identification 
 
+
 We define a threshold
 
 Proteins which depend on RNA are expected to migrate to different positions in the RNase treated sample in comparison to the Ctrl sample. To identify whether a protein is a RBP or not we need to detect the maxima in both samples. We want to detect both local and global maxima because even a shift of a local maximum could hold relevant biological information.
@@ -728,6 +730,7 @@ maxnum_plot_col()
 ```
 
 
+
 ```{r}
 # Function to get list with only local maxima (the local maxima of all 3 reps are combined in Rep1. Rep2 and Rep3 are useless)
 localmax = function(input){
@@ -773,7 +776,9 @@ for (i in seq(0.1,0.9,0.1)){
 
 ## 4. T-Test 
 
+
 T Test shows us if the global maxima of each of the proteins (all repetitions) between Ctrl and RNase group has a significance difference. A significanct difference between the 2 group will be categorized as RNA dependent and it will be our first criteria for RNA dependency.
+
 
 ```{r}
 # Function to make data frame where absolute maxima of 3 Reps of a protein are inserted in a column
@@ -816,15 +821,10 @@ test
 ```
 
 
-
-
-
-
 ## 5. K-Means Clustering
 
+
 Through K-Means Clustering and comparing our t test results, we define selection criteria (Y Shift and X Shift) for determining RNA dependent Proteins. Y Shift is the difference of protein amount between the global maxima of Ctrl and RNase Group. X Shift is the difference of locations of global maxima (fraction) between the global maxima of Ctrl and RNase Group. If the X and Y Shift has positive values (left and down Shift), we define the protein as RNA dependent. If the X and Y Shift has negative values or close to zero (right and up Shift), we define the protein as RNA independent. These shifts will be our second criteria for RNA dependency.
-
-
 
 
 ```{r}
@@ -875,9 +875,11 @@ fviz_cluster(km, data = pxy, geom = c("point"), main = "K Means Clustering with 
 ```
 
 
-## Comparing RNA Dependency from both T Test and K Means
+## 6.1 Comparing RNA Dependency from both T Test and K Means
+
 
 "Match" shows 1 (True) and 0 (False). True means that the results from T-Test in terms of RNA (in)dependency is the same as K-Means and the other way around for False.
+
 
 ```{r}
 # Comparing RNA Dependency from both T Test and K Means
@@ -1022,7 +1024,7 @@ RNase_Independent_Allmax_1 = maxima_RNase_0.4[,-whichrow(row_rnadep_1)]
 ```
 
 
-## Comparing with Data Bank
+## 6.2 Comparing with Data Bank
 
 
 ```{r}
@@ -1066,6 +1068,7 @@ length(RDeep_1)
 ```
 
 
+
 ```{r}
 # Check how many RNA dependent proteins (2 conditions fulfilled) that are identified through our code and from data bank
 temporary_2 = colnames(Ctrl_Dependent_Abmax_2)
@@ -1090,8 +1093,13 @@ Not_identified_RDeep = intersect(names(databank_value), temporary_none)
 length(Not_identified_RDeep)
 ```
 
+
 Too many RNA dependent proteins were not identified (2031), so we have to try to find more Maxima and more potential dependent proteins, we can apply our criteria on 
 --> local maxima detection and applying our criteria on detected values
+
+
+## 7.1 T Test of Local Maxima
+
 
 ```{r}
 # T-Test function for local maxima
@@ -1149,7 +1157,7 @@ length(local_maxima_Rdeep)
 ```
 
 
-## T Test results of local maxima will be the 3rd criteria
+## 7.2 T Test results of local maxima will be the 3rd criteria
 
 
 ```{r}
@@ -1180,9 +1188,9 @@ length(Not_identified_RDeep_3)
 
 ## Further Databank by Khalida
 ```{r}
-load("C:/Users/Archid Knighton/Documents/GitHub/HS_RBPs.RData")
+load("C:/Users/Archid Knighton/Documents/GitHub/2022-topic-03-team-04/HS_RBPs.RData")
 
-load("C:/Users/Archid Knighton/Documents/GitHub/HS_non_RBPs.RData")
+load("C:/Users/Archid Knighton/Documents/GitHub/2022-topic-03-team-04/HS_non_RBPs.RData")
 
 cor(HS_RBPs$Mass_kDa, HS_RBPs$Length_AA)
 
@@ -1203,7 +1211,8 @@ qqline(lm1$residuals)
 ```
 
 
-## 6. Linear Regression
+## 8.1 Linear Regression (Using Correlation to Predict Y Shift)
+
 
 Ctrl and RNase should have lower correlation for RNA dependent than RNA indepedent.
 
@@ -1257,6 +1266,14 @@ lm = lm(Y_Shift ~ Correlation, data = train_df)
 summary(lm)
 
 
+# Plot Linear Regression (Error is caused by logarithming negative values and can be ignored. Logarithming make visualization better)
+ggplot(data = train_df, aes(x = Correlation, y = Y_Shift)) +
+  geom_point(color="blue") +
+  scale_x_continuous(trans = "log10") +
+  scale_y_continuous(trans = "log10") +
+  geom_smooth(method="lm", color="red")
+
+
 # Plot Residuals
 hist(lm$residuals, breaks = 20)
 qqnorm(lm$residuals)
@@ -1283,9 +1300,76 @@ ggplot(data = compare_df, aes(x = actual_value, y = predicted_value)) +
 ```
 
 
+## 8.2 Linear Regression using RBP2GO_Score to Predict X Shift (by Richard)
 
 
-Non-linear Regression 
+After testing multiplte variables from the new data bank and the data that we have, we decide to use these 2 variables because they have low correlation and a p value that is less than 0.05 in linear regression. 
+
+
+```{r}
+# HS_RBPs and HS_non_RBPs are the new data bank (data frame)
+load("C:/Users/Archid Knighton/Documents/GitHub/2022-topic-03-team-04/HS_RBPs.RData")
+
+
+# Find which protein in the new data bank is the same as our y shift
+
+protein_same_rbp = sort(intersect(HS_RBPs[,3], names(y_shift)))
+temp_row_y_shift = c()
+temp_row_databank = c()
+
+for (i in 1:length(protein_same_rbp)){
+  temp_row_y_shift[i] = which(protein_same_rbp[i] == names(y_shift))
+}
+
+for (i in 1:length(protein_same_rbp)){
+  temp_row_databank[i] = which(protein_same_rbp[i] == HS_RBPs[,3])
+}
+
+
+# Create data frame with y shift and data from data bank
+df_lm_4 = data.frame(Y_Shift = y_shift[temp_row_y_shift], RBP2GO_Score = HS_RBPs$RBP2GO_Score[temp_row_databank], Listing_Count = HS_RBPs$Listing_Count[temp_row_databank], AVG10_Int_Listing_Count = HS_non_RBPs$AVG10_Int_Listing_Count[temp_row_databank], Mass_kDa = HS_non_RBPs$Mass_kDa[temp_row_databank], Length_AA = HS_non_RBPs$Length_AA[temp_row_databank], X_Shift = x_shift[temp_row_y_shift])
+
+
+# Linear Regression
+train_df_4 = df_lm_4[1:round(0.8*dim(df_lm_4)[1]),]
+test_df_4 = df_lm_4[(dim(train_df_4)[1]+1):dim(df_lm_4)[1],]
+lm_4 = lm(X_Shift ~ RBP2GO_Score , data = train_df_4)
+summary(lm_4)
+
+
+# Plot Linear Regression
+ggplot(data = train_df_4, aes(x = RBP2GO_Score, y = X_Shift)) +
+  geom_point(color="blue") +
+  geom_smooth(method="lm", color="red")
+
+
+# Plot Residuals
+hist(lm_4$residuals, breaks = 20)
+qqnorm(lm_4$residuals)
+qqline(lm_4$residuals)
+
+
+# Linear Regression first Prerequisite (Correlation between residuals and x values is 0)
+cor(train_df_4$RBP2GO_Score, lm_4$residuals)
+
+
+# Linear Regression second Prerequisite (Correlation between expected y and x values is 1)
+cor(train_df_4$RBP2GO_Score*lm_4$coefficients[2] + lm_4$coefficients[1], train_df_4$RBP2GO_Score)
+
+
+# Testing Linear Model
+test_model_4 <- predict.lm(lm_4, test_df_4)
+
+
+# Plot actual value (x Axis) against predicted Value (y Axis) 
+compare_df_4 = data.frame(actual_value = test_df_4$X_Shift, predicted_value = test_model_4)
+ggplot(data = compare_df_4, aes(x = actual_value, y = predicted_value)) +
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1)
+```
+
+
+## Non-linear Regression 
 
 ```{r}
 #formula = ax^2+bx+c 
