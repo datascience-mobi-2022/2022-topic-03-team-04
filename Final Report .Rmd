@@ -15,15 +15,16 @@ knitr::opts_chunk$set(echo = TRUE)
 RNA-binding proteins are proteins that bind to the double or single stranded RNA in cells and by this interact with transcripts of RNA-driven processes. This large group of proteins play key roles in RNA processing and modification (Alternative splicing, RNA editing and polyadenylation), export, mRNA localization and translation. The malfunction of RBP´s underlies the origin of many diseases from neurogenerative disorders to cancer.  Therefore, it is necessary to increase the number of recognized RBP´s and the understanding of their molecular mechanisms.
 For that reason, M.Caudron-Herger et al. created R-Deep with the aim to detect RBP´s automatically. In general, R-Deep is a proteome-wide, unbiased, and enrichment-free screen based on density gradient ultracentrifugation.
 
-2. Material and Methods
+2. Materials and Methods
+
+RDeep 
+
 
 Dataset exploration
 Our given dataset consists of mass-spectometry data from non-synchronized A549 cells which are human lung carcinoma cells of a caucasian male. In general, the data show the protein amount of each of our 3680 human proteins per fraction. The RDeep screen has been repeated three times so it comprises three replicates for each sample. All in all, we got 3680 rows with one human proteins per row and 150 columns for our Ctrl and RNase group for 25 fractions and three replicates each. 
 
-Normalization
-The total amount of protein of every replicate should be similar. In our given dataset this was not the case. Normalization is the process to account for the bias and make samples more comparable. Our aim was to change the values of columns to a common scale without distorting differences in the range of values and by this reducing the variation between our three technical replicates.
-
 Fractionwise Normalization
+The total amount of protein of every replicate should be similar. In our given dataset this was not the case. Normalization is the process to account for the bias and make samples more comparable. Our aim was to change the values of columns to a common scale without distorting differences in the range of values and by this reducing the variation between our three technical replicates.
 Therefore, for our first normalization we compute the sums fractionwise and find the two closest sums. We then define normalization factors for the replicates. The quotients of the mean sums and sums of replicates are the normalization factors. 
 
 Anti-outlier function
@@ -31,16 +32,19 @@ For our second normalization, we defined the mean out of the two most similar re
 
 Peaks identification
 We expect RNA dependent proteins to migrate to migrate to different positions in the RNase treated sample compared to the Ctrl sample. As a next step we identify the maxima in both samplest o characterize a protein as RNA dependent or RNA independent. We detect the local and the global maxima to draw all the biological information we could possibly get from our given values.
-Our theoretical maximum is a point x whose neighboring values have to be smaller. Therefore we use a threshold value of 20% of the global maximum. We performed this to our anti_outlier_function.
+Our theoretical maximum is a point x whose neighboring values have to be smaller. Therefore we use a threshold value of 40% of the global maximum. We performed this to our anti_outlier_function.
 
-Criterua for RNA dependency
+Criteria for RNA dependency
 	
-T-Test
+T-Test of absolute maxima 
+
+T-Test of local maxima
 T-Test shows us if the global maxima of each of the proteins (all replicates) between Ctrl and RNase group has a significant difference. We declare a significant difference between both groups as RNA dependent. It will be our first criteria for RNA dependency.
 
 
 K-Means Clustering (Y-shift and X-shift detection)
-Through K-Means Clustering and comparing our t-test results, we define selection criteria (Y-shift and X-shift) to determine RNA dependent proteins. Y-shift ist he difference of protein amount between the global maxima of Ctrl and RNase group. X-shift ist he difference of locations of global maxima (fraction) between the global maxima of Ctrl and RNase group. If the X- and Y-shift has positive values (left and down shift), we define the protein as RNA dependent. If the X- and Y-shift has negative values or close to zero (right and up shift), we define the protein as RNA independent. These shifts will be our second criteria for RNA dependency. We also combined our X- and Y-shifts in a dataframe and used the elbow method to determine the optimal number of clusters.	
+
+Through K-Means Clustering and comparing our t-test results, we define selection criteria (Y-shift and X-shift) to determine RNA dependent proteins. Y-shift is the difference of protein amount between the global maxima of Ctrl and RNase group. X-shift is the difference of locations of global maxima (fraction) between the global maxima of Ctrl and RNase group. 
 
 Linear regression
 Finally, we perform a linear regression. This model can generally be used to model the relationship between a dependent variable (regressand) and one or more explanatory variables (predictors). The relationship is represented by a linear function. We can see from the model to what extent the dependent variable can be explained by the other variables. 
@@ -59,6 +63,8 @@ The comparison of the MICA_HUMAN_Ctrl before and after the application of the an
 
 Peaks Identification 
 
+
+
 Criteria for RNA dependency
 
 T-Test 
@@ -67,6 +73,10 @@ T-Test
 
 
 K-means clustering 
+
+If the X- and Y-shift has positive values (left and down shift), we define the protein as RNA dependent. If the X- and Y-shift has negative values or close to zero (right and up shift), we define the protein as RNA independent. These shifts will be our second criteria for RNA dependency. We also combined our X- and Y-shifts in a dataframe and used the elbow method to determine the optimal number of clusters.	
+
+
 Comparison of RNA dependency of both t-Test and K-Means
 "Match" shows 1 (True) and 0 (False). True means that the results from T-Test in terms of RNA (in)dependency is the same as K-Means and the other way around for False. We have defined 2 Criteria for RNA dependency. The first is the result from T-test where a significant difference of the absolute maxima means that the protein is RNA-dependent. The second one is the result from K-Means clustering. Here proteins grouped in a cluster with a positive Y-Shift are defined as RNA-depedent. Below we consider 2 cases. First when both criteria are fulfilled and the other one when either criteria is satisfied.
 
