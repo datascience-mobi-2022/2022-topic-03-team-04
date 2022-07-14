@@ -883,10 +883,20 @@ while (i<dim(Data.RBPResearch)[1]){
 temp_name = databank[,1]
 databank = as.integer(databank[,2])
 names(databank) = temp_name
+databank = databank[-which(duplicated(names(databank)))]
 
 
-# Take only proteins that are at least one time identified as RBP from databank
-databank_value = databank[-which(databank == 0)]
+# Proteins that exist both in data bank and our data
+included_protein = intersect(names(databank), colnames(abmax_Ctrl))
+row_included_protein = c()
+for (i in 1:length(included_protein)){
+  row_included_protein[i] = which(names(databank) == included_protein[i])
+}
+databank_adjusted = databank[row_included_protein] ## Proteins that will be checked
+
+
+# Take only proteins that are at least one time identified from data bank
+databank_value = databank_adjusted[-which(databank_adjusted == 0)]
 
 
 # Check how many RNA dependent proteins (2 conditions fulfilled) that are identified through our code and from data bank
@@ -903,19 +913,18 @@ temporary_1 = append(temporary_1, numeric(length(databank_value - length(tempora
 
 RDeep_1 = intersect(names(databank_value), temporary_1)
 length(RDeep_1)
-```
 
 
-```{r}
 # Check how many RNA dependent proteins were not identified 
-temporary_none = colnames(Ctrl_Independent_Abmax_2)
-temporary_none = append(temporary_none, numeric(length(databank_value -length(temporary_none))))
-Not_identified_RDeep = intersect(names(databank_value), temporary_none)
-length(Not_identified_RDeep)
+row_notrnadep_1 = setdiff(1:3680, row_rnadep_1)
+NotRDeep_1 = rownames(test)[row_notrnadep_1]
+
+Not_identified_RDeep_1 = intersect(names(databank_value), NotRDeep_1)
+length(Not_identified_RDeep_1)
 ```
 
 
-Too many RNA dependent proteins were not identified (2031), so we have to try to find more Maxima and more potential dependent proteins, we can apply our criteria on 
+Too many RNA dependent proteins were not identified (1860), so we have to try to find more Maxima and more potential dependent proteins, we can apply our criteria on 
 --> local maxima detection and applying our criteria on detected values
 
 
@@ -1097,7 +1106,7 @@ ggplot(data = compare_df, aes(x = actual_value, y = predicted_value)) +
 ```
 
 
-The plot of predicted and actual value of Y shift shows us, that the model doesn't really work when the values are below 0. When the points are closer to the line, it indicates that the predicted values are close to the actual one. Nevertheless, the model works decently when the values are above 0. Sadly, the actual Y shift has a very high spread and makes it hard to find a perfect linear model to predit y shift. 
+The QQ plot shows us that the residuals are normally distributed with heavy tails. The normal distribution of residues is centered at 0, that the model fits the real values well. The plot of predicted and actual value of Y shift shows us, that the model doesn't really work when the values are below 0. When the points are closer to the line, it indicates that the predicted values are close to the actual one. Nevertheless, the model works decently when the values are above 0. Sadly, the actual Y shift has a very high spread and makes it hard to find a perfect linear model to predit y shift. 
 
 
 ## 8.2 Linear Regression using RBP2GO_Score to Predict X Shift
@@ -1169,4 +1178,4 @@ ggplot(data = compare_df_4, aes(x = actual_value, y = predicted_value)) +
 ```
 
 
-The plot of predicted and actual value of X shift works fairly good when the x shift are very minimal (shift by one fraction). The linear model unfortunately doesn't predict very well due to the variability of the x shift, especially when the shift is higher. 
+The QQ plot shows us that the residuals are normally distributed with heavy tails. The normal distribution of residues is centered at 0, that the model fits the real values well. The plot of predicted and actual value of X shift works fairly good when the x shift are very minimal (shift by one fraction). The linear model unfortunately doesn't predict very well due to the variability of the x shift, especially when the shift is higher. 

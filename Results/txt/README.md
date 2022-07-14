@@ -1,6 +1,6 @@
 # Results
 
-All of our results are exported here as txt. 
+All of our data frame, vector and list results are exported here as txt. 
 
 | Data | Description |
 | ------ | ------ | 
@@ -18,7 +18,7 @@ All of our results are exported here as txt.
 | maxnum_RNase_0.4 | Number of Maxima of all Threshold RNase |
 | Norm_Ctrl | 1st Normalzation Ctrl |
 | Norm_RNase | 1st Normalzation RNase |
-| Not_identified_RDeep | Not Identified RNA Dependent Protein (2 Criteria) |
+| Not_identified_RDeep_1 | Not Identified RNA Dependent Protein (2 Criteria) |
 | Not_identified_RDeep_3 | Not Identified RNA Dependent Protein (3 Criteria) |
 | RDeep_1 | Identified RNA Dependent Protein (2 Criteria) |
 | RDeep_3 | Identified RNA Dependent Protein (3 Criteria) |
