@@ -20,7 +20,7 @@ RDeep
 R-DeeP is a proteome-wide, unbiased and enrichment-free screen. The principle of R-DeeP is based on cellular lysate fractionation by density gradient ultracentrifugation.The outcome is analyzed by proteome-wide mass spectometry or individual western blotting. In general, R-DeeP is used to determine RNA-dependent protein, that interact directly or indirectly with RNA. Lysates with (RNase group) and without (Ctrl group) RNase treatment are compared. By that differences in molecular weight, hence and the size of the complexes are determined.RBPs are expected to split after RNase treatment and migrate to different fractions in a sucrose density gradient.
 
 ```{r}
-#(Bild RDEEP selbstgezeichnet einfügen)
+![](images/.png)
 ```
 
 
@@ -73,6 +73,8 @@ To find more RNA dependent proteins, we will include a 3rd criteria to classify 
 
 
 Comparison with other databanks 
+
+In order to calculate the true positive and true negative rate and see how good our criteria find the RNA dependent proteins we compare our finding with mammalian RNA-binding protein resources (https://r-deep.dkfz.de)
 
 
 
@@ -162,8 +164,25 @@ We found 305 proteins that fulfill one of the two criteria and 63 proteins that 
 
 Comparison with other databanks
 
+The comparison with the table of mammalian RNA-binding protein resources has shown that our applied criteria finds the RNA-dependent proteins with very low false positive rate, but very high false negative rate. 
+Out of 63 identified RNA-dependent proteins that fulfill both criteria, 57 had a match with the comparable databank and for one criteria fulfilled out of 305 identified proteins 228 had a match. 
+Unfortunately our applied criteria could not identify 1860 proteins which makes the false negative rate really high.
+
+```{r}
+#Tabelle mit true negative, true positive, false negative und false positive
+
+```
+
+
+
+
+
+
+
 
 Local maxima (third criteria)
+
+
 
 
 
@@ -220,11 +239,6 @@ Discussion
 
 
 Peaks Identification
-	
-The RNA-dependent protein complex  will dissociate and individual proteins will migrate in different fractions.
-Analysis of the protein content of fractions by comparing Ctrl and RNAse samples allows us to identify RNA-dependent shifts.
-To define these shifts, we wrote an own maxima detection function that detects global as well as local peaks. Using the threshold, we only detect
-maxima with a certain significance. Our chosen threshold of 40% protein value is enough to get only significant maxima. 
 
 
 
