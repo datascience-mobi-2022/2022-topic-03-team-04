@@ -22,7 +22,7 @@ library(factoextra) # plotting k means
 #MS_Table <- read.table("~/Desktop/2022-topic-03-team-04/RDeeP_A549_NS.csv", header=TRUE, row.names=1, sep = ";")
 #loading "RDeeP_A549_NS.csv" into Data.raw data frame
 
-Data.raw <- read.table("RDeeP_A549_NS.csv", header=TRUE, row.names=1, sep = ";")
+Data.raw <- read.table("data/RDeeP_A549_NS.csv", header=TRUE, row.names=1, sep = ";")
 #creating a copy of Data.raw and saving it as Data.copy
 Data.copy = Data.raw
 ```
@@ -90,6 +90,7 @@ RNase = data.frame(RNase)
 
 
 ```{r}
+# by Madleen
 Fractions = c(1:25)
 MICA_HUMAN_Protein  = ggplot() +
  geom_line(data = select(Ctrl, contains("MICA_HUMAN_Rep_1")),  aes(x = Fractions, y = MICA_HUMAN_Rep_1, color= 'Ctrl_Rep1')) + 
@@ -104,7 +105,9 @@ MICA_HUMAN_Protein  = ggplot() +
   
   geom_line(data = select(RNase, contains("MICA_HUMAN_Rep_3")), aes(x = Fractions, y = MICA_HUMAN_Rep_3 , color= 'RNase_Rep3')) +
   
-  scale_colour_manual(name="legend",values=c(Ctrl_Rep1="blue2",RNase_Rep1="green4", Ctrl_Rep2="magenta1", RNase_Rep2="tomato1",Ctrl_Rep3="darkviolet", RNase_Rep3="turquoise4")) +
+  scale_colour_manual(name="legend",values=c(Ctrl_Rep1="blue2",RNase_Rep1="red", Ctrl_Rep2="magenta1", RNase_Rep2="skyblue",Ctrl_Rep3="darkviolet", RNase_Rep3="turquoise4")) +
+  
+  theme(panel.background = element_rect(fill = "white", colour = "black"))+
   
   labs(title="MICA_HUMAN_Protein_Raw", y= "Protein Amount") 
   MICA_HUMAN_Protein + scale_x_continuous(breaks = seq(1, 25, by = 1))
@@ -116,7 +119,9 @@ MICA_HUMAN_Protein_Ctrl = ggplot() +
   
   geom_line(data = select(Ctrl, contains("MICA_HUMAN_Rep_3")),  aes(x = Fractions, y = MICA_HUMAN_Rep_3 , color= 'Ctrl_Rep3')) +
   
-  scale_colour_manual(name="legend",values=c(Ctrl_Rep1="blue2",Ctrl_Rep2="purple4", Ctrl_Rep3="magenta1")) +
+  scale_colour_manual(name="legend",values=c(Ctrl_Rep1="green",Ctrl_Rep2="purple4", Ctrl_Rep3="magenta1")) +
+  
+   theme(panel.background = element_rect(fill = "white", colour = "black"))+
   
   labs(title="MICA_HUMAN_Ctrl_Raw", y= "Protein Amount") 
  MICA_HUMAN_Protein_Ctrl + scale_x_continuous(breaks = seq(1, 25, by = 1))
@@ -128,7 +133,9 @@ MICA_Human_Protein_RNase = ggplot() +
   
   geom_line(data = select(RNase,contains("MICA_HUMAN_Rep_3")), aes(x = Fractions, y = MICA_HUMAN_Rep_3, color= 'RNase_Rep3')) +
   
-   scale_colour_manual(name="legend",values=c(RNase_Rep1="blue2",RNase_Rep2="green4", RNase_Rep3= "magenta1")) +
+   scale_colour_manual(name="legend",values=c(RNase_Rep1="blue2",RNase_Rep2="red", RNase_Rep3= "magenta1")) +
+  
+  theme(panel.background = element_rect(fill = "white", colour = "black"))+
   
   labs(title="MICA_HUMAN_RNase_Raw", y= "Protein Amount") 
   MICA_Human_Protein_RNase + scale_x_continuous(breaks = seq(1, 25, by = 1))  
@@ -175,10 +182,11 @@ plotdata = data.frame(value, names=c("Ctrl1", "Ctrl2", "Ctrl3", "RNase1", "RNase
 
 
 ```{r}
-#by Madleen 
+# by Madleen 
 colour  = c("maroon1", "orchid3", "skyblue", "hotpink", "plum1", "skyblue1")
 ggplot(plotdata, aes(names, value)) +
   geom_bar(stat = "identity", fill = colour) +
+  theme(panel.background = element_rect(fill = "white", colour = "black"))+
   labs( title = "Before Normalization", y = "protein value", x = "Replicates")
 ```
 
@@ -294,7 +302,7 @@ Rep_2_norm_Ctrl_sums = rowSums(Rep_2_norm_Ctrl)
 Rep_3_norm_Ctrl_sums = rowSums(Rep_3_norm_Ctrl)
 
 
-#by Madleen
+# by Madleen
 Total_Protein_by_fractions_new = cbind(Rep_1_norm_RNase_sums,Rep_2_norm_RNase_sums, Rep_3_norm_RNase_sums, Rep_1_norm_Ctrl_sums, Rep_2_norm_Ctrl_sums, Rep_3_norm_Ctrl_sums)
 Total_Protein_norm_new = t(Total_Protein_by_fractions_new)/1
 Total_Protein_norm_new = as.data.frame(Total_Protein_norm_new)
@@ -305,6 +313,7 @@ plotdata_norm_new = data.frame(Total_Protein_amount_norm_new, Replicates = c("RN
 colour1  = c("maroon1", "orchid3", "skyblue", "hotpink", "plum1", "skyblue1")
 ggplot(plotdata_norm_new, aes(Replicates, Total_Protein_amount_norm_new )) +
   geom_bar(stat = "identity", fill = colour) +
+  theme(panel.background = element_rect(fill = "white", colour = "black"))+
   labs( title = "After Normalization 1", y = "Total protein amout", x = "Replicates")
 ```
 
@@ -425,6 +434,8 @@ tRNase_combi_df = as.data.frame(t(RNase_combi_df))
 ```{r}
 Fractions = c(1:25)
 
+# by Madleen
+
 MICA_HUMAN_Protein_Ctrl = ggplot() + 
   geom_line(data = select(Ctrl, contains("MICA_HUMAN_Rep_1")),  aes(x = Fractions, y = MICA_HUMAN_Rep_1, color= 'Ctrl_Rep1')) + 
   
@@ -435,7 +446,7 @@ MICA_HUMAN_Protein_Ctrl = ggplot() +
   scale_colour_manual(name="legend",values=c(Ctrl_Rep1="blue2",Ctrl_Rep2="purple4", Ctrl_Rep3="magenta1")) +
   
   labs(title="MICA_HUMAN_Ctrl_Raw", y= "Protein Amount") 
- MICA_HUMAN_Protein_Ctrl + scale_x_continuous(breaks = seq(1, 25, by = 1))
+ MICA_HUMAN_Protein_Ctrl + scale_x_continuous(breaks = seq(1, 25, by = 1)) 
     
  
 MICA_HUMAN_Protein_Ctrl_Norm_Second = ggplot() + 
@@ -445,7 +456,9 @@ MICA_HUMAN_Protein_Ctrl_Norm_Second = ggplot() +
   
   geom_line(data = select(tCtrl_combi_df, contains("MICA_HUMAN_Rep_3")),  aes(x = Fractions, y = MICA_HUMAN_Rep_3 , color= 'Ctrl_Rep3')) +
   
-  scale_colour_manual(name="legend",values=c(Ctrl_Rep1="blue2",Ctrl_Rep2="purple4", Ctrl_Rep3="magenta1")) +
+  scale_colour_manual(name="legend",values=c(Ctrl_Rep1="red",Ctrl_Rep2="green", Ctrl_Rep3="magenta1")) +
+   
+   theme(panel.background = element_rect(fill = "white", colour = "black"))+
   
   labs(title="MICA_HUMAN_Ctrl_Norm_Second", y= "Protein Amount") 
  MICA_HUMAN_Protein_Ctrl_Norm_Second + scale_x_continuous(breaks = seq(1, 25, by = 1))
@@ -699,7 +712,9 @@ pxy = data.frame(X_Shift = x_shift, Y_Shift = y_shift)
 wss = sapply(2:8,function(x){ 
   kmeans(pxy, x, 100)$tot.withinss
 })
-plot(2:8,wss,type='l',xlab="Number of Clusters", ylab="Total within-clusters Sum of Squares")
+
+# by Madleen
+plot(2:8,wss,type='l',xlab="Number of Clusters", ylab="Total within-clusters Sum of Squares", col="red", main="Elbow Method")
 
 
 # Plotting the Clusters
@@ -868,7 +883,7 @@ RNase_Independent_Allmax_1 = maxima_RNase_0.4[,-whichrow(row_rnadep_1)]
 # Protein names and number of times listed as RBP from data bank is taken and put into new data frame
 
 # ~/Desktop/2022-topic-03-team-04/table_RBP_lists.csv
-Data.RBPResearch <- read.table("table_RBP_lists.csv", header=FALSE, sep = ",")
+Data.RBPResearch <- read.table("data/table_RBP_lists.csv", header=FALSE, sep = ",")
 
 databank = data.frame(matrix(nrow=5004, ncol=2))
 
@@ -1074,16 +1089,19 @@ summary(lm)
 
 # Plot Linear Regression (Error is caused by logarithming negative values and can be ignored. Logarithming make visualization better)
 ggplot(data = train_df, aes(x = Correlation, y = Y_Shift)) +
-  geom_point(color="blue") +
+  geom_point(color="skyblue") +
+  ggtitle("Linear Regression of Y-Shift") +
+  theme(plot.title = element_text(color="black", size=14, face="bold.italic", hjust=(0.5))) +
   scale_x_continuous(trans = "log10") +
   scale_y_continuous(trans = "log10") +
-  geom_smooth(method="lm", color="red")
+  geom_smooth(method="lm", color="red") +
+  theme(panel.background = element_rect(fill = "white", colour = "black"))
 
 
-# Plot Residuals
-hist(lm$residuals, breaks = 20)
-qqnorm(lm$residuals)
-qqline(lm$residuals)
+# Plot Residuals (by Madleen)
+hist(lm$residuals, breaks = 20, col="violet", main="Histogram of Y Shift Residuals", xlab="Residuals")
+qqnorm(lm$residuals, col="red", main="QQ Plot of Y Shift Residuals")
+qqline(lm$residuals, col="blue")
 
 
 # Linear Regression first Prerequisite (Correlation between residuals and x values is 0)
@@ -1101,8 +1119,11 @@ test_model <- predict.lm(lm, test_df)
 # Plot actual value (x Axis) against predicted Value (y Axis) 
 compare_df = data.frame(actual_value = test_df$Y_Shift, predicted_value = test_model)
 ggplot(data = compare_df, aes(x = actual_value, y = predicted_value)) +
-  geom_point() +
-  geom_abline(intercept = 0, slope = 1)
+  ggtitle("Plot of Actual and Predicted Value of Y Shift") +
+  theme(plot.title = element_text(color="black", size=14, face="bold.italic", hjust=(0.5))) +
+  geom_point(col="skyblue") +
+  geom_abline(intercept = 0, slope = 1, col="red") +
+  theme(panel.background = element_rect(fill = "white", colour = "black"))
 ```
 
 
@@ -1119,7 +1140,7 @@ After testing multiplte variables from the new data bank and the data that we ha
 # HS_RBPs is the new data bank (data frame)
 
 # ~/Desktop/2022-topic-03-team-04/HS_RBPs.RData
-load("HS_RBPs.RData")
+load("data/HS_RBPs.RData")
 
 # Find which protein in the new data bank is the same as our y shift
 protein_same_rbp = sort(intersect(HS_RBPs$Entry_Name.x, names(y_shift)))
@@ -1148,14 +1169,17 @@ summary(lm_4)
 
 # Plot Linear Regression
 ggplot(data = train_df_4, aes(x = RBP2GO_Score, y = X_Shift)) +
-  geom_point(color="blue") +
-  geom_smooth(method="lm", color="red")
+  geom_point(color="skyblue") +
+  ggtitle("Linear Regression of X-Shift") +
+  theme(plot.title = element_text(color="black", size=14, face="bold.italic", hjust=(0.5))) +
+  geom_smooth(method="lm", color="red") +
+  theme(panel.background = element_rect(fill = "white", colour = "black"))
 
 
-# Plot Residuals
-hist(lm_4$residuals, breaks = 20)
-qqnorm(lm_4$residuals)
-qqline(lm_4$residuals)
+# Plot Residuals (by Madleen)
+hist(lm_4$residuals, breaks = 20, col="violet", main="Histogram of X Shift Residuals", xlab="Residuals")
+qqnorm(lm_4$residuals, col="red", main="QQ Plot of X Shift Residuals")
+qqline(lm_4$residuals, col="blue")
 
 
 # Linear Regression first Prerequisite (Correlation between residuals and x values is 0)
@@ -1173,8 +1197,11 @@ test_model_4 <- predict.lm(lm_4, test_df_4)
 # Plot actual value (x Axis) against predicted Value (y Axis)
 compare_df_4 = data.frame(actual_value = test_df_4$X_Shift, predicted_value = test_model_4)
 ggplot(data = compare_df_4, aes(x = actual_value, y = predicted_value)) +
-  geom_point() +
-  geom_abline(intercept = 0, slope = 1)
+  ggtitle("Plot of Actual and Predicted X Shift Value") +
+  theme(plot.title = element_text(color="black", size=14, face="bold.italic", hjust=(0.5))) +
+  geom_point(col="skyblue") +
+  geom_abline(intercept = 0, slope = 1, col="red") +
+  theme(panel.background = element_rect(fill = "white", colour = "black"))
 ```
 
 
