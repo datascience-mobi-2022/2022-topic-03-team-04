@@ -144,14 +144,7 @@ MICA_Human_Protein_RNase = ggplot() +
 
 ## 2. Evaluation of the reproducibility of the experiments
 
-
----> rewrite the text!!!
-To investigate the protein amount of the replicates further we sum up the total protein amount of all genes per sample replicate and plot them side by side in a bar plot. We can see that there is a huge difference between the RNase samples and also the Ctrl samples do not align.
-
-In conclusion the protein amounts differ and are not well comparable. 
-
-Possible causes for this fluctuation of the protein amounts lay in the experimental design of the data generation. The sucrose gradients were all produced in one step to minimize the variations. But had to be transported to the ultracentrifugation and were then fractioned by hand. And as we see the lysates can differ in their containing protein amount.
-
+For further analysis of the replicates we sum up the total protein amount of all genes per replicate and plot them side by side in a bar plot. 
 
 ```{r}
 Rep_1_Ctrl <- Ctrl %>% select(contains("Rep_1"))
@@ -189,6 +182,11 @@ ggplot(plotdata, aes(names, value)) +
   theme(panel.background = element_rect(fill = "white", colour = "black"))+
   labs( title = "Before Normalization", y = "protein value", x = "Replicates")
 ```
+
+
+The bar plot reveals that there is a difference between the replicates and also there is a huge difference between Ctrl and RNase samples. The three replicates of Ctrl and RNase should theoretically have the same total amount since these are the results of the same experiment, but due to human factor in the lab working, the irregularities are not avoidable. 
+
+In order to make the Ctrl and RNase comparable a normalization is needed.  
 
 
 ## 2.1 Fractionwise Normalization 
@@ -628,7 +626,7 @@ for (i in seq(0.1,0.9,0.1)){
 ## 4. T-Test 
 
 
-T Test shows us if the global maxima of each of the proteins (all repetitions) between Ctrl and RNase group has a significance difference. A significanct difference between the 2 group will be categorized as RNA dependent and it will be our first criteria for RNA dependency.
+T Test shows us if the global maxima of each of the proteins (all repetitions) between Ctrl and RNase group has a significance difference. A significant difference between the two groups will be categorized as RNA dependent and it will be our first criteria for RNA dependency.
 
 
 ```{r}
@@ -713,12 +711,10 @@ wss = sapply(2:8,function(x){
   kmeans(pxy, x, 100)$tot.withinss
 })
 
-# by Madleen
 plot(2:8,wss,type='l',xlab="Number of Clusters", ylab="Total within-clusters Sum of Squares", col="red", main="Elbow Method")
 
 
 # Plotting the Clusters
-## By Madleen
 km = kmeans(pxy, centers = 3, nstart = 100, iter.max = 100)
 fviz_cluster(km, data = pxy, geom = c("point"), main = "K Means Clustering with 3 Clusters")+
   theme(panel.background = element_rect(fill='white', colour='black'))+
@@ -797,7 +793,7 @@ if(length(which(compare[,4] == 3)) == 63){
 ```
 
 
-We have defined 2 Criteria for RNA dependency. The first is the result from T Test where a significant difference of Absolute Maxima means RNA dependent. The second one is the result from K Means Clustering where Proteins that are grouped in a cluster which the majority has positive Y-Shift as RNA depedent. Below we consider 2 cases. First when both criteria are fulfilled and the other one when either criteria is satisfied.
+We have defined 2 Criteria for RNA dependency. The first is the result from T Test where a significant difference of absolute maxima means RNA dependent. The second one is the result from K means clustering where proteins that are grouped in a cluster which the majority has positive Y-Shift as RNA depedent. Below we consider 2 cases. First when both criteria are fulfilled and the other one when either criteria is satisfied.
 
 
 ```{r}
@@ -1004,7 +1000,7 @@ length(local_maxima_Rdeep)
 ## 7.2 T Test results of local maxima will be the 3rd criteria
 
 
-To find more RNA dependent protein, we will include a 3rd criteria to classify the protein as RNA dependent. The 3rd criteria is the result of t test of local maxima. The reason is that from 2259 Proteins that are listed in the data bank, we only identify 228 of 2259 proteins (10.09%) as RNA dependent protein with 2 conditions. With a 3rd condition, we expect more proteins to be identified as RNA dependent. 
+To find more RNA dependent proteins, we will include a 3rd criteria to classify the protein as RNA dependent. The 3rd criteria is the result of t-test of local maxima. The reason is that from 2259 Proteins that are listed in the data bank, we only identify 228 of 2259 proteins (10.09%) as RNA dependent protein with 2 conditions. With a 3rd condition, we expect more proteins to be identified as RNA dependent. 
 
 
 ```{r}
