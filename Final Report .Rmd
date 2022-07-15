@@ -17,7 +17,13 @@ For that reason, M.Caudron-Herger et al. created R-Deep with the aim to detect R
 
 2. Materials and Methods
 
-RDeep 
+RDeep
+R-DeeP is a proteome-wide, unbiased and enrichment-free screen. The principle of R-DeeP is based on cellular lysate fractionation by density gradient ultracentrifugation.The outcome is analyzed by proteome-wide mass spectometry or individual western blotting. In general, R-DeeP is used to determine RNA-dependent protein, that interact directly or indirectly with RNA. Lysates with (RNase group) and without (Ctrl group) RNase treatment are compared. By that differences in molecular weight, hence and the size of the complexes are determined.RBPs are expected to split after RNase treatment and migrate to different fractions in a sucrose density gradient.
+
+```{r}
+#(Bild RDEEP selbstgezeichnet einfügen)
+```
+
 
 
 Dataset exploration
@@ -30,21 +36,29 @@ Therefore, for our first normalization we compute the sums fractionwise and find
 Anti-outlier function
 For our second normalization, we defined the mean out of the two most similar replicates and by this wrote an own function to exclude outliers. The outliers were found, removed, and replaced by the mean of the other two most similar replicates. 
 
-Peaks identification
-We expect RNA dependent proteins to migrate to migrate to different positions in the RNase treated sample compared to the Ctrl sample. As a next step we identify the maxima in both samplest o characterize a protein as RNA dependent or RNA independent. We detect the local and the global maxima to draw all the biological information we could possibly get from our given values.
-Our theoretical maximum is a point x whose neighboring values have to be smaller. Therefore we use a threshold value of 40% of the global maximum. We performed this to our anti_outlier_function.
+Peaks We expect RNA dependent proteins to migrate to migrate to different positions in the RNase treated sample compared to the Ctrl sample. As a next step we identify the maxima in both samples to characterize a protein as RNA dependent or RNA independent. We detect the local and the global maxima to draw all the biological information we could possibly get from our given values.
+Our theoretical maximum is a point x whose neighboring values have to be smaller. Therefore we use a threshold value of 40% of the global maximum. We performed this to our anti_outlier_function. 
+
+```{r}
+#(Bild selbstgemalt Maxima detection)
+```
 
 Criteria for RNA dependency
-	
+
 T-Test of absolute maxima 
 
-T-Test of local maxima
+T-Test of global maxima
 T-Test shows us if the global maxima of each of the proteins (all replicates) between Ctrl and RNase group has a significant difference. We declare a significant difference between both groups as RNA dependent. It will be our first criteria for RNA dependency.
 
 
 K-Means Clustering (Y-shift and X-shift detection)
-
+K-Means Clustering is an unsupervised non-linear algorithm that clusters data based on similarity. Its aim is to partition the observations into a previously definded number of clusters. We define this number by performing the elbow method. (Bild von Carls Vorlesung zu Kmeans?)
 Through K-Means Clustering and comparing our t-test results, we define selection criteria (Y-shift and X-shift) to determine RNA dependent proteins. Y-shift is the difference of protein amount between the global maxima of Ctrl and RNase group. X-shift is the difference of locations of global maxima (fraction) between the global maxima of Ctrl and RNase group. 
+
+T-Test of local maxima
+
+
+
 
 Linear regression
 Finally, we perform a linear regression. This model can generally be used to model the relationship between a dependent variable (regressand) and one or more explanatory variables (predictors). The relationship is represented by a linear function. We can see from the model to what extent the dependent variable can be explained by the other variables. 
@@ -52,22 +66,61 @@ Our regression model predicts the Y-Shift values with the information from corre
 
 
 
+
+
+
+
+
+
 Results 
 
 Fractionwise Normalization 
 
+After we run the fractionwise normalization the protein amount between the three replicates of RNase dataframe and the three replicates of the Ctrl dataframe is equal. This can be seen in the barplot. The barplot also shows that although the protein amount of all three replicates of Ctrl and RNase is equal, there is a difference between the total amount of Ctrl ans RNase, which is exactly what we need. 
+
+```{r}
+##barplot einfügen
+```
+
+
 Anti outlier function 
 The comparison of the MICA_HUMAN_Ctrl before and after the application of the anti_outlier_function has shown that the function reduced the outliers. Now the three replicates are comparable. 
+
+```{r}
+# plots einfügen
+```
 
 
 
 Peaks Identification 
 
+```{r}
+# von Greta gemaltes Bild einfügen
+```
+
 
 
 Criteria for RNA dependency
 
-T-Test 
+
+
+T-Test of global maxima
+
+```{r}
+#Tabelle einfügen mit den TRUE/FALSE Ergebnissen 
+```
+
+
+T-Test of local maxima
+
+
+K-Means Clustering (Y-shift and X-shift detection)
+
+```{r}
+#Bild einfügen
+```
+
+
 
 
 
@@ -98,7 +151,11 @@ maxima with a certain significance. Our chosen threshold of 40% protein value is
 
 Threshold 40%--> reduce noisy data
 
-Results (K-means)
+
 
 
 Conclusion 
+
+True positive and true negative rate 
+
+
