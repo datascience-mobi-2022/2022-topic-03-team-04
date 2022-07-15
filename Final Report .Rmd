@@ -112,14 +112,16 @@ Criteria for RNA dependency
 
 
 
-T-Test of global maxima
+T-Test of global and local maxima
+
+A data frame **test** with 3680 rows and 1 column is produced after performing t test of global maxima between Ctrl and RNase group. The row represents the name of the proteins that is alphabetically ordered. The only column represents the RNA dependency with 2 kind of results, TRUE or FALSE.
+
+For t test of local maxima, the result is a data frame **test_0.4** that consists of 3680 rows and 1 column. The name of the proteins are in rows and the only column shows the RNA dependency. 3 outcomes are generated, TRUE, FALSE or NA.
 
 ```{r}
 #Tabelle einfügen mit den TRUE/FALSE Ergebnissen 
 ```
 
-
-T-Test of local maxima
 
 
 K-Means Clustering (Y-shift and X-shift detection)
@@ -144,7 +146,45 @@ Comparison of RNA dependency of both t-Test and K-Means
 
 Linear Regression model 
 
-Our regression model with the p-value: 3.351e-08 is significant and can be used. We get low adjusted R-squared value (0.008034). 
+The first linear regression is performed between correlation in x axis and y shift in y axis. The linear equation from the regression is $y = 1690907x - 1184175$. The p value for the predictor variable y is 7.98e^-06^ and for x is 5.96e^-09^. The p value of our model is 5.962e^-09^. A more detailed overview of of the regression **summary(lm)** can be seen in the picture below.
+
+```{r}
+picture
+```
+
+The histogram of the residues shows that the residuals are between -2e^-07^ and 2e^-07^. The QQ plot of the theoretical and sample residues aligns with the QQ line except when the theoretical quantiles are below -2.5 and above 2.5. 
+
+```{r}
+picture
+```
+
+The last plot is a plot with actual value in x axis, predicted value in y axis and a linear line with intercept 0 and slope 1. The data points gather mostly on the place where the predicted and actual values are above 0. Below 0 there are only few points are near the linear line. Nonetheless, there are also some points that are very far from the linear line.
+
+
+```{r}
+picture
+```
+
+The second linear regression is performed between RBP2GOScore in x axis and x shift in y axis. The linear equation from the regression is $y = 0.069630x -0.368093$. The p value for the predictor variable y is 0.00285 and for x is 2e^-16^. The p value of our model is 2.2e^-16^. A more detailed overview of of the regression **summary(lm_4)** can be seen in the picture below.
+
+```{r}
+picture
+```
+
+The histogram of the residues shows that the residuals are between -10 and 20. The QQ plot of the theoretical and sample residues aligns with the QQ line except when the theoretical quantiles are below -1.5 and above 1. 
+
+```{r}
+picture
+```
+
+The last plot is a plot with actual value in x axis, predicted value in y axis and a linear line with intercept 0 and slope 1. The data points gather mostly near the linear line when the actual value is between -2 and 2 and the predicted value is around 0.5.
+
+
+```{r}
+picture
+```
+
+
 
 Discussion 
 
