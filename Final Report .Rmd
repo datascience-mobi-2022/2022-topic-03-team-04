@@ -36,11 +36,17 @@ Therefore, for our first normalization we compute the sums fractionwise and find
 Anti-outlier function
 For our second normalization, we defined the mean out of the two most similar replicates and by this wrote an own function to exclude outliers. The outliers were found, removed, and replaced by the mean of the other two most similar replicates. 
 
+
+Peaks identification
+
 Peaks We expect RNA dependent proteins to migrate to migrate to different positions in the RNase treated sample compared to the Ctrl sample. As a next step we identify the maxima in both samples to characterize a protein as RNA dependent or RNA independent. We detect the local and the global maxima to draw all the biological information we could possibly get from our given values.
-Our theoretical maximum is a point x whose neighboring values have to be smaller. Therefore we use a threshold value of 40% of the global maximum. We performed this to our anti_outlier_function. 
+Our theoretical maximum is a point x whose neighboring values have to be smaller. 
+
+The method is based on checking the neighbours of each fraction. For the first fraction, only the right neighbour will be compared because there is no left neighbour. For the second till twenty fourth fraction, both left and right neighbours will be compared. For the last fraction, only the left neighbour will be compared since right neighbour doesn't exist. If the the checked fraction have higher values than the neighbour(s), then the fraction is a maxima. If the the checked fraction have lower values than the neighbour(s), then the fraction is a not a maxima and will be zero-ed in our code.
 
 ```{r}
 #(Bild selbstgemalt Maxima detection)
+
 ```
 
 Criteria for RNA dependency
@@ -91,8 +97,10 @@ The comparison of the MICA_HUMAN_Ctrl before and after the application of the an
 ```
 
 
-
 Peaks Identification 
+
+For the local maxima we decided to use a threshold value of 40% of the global maxima. Our chosen threshold of 40% protein value is enough to get only significant maxima and reduce the effect of noisy data. 
+
 
 ```{r}
 # von Greta gemaltes Bild einfügen
@@ -149,7 +157,7 @@ Analysis of the protein content of fractions by comparing Ctrl and RNAse samples
 To define these shifts, we wrote an own maxima detection function that detects global as well as local peaks. Using the threshold, we only detect
 maxima with a certain significance. Our chosen threshold of 40% protein value is enough to get only significant maxima. 
 
-Threshold 40%--> reduce noisy data
+
 
 
 
