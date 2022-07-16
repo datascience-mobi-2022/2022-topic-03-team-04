@@ -162,14 +162,14 @@ A plot of y shift in y axis and x shift in x axis was created to better visualiz
 ![](../results/png/K_Means.png)
 
 
-3.5.3  Comparison with Data Bank with 2 Criteria
+3.5.3  Comparison with Data Bank with two Criteria
 
 The results of the RNA dependent proteins (2 Criteria) were presented in 2 data frames. 305 proteins **Ctrl_Dependent_Abmax_1** were identified when one of the two criteria was fulfilled and 63 proteins **Ctrl_Dependent_Abmax_2** when both criteria were fulfilled. 
 
 To check how many RNA dependent proteins were "correctly" identified, our results were compared with a data bank **table_RBP_lists.csv** from RDeep website. Out of 63 identified RNA-dependent proteins that fulfill both criteria, 57 had a match with the comparable databank (**Rdeep2**) and for one criteria fulfilled out of 305 identified proteins 228 havd match (**Rdeep1**). Unfortunately our applied criteria could not identify 1860 RNA dependent proteins (**Not_identified_RDeep_1**).
 
 
-3.5.4  Comparison with Data Bank with 3 Criteria
+3.5.4  Comparison with Data Bank with three Criteria
 
 The results of the RNA dependent proteins (3 Criterias) were presented in a data frame **dependent_3** where 472 proteins were classified as RNA-dependent. Out of 472 identified RNA-dependent proteins that fulfill either criteria, 350 had a match (**RDeep3**). Unfortunately our applied criteria could not identify 1738 RNA dependent (**Not_identified_RDeep_3**).
 
@@ -221,30 +221,28 @@ In order to decide which threshold is the best for the local maxima we ran our m
 
 4.3 Criteria for RNA dependency:
 
-4.3.1 K-means Clustering (Y-shift and X-shift detection):
+4.3.1 Criteria for RNA dependency, both T-Test (global maximum) and K-Means (X- and Y-shift for global maxima):
 
 The elbow method revealed that the optimal number of clusters was three: RNA-dependent proteins cluster (X-shift and Y-shift are positive), RNA-independet proteins cluster (X-shift and Y-shift are negative) and not defined (no shift), or only one positive shift (X-shift or Y-shift).
+We firstly defined two criteria for RNA-dependency. The k-means clustering of the Y-Shift and X-Shift and the T-Test significance for global maxima. 
+Although our defined two criteria could find RNA-dependent proteins with high true positive rate, the false negative rate was still too high. 
 
 
+4.3.2 Comparison with Data Bank with two Criteria:
 
-We firstly defined two criteria for RNA-dependency. The k-means clustering of the Y-Shift and X-Shift and the T-Test significance. 
-Although our defined two criteria could find RNA-dependent proteins with high true positive rate, the false negative rate was still too high, and even after we defined the third criteria it did not get significantly better. 
-
-
-
-
-
-3.5.3  Comparison of RNA dependency of both T-Test and K-Means:
-
-We created a match function in order to find the proteins that fulfill the criteria for RNA-dependency, the T-test results for significant difference of the global maxima for Ctrl and RNAse and the K means clustering (Y-shift and X-shift detection).
-We found 305 proteins that fulfill one of the two criteria and 63 proteins that fulfill both criteria. 
-
-
-3.7 Comparison with other databanks:
-
+We created a match function in order to find the proteins that fulfill the criteria for RNA-dependency, the T-test results for significant difference of the global maxima for Ctrl and RNAse and the K means clustering (Y-shift and X-shift detection). The match function made the comparison with the databank possible. 
 The comparison with the table of mammalian RNA-binding protein resources has shown that our applied criteria finds the RNA-dependent proteins with very low false positive rate, but very high false negative rate. 
 Out of 63 identified RNA-dependent proteins that fulfill both criteria, 57 had a match with the comparable databank and for one criteria fulfilled out of 305 identified proteins 228 had a match. 
 Unfortunately our applied criteria could not identify 1860 proteins which makes the false negative rate really high.
+
+
+4.3.3 Comparison with Data Bank with three Criteria:
+
+To find more RNA dependent proteins, we included a 3rd criteria, T-test results for local maxima to decrease the false negative and increase the true positive rates. 
+As can be seen from the table the false negative rate could be decreased but unfortunately our criteria were still not exact enough and the false negative rates are still way too high. 
+One possible approach for better results could be using more replicates, define different criteria or maybe try different databanks, since we only compared our findings with one databank. 
+
+
 
 
 
@@ -252,8 +250,6 @@ Conclusion
 
 
 
-
-True positive and true negative rate 
 
 
 References
