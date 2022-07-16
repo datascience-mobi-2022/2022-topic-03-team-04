@@ -26,8 +26,6 @@ Richard: Coding (analysis), Report
 
 
 ```{r 1.1 loading data}
-#MS_Table <- read.table("~/Desktop/2022-topic-03-team-04/RDeeP_A549_NS.csv", header=TRUE, row.names=1, sep = ";")
-#loading "RDeeP_A549_NS.csv" into Data.raw data frame
 
 Data.raw <- read.table("data/RDeeP_A549_NS.csv", header=TRUE, row.names=1, sep = ";")
 #creating a copy of Data.raw and saving it as Data.copy
@@ -42,7 +40,7 @@ dim(Data.copy)
 
 
 The data set has 150 columns and 3680 rows. 
-Our first aim is to restructure the data set by fractions and divide it in two data sets, one for RNase and one for Ctrl, which will make the further analysis easier to perform. Therefor we create a resstructure fucntion.
+Our first aim is to restructure the data set by fractions and divide it in two data sets, one for RNase and one for Ctrl, which will make the further analysis easier to perform. Therefor we create a restructure fucntion.
 We pick by repetitions and create Rep1, Rep2 and Rep3 vectors: starting with 1 (Ctrl) or with 2 (RNase). Every six columns there is a new fraction. 
 
 
@@ -486,7 +484,7 @@ MICA_HUMAN_Protein_Ctrl_Norm_Second = ggplot() +
 ## 3. Peaks Identification 
 
 
-The method is based on checking the neighbours of each fraction. For the first fraction, only the right neighbour will be compared because there is no left neighbour. For the second till twenty fourth fraction, both left and right neighbours will be compared. For the last fraction, only the left neighbour will be compared since right neighbour doesn't exist. If the the checked fraction have higher values than the neighbour(s), then the fraction is a maxima. If the the checked fraction have lower values than the neighbour(s), then the fraction is a not a maxima and will be zero-ed in our code.
+The method is based on checking the neighbours of each fraction. For the first fraction, only the right neighbour will be compared because there is no left neighbour. For the second-twenty fourth fraction, both left and right neighbours will be compared. For the last fraction, only the left neighbour will be compared since right neighbour doesn't exist. If the checked fraction has higher values than the neighbour(s), then the fraction is a maxima. If the the checked fraction has lower values than the neighbour(s), then the fraction is a not a maxima and will be zero-ed in our code.
 
 
 ```{r}
@@ -574,8 +572,8 @@ for (i in seq(0.1,0.9,0.1)){
 
 
 ```{r}
-# Function to plot random protein with threshold in x-axis and number of maxima in y-axis (only correctly works with input either maxnum_Ctrl_0.1 or "maxnum_RNase_0.1", nonetheless with any desired rows
 
+# Function to plot random protein with threshold in x-axis and number of maxima in y-axis (only correctly works with input either maxnum_Ctrl_0.1 or "maxnum_RNase_0.1", nonetheless with any desired rows
 
 maxnum_plot_col = function(){
   row = sample(1:length(maxnum_Ctrl_0.1),1)
@@ -606,6 +604,7 @@ maxnum_plot_col()
 ```{r}
 
 # Function to get list with only local maxima (the local maxima of all 3 reps are combined in Rep1. Rep2 and Rep3 are useless)
+
 localmax = function(input){
   temp = list()
   for (i in 1:dim(input)[2]){
@@ -820,7 +819,7 @@ if(length(which(compare[,4] == 3)) == 63){
 ```
 
 
-We have defined 2 Criteria for RNA dependency. The first is the result from T Test where a significant difference of absolute maxima means RNA dependent. The second one is the result from K means clustering where proteins that are grouped in a cluster which the majority has positive Y-Shift as RNA depedent. Below we consider 2 cases. First when both criteria are fulfilled and the other one when either criteria is satisfied.
+We have defined 2 Criteria for RNA dependency. The first is the result from T Test where a significant difference of absolute maxima means RNA dependency. The second one is the result from K means clustering where proteins are grouped into three clusters by their X- and Y-shift characteristics. Positive shift (RNA dependency), no shift (not defined dependency) and negative shift (no RNA dependency). Below we consider 2 cases. First when both criteria are fulfilled and the other one when either criteria is satisfied.
 
 
 ```{r}
@@ -1035,7 +1034,7 @@ length(local_maxima_Rdeep)
 ## 7.2 T Test results of local maxima will be the 3rd criteria
 
 
-To find more RNA dependent proteins, we will include a 3rd criteria to classify the protein as RNA dependent. The 3rd criteria is the result of t-test of local maxima. The reason is that from 2088 Proteins that are listed in the data bank, we only identify 228 of 2088 proteins as RNA dependent protein with 2 conditions. With a 3rd condition, we expect more proteins to be identified as RNA dependent. 
+To find more RNA dependent proteins, we will include a 3rd criteria to classify the protein as RNA dependent. The 3rd criteria is the result of T Test of local maxima. From 2088 Proteins that are listed in the data bank, we only identify 228 of 2088 proteins as RNA dependent with 2 conditions. With a 3rd condition, we expect more proteins to be identified as RNA dependent. 
 
 
 ```{r}
@@ -1071,18 +1070,13 @@ length(Not_identified_RDeep_3)
 By comparing our findings with the RBP lists databank we calculated the true postitive, true negative, false positive and false negative rates. The results can be seen in the table. 
 
 
-```{r}
 ![](../results/png/TrueFalseRates.png)
-  
-
-```
-
 
 
 ## 8.1 Linear Regression (Using Correlation to Predict Y Shift)
 
 
-Ctrl and RNase should have lower correlation for RNA dependent than RNA indepedent.
+Ctrl and RNase should have lower correlation for RNA dependent than RNA indepedent. We use the correlation between Ctrl and RNase to predict the Y Shift.
 
 
 ```{r}
@@ -1175,7 +1169,7 @@ ggplot(data = compare_df, aes(x = actual_value, y = predicted_value)) +
 ```
 
 
-The QQ plot shows us that the residuals are normally distributed with heavy tails. The normal distribution of residues is centered at 0, that the model fits the real values well. The plot of predicted and actual value of Y shift shows us, that the model doesn't really work when the values are below 0. When the points are closer to the line, it indicates that the predicted values are close to the actual one. Nevertheless, the model works decently when the values are above 0. Sadly, the actual Y shift has a very high spread and makes it hard to find a perfect linear model to predit y shift. 
+The QQ plot shows us that the residuals are normally distributed with heavy tails. The normal distribution of residues is centered at 0, that the model fits the real values well. The plot of predicted and actual values of Y shifts shows us, that the model doesn't really work when the values are below 0. When the points are closer to the line, it indicates that the predicted values are close to the actual one. Nevertheless, the model works decently when the values are above 0. Sadly, the actual Y shift has a very high spread and makes it hard to find a perfect linear model to predict the Y shift. 
 
 
 ## 8.2 Linear Regression using RBP2GO_Score to Predict X Shift
@@ -1254,4 +1248,4 @@ ggplot(data = compare_df_4, aes(x = actual_value, y = predicted_value)) +
 ```
 
 
-The QQ plot shows us that the residuals are normally distributed with heavy tails. The normal distribution of residues is centered at 0, that the model fits the real values well. The plot of predicted and actual value of X shift works fairly good when the x shift are very minimal (shift by one fraction). The linear model unfortunately doesn't predict very well due to the variability of the x shift, especially when the shift is higher. 
+The QQ plot shows us that the residuals are normally distributed with heavy tails. The normal distribution of residues is centered at 0, that the model fits the real values well. The plot of predicted and actual values of X shifts works fairly good when the X shifts are very minimal (shift by one fraction). The linear model unfortunately doesn't predict very well due to the variability of the X shifts, especially when the shifts are higher. 
