@@ -2,7 +2,9 @@
 title: "Report"
 author: "Khalida Dushimova, Richard Efraim Langi, Madleen Piegsa, Greta Karathanos"
 date: '2022-07-12'
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -203,32 +205,53 @@ The last plot was a plot with actual value in x axis, predicted value in y axis 
 
 ![](../results/png/Actual_Predict_X.png)
 
+4. Discussion
 
-4. Discussion 
+4. 1 Normalization (Fractionwise Normalization and Anti Outlier Function):
 
-Normalization (Fractionwise Normalization and Anti Outlier Function):
-
-The normalization worked as expected. The total amount of protein per replicate was equal for all Ctrl replicates and equal for all RNase replicates, which made the replicates good comparable. The total amount of Ctrl dataframe was higher than the total amount of RNase dataframe. 
-
-The anti outlier function did exactly what we wanted. 
+The normalization worked as expected. The total amount of protein per replicate was equal for all Ctrl replicates and equal for all RNase replicates, which made the replicates good comparable. 
+The Anti outlier function did exactly what we wanted. The outliers were reduced and did not have a significant effect on our data after the normalization. 
 
 
+4.2 Peaks Identification:
 
-Peaks Identification
-
-
-Criteria for RNA dependency:
-
-Although our defined two criteria could find RNA-dependent proteins with high true positive rate, the false negative rate is still too high, even after we defined the third criteria. For better true positive and true negative rates more criteria should be found. 
+The self-written maximafunction detected the global and  also local maxima for different thresholds. 
+In order to decide which threshold is the best for the local maxima we ran our maxnum_plot_col function, which ploted a random protein with threshold in x-axis and number of maxima in y-axis. Having ran the function several times,we decided to use a threshold value of 40% of the global maxima. Our chosen threshold of 40% was enough to get only significant maxima and reduce the effect of noisy data. 
 
 
+4.3 Criteria for RNA dependency:
+
+4.3.1 K-means Clustering (Y-shift and X-shift detection):
+
+The elbow method revealed that the optimal number of clusters was three: RNA-dependent proteins cluster (X-shift and Y-shift are positive), RNA-independet proteins cluster (X-shift and Y-shift are negative) and not defined (no shift), or only one positive shift (X-shift or Y-shift).
 
 
 
+We firstly defined two criteria for RNA-dependency. The k-means clustering of the Y-Shift and X-Shift and the T-Test significance. 
+Although our defined two criteria could find RNA-dependent proteins with high true positive rate, the false negative rate was still too high, and even after we defined the third criteria it did not get significantly better. 
+
+
+
+
+
+3.5.3  Comparison of RNA dependency of both T-Test and K-Means:
+
+We created a match function in order to find the proteins that fulfill the criteria for RNA-dependency, the T-test results for significant difference of the global maxima for Ctrl and RNAse and the K means clustering (Y-shift and X-shift detection).
+We found 305 proteins that fulfill one of the two criteria and 63 proteins that fulfill both criteria. 
+
+
+3.7 Comparison with other databanks:
+
+The comparison with the table of mammalian RNA-binding protein resources has shown that our applied criteria finds the RNA-dependent proteins with very low false positive rate, but very high false negative rate. 
+Out of 63 identified RNA-dependent proteins that fulfill both criteria, 57 had a match with the comparable databank and for one criteria fulfilled out of 305 identified proteins 228 had a match. 
+Unfortunately our applied criteria could not identify 1860 proteins which makes the false negative rate really high.
 
 
 
 Conclusion 
+
+
+
 
 True positive and true negative rate 
 
