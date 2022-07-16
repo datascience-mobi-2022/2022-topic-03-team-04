@@ -346,16 +346,15 @@ Norm_RNase = Norm_RNase [order(rownames(Norm_RNase)), ]
 
 
 ```{r}
-
 Norm_Ctrl
 
-saveRDS(Norm_Ctrl, file = "Norm_Ctrl.rds")
+saveRDS(Norm_Ctrl, file = "data/Norm_Ctrl.rds")
 
-saveRDS(Norm_RNase, file = "Norm_RNase.rds")
+saveRDS(Norm_RNase, file = "data/Norm_RNase.rds")
 
-Data_Norm_RNase <- readRDS("Norm_RNase.rds")
+Data_Norm_RNase <- readRDS("data/Norm_RNase.rds")
 
-Data_Norm_Ctrl <- readRDS("Norm_Ctrl.rds")
+Data_Norm_Ctrl <- readRDS("data/Norm_Ctrl.rds")
 ```
 
 
