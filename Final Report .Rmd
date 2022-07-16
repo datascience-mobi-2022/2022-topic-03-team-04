@@ -12,12 +12,13 @@ knitr::opts_chunk$set(echo = TRUE)
 
 1. Introduction
 
-RNA-binding proteins are proteins that bind to the double or single stranded RNA in cells and by this interact with transcripts of RNA-driven processes. This large group of proteins play key roles in RNA processing and modification (Alternative splicing, RNA editing and polyadenylation), export, mRNA localization and translation. The malfunction of RBP´s underlies the origin of many diseases from muscular atrophies and neurological disorders to cancer. Therefore, it is necessary to increase the number of recognized RBPs and the understanding of their molecular mechanisms. Since identifying molecular mechanisms is one of the biggest challenge in (nc)RNA research, M.Caudron-Herger et al. created R-Deep with the aim to detect RBPs automatically.In general, R-Deep is a proteome-wide, unbiased, and enrichment-free screen based on density gradient ultracentrifugation. Performing R-Deep, lysates with a previous RNase treatment (RNase group) and without a previous RNase treatment (Ctrl group) were separated by their density. Each fraction was analyzed by mass spectometry or western blot according to their protein amount. True-positive detected RNA-dependent proteins can bind directly to the RNA (RBP) or bind to RBPs. 
+RNA-binding proteins are proteins that bind to the double or single stranded RNA in cells and by this interact with transcripts of RNA-driven processes. This large group of proteins plays the key roles in RNA processing and modification (Alternative splicing, RNA editing and polyadenylation), export, mRNA localization and translation. 
+The malfunction of RBP´s underlies the origin of many diseases from muscular atrophies and neurological disorders to cancer. (Referenz) Therefore, it is necessary to increase the number of recognized RBPs and the understanding of their molecular mechanisms. Since identifying molecular mechanisms is one of the biggest challenge in (nc)RNA (-> non coding), research M.Caudron-Herger et al. created R-Deep with the aim to detect RBPs automatically. In general, R-Deep is a proteome-wide, unbiased, and enrichment-free screen based on density gradient ultracentrifugation. Performing R-Deep, lysates with a previous RNase treatment (RNase group) and without a previous RNase treatment (Ctrl group) were separated by their density. Each fraction was analyzed by mass spectometry or western blot according to their protein amount. True-positive detected RNA-dependent proteins can bind directly to the RNA (RBP) or bind to RBPs. 
 
 2. Materials and Methods
 
-RDeep
-R-DeeP is a proteome-wide, unbiased and enrichment-free screen. The principle of R-DeeP is based on cellular lysate fractionation by density gradient ultracentrifugation.The outcome is analyzed by proteome-wide mass spectometry or individual western blotting. In general, R-DeeP is used to determine RNA-dependent protein, that interact directly or indirectly with RNA. Lysates with (RNase group) and without (Ctrl group) RNase treatment are compared. By that differences in molecular weight, hence and the size of the complexes are determined.RBPs are expected to split after RNase treatment and migrate to different fractions in a sucrose density gradient.
+2.1 RDeep:
+R-DeeP is a proteome-wide, unbiased and enrichment-free screen. The principle of R-DeeP is based on cellular lysate fractionation by density gradient ultracentrifugation. (Referenz) The outcome is analyzed by proteome-wide mass spectometry or individual western blotting. In general, R-DeeP is used to determine RNA-dependent protein, that interact directly or indirectly with RNA. Lysates with (RNase group) and without (Ctrl group) RNase treatment are compared. By that differences in molecular weight, hence and the size of the complexes are determined.RBPs are expected to split after RNase treatment and migrate to different fractions in a sucrose density gradient.
 
 ```{r}
 ![](images/.png)
@@ -25,20 +26,20 @@ R-DeeP is a proteome-wide, unbiased and enrichment-free screen. The principle of
 
 
 
-Dataset exploration
+2.2 Dataset exploration:
 Our given dataset consists of mass-spectometry data from non-synchronized A549 cells which are human lung carcinoma cells of a caucasian male. In general, the data show the protein amount of each of our 3680 human proteins per fraction. The RDeep screen has been repeated three times so it comprises three replicates for each sample. All in all, we got 3680 rows with one human proteins per row and 150 columns for our Ctrl and RNase group for 25 fractions and three replicates each. 
 
 
 
-Fractionwise Normalization
+2.3 Fractionwise Normalization:
 The total amount of protein of every replicate should be similar. In our given dataset this was not the case. Normalization is the process to account for the bias and make samples more comparable. Our aim was to change the values of columns to a common scale without distorting differences in the range of values and by this reducing the variation between our three technical replicates.
 Therefore, for our first normalization we compute the sums fractionwise and find the two closest sums. We then define normalization factors for the replicates. The quotients of the mean sums and sums of replicates are the normalization factors. 
 
-Anti-outlier function
+2.4 Anti-outlier function:
 For our second normalization, we defined the mean out of the two most similar replicates and by this wrote an own function to exclude outliers. The outliers were found, removed, and replaced by the mean of the other two most similar replicates. 
 
 
-Peaks identification
+2.5 Peaks identification:
 
 Peaks We expect RNA dependent proteins to migrate to migrate to different positions in the RNase treated sample compared to the Ctrl sample. As a next step we identify the maxima in both samples to characterize a protein as RNA dependent or RNA independent. We detect the local and the global maxima to draw all the biological information we could possibly get from our given values.
 Our theoretical maximum is a point x whose neighboring values have to be smaller. 
@@ -50,15 +51,15 @@ The method is based on checking the neighbours of each fraction. For the first f
 
 ```
 
-Criteria for RNA dependency
+2.6 Criteria for RNA dependency:
 
-T-Test of absolute maxima 
+2.6.1 T-Test of absolute maxima:
 
 T-Test of global maxima
 T-Test shows us if the global maxima of each of the proteins (all replicates) between Ctrl and RNase group has a significant difference. We declare a significant difference between both groups as RNA dependent. It will be our first criteria for RNA dependency.
 
 
-K-Means Clustering (Y-shift and X-shift detection)
+2.6.2 K-Means Clustering (Y-shift and X-shift detection):
 
 K-Means Clustering is an unsupervised non-linear algorithm that clusters data based on similarity. Its aim is to partition the observations into a previously definded number of clusters. We define this number by performing the elbow method. 
 Through K-Means Clustering and comparing our t-test results, we define selection criteria (Y-shift and X-shift) to determine RNA dependent proteins. Y-shift is the difference of protein amount between the global maxima of Ctrl and RNase group. X-shift is the difference of locations of global maxima (fraction) between the global maxima of Ctrl and RNase group. 
@@ -67,23 +68,22 @@ If the X- and Y-shift has positive values (left and down shift), we define the p
 
 
 
-T-Test of local maxima
+2.6.3 T-Test of local maxima:
 
 To find more RNA dependent proteins, we will include a 3rd criteria to classify the protein as RNA dependent. The 3rd criteria is the result of t-test of local maxima. 
 
 
-Comparison with other databanks 
+2.7 Comparison with other databanks:
 
 In order to calculate the true positive and true negative rate and see how good our criteria find the RNA dependent proteins we compare our finding with mammalian RNA-binding protein resources (https://r-deep.dkfz.de)
 
 
 
-
-
-Linear regression
+2.8 Linear regression:
 Finally, we perform a linear regression. This model can generally be used to model the relationship between a dependent variable (regressand) and one or more explanatory variables (predictors). The relationship is represented by a linear function. We can see from the model to what extent the dependent variable can be explained by the other variables. 
 Our regression model predicts the Y-Shift values with the information from correlation between Ctrl and RNase.
 
+2.9 Working with complementary data:
 
 
 
@@ -92,9 +92,10 @@ Our regression model predicts the Y-Shift values with the information from corre
 
 
 
-Results 
 
-Dataset exploration
+3. Results 
+
+3.1 Dataset exploration:
 
 
 For further analysis of the replicates we sum up the total protein amount of all genes per replicate and plot them side by side in a bar plot. 
@@ -103,7 +104,7 @@ In order to make the Ctrl and RNase comparable a normalization is needed.
 
 
 
-Fractionwise Normalization 
+3.2 Fractionwise Normalization:
 
 After we run the fractionwise normalization the protein amount between the three replicates of RNase dataframe and the three replicates of the Ctrl dataframe is equal. This can be seen in the barplot. The barplot also shows that although the protein amount of all three replicates of Ctrl and RNase is equal, there is a difference between the total amount of Ctrl ans RNase, which is exactly what we need. 
 
@@ -112,7 +113,8 @@ After we run the fractionwise normalization the protein amount between the three
 ```
 
 
-Anti outlier function 
+3.3 Anti outlier function:
+
 The comparison of the MICA_HUMAN_Ctrl before and after the application of the anti_outlier_function has shown that the function reduced the outliers. Now the three replicates are comparable. 
 
 ```{r}
@@ -120,7 +122,7 @@ The comparison of the MICA_HUMAN_Ctrl before and after the application of the an
 ```
 
 
-Peaks Identification 
+3.4 Peaks Identification: 
 
 After the apply our self-written maximafunction the global (absolute) and local maxima are detected and the values for different thresholds are saved in different dataframes, for each threshold for RNase and Ctrl. 
 
@@ -133,10 +135,10 @@ In order to decide which threshold is the best for the local maxima we run our m
 
 
 
-Criteria for RNA dependency
+3.5 Criteria for RNA dependency:
 
 
-T-Test of global and local maxima
+3.5.1 T-Test of global and local maxima:
 
 A data frame **test** with 3680 rows and 1 column is produced after performing t-test of global maxima between Ctrl and RNase group. The row represents the name of the proteins that is alphabetically ordered. The only column represents the RNA dependency with 2 kind of results, TRUE or FALSE.
 
@@ -147,7 +149,7 @@ For t test of local maxima, the result is a data frame **test_0.4** that consist
 ```
 
 
-K-Means Clustering (Y-shift and X-shift detection)
+3.5.2 K-Means Clustering (Y-shift and X-shift detection):
 
 The elbow method revealed that the optimal number of clusters is three: RNA-dependent proteins cluster (X-shift and Y-shift are positive), RNA-independet proteins cluster (X-shift and Y-shift are negative) and not defined (no shift), or only one positive shift (X-shift or Y-shift). 
 
@@ -156,13 +158,13 @@ The elbow method revealed that the optimal number of clusters is three: RNA-depe
 ```
 
 
-Comparison of RNA dependency of both T-Test and K-Means
+3.5.3  Comparison of RNA dependency of both T-Test and K-Means:
 
 We created a match function in order to find the proteins that fulfill the criteria for RNA-dependency, the T-test results for significant difference of the global maxima for Ctrl and RNAse and the K means clustering (Y-shift and X-shift detection).
 We found 305 proteins that fulfill one of the two criteria and 63 proteins that fulfill both criteria. 
 
 
-Comparison with other databanks
+3.7 Comparison with other databanks:
 
 The comparison with the table of mammalian RNA-binding protein resources has shown that our applied criteria finds the RNA-dependent proteins with very low false positive rate, but very high false negative rate. 
 Out of 63 identified RNA-dependent proteins that fulfill both criteria, 57 had a match with the comparable databank and for one criteria fulfilled out of 305 identified proteins 228 had a match. 
@@ -236,6 +238,10 @@ picture
 
 Discussion 
 
+Normalization 
+
+
+
 
 
 Peaks Identification
@@ -248,5 +254,8 @@ Peaks Identification
 Conclusion 
 
 True positive and true negative rate 
+
+
+References
 
 

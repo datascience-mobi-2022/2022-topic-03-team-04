@@ -10,9 +10,15 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 library(dplyr) #for the select function 
-library(ggplot2)
+library(ggplot2) 
 library(factoextra) # plotting k means
 ```
+
+
+Greta: Normalization, Report, Presentation
+Khalida: Coding (analysis), Report, Presentation 
+Madleen: Results visualization
+Richard: Coding (analysis), Report
 
 
 ## 1. Description of dataset (Raw data)
@@ -40,6 +46,7 @@ We pick by repetitions and create Rep1, Rep2 and Rep3 vectors: starting with 1 (
 
 
 ```{r 1.2 Raw data reorganization}
+
 restructure_func = function(input_df,start){ #start = 1 for Ctrl and start = 2 for RNase.
   Vector.Rep1 <- c(seq(from =start, to = 150, by = 6)) # by 6 to reach the next fraction 
   Vector.Rep2 <- c(seq(from =start+2, to = 150, by = 6))
@@ -90,7 +97,7 @@ RNase = data.frame(RNase)
 
 
 ```{r}
-# by Madleen
+
 Fractions = c(1:25)
 MICA_HUMAN_Protein  = ggplot() +
  geom_line(data = select(Ctrl, contains("MICA_HUMAN_Rep_1")),  aes(x = Fractions, y = MICA_HUMAN_Rep_1, color= 'Ctrl_Rep1')) + 
@@ -146,7 +153,8 @@ MICA_Human_Protein_RNase = ggplot() +
 
 For further analysis of the replicates we sum up the total protein amount of all genes per replicate and plot them side by side in a bar plot. 
 
-```{r}
+```{r} 
+
 Rep_1_Ctrl <- Ctrl %>% select(contains("Rep_1"))
 Rep_1_Ctrl_sums = colSums(Rep_1_Ctrl) 
 Rep_2_Ctrl <- Ctrl %>% select(contains("Rep_2"))
@@ -175,7 +183,8 @@ plotdata = data.frame(value, names=c("Ctrl1", "Ctrl2", "Ctrl3", "RNase1", "RNase
 
 
 ```{r}
-# by Madleen 
+# Visualization
+
 colour  = c("maroon1", "orchid3", "skyblue", "hotpink", "plum1", "skyblue1")
 ggplot(plotdata, aes(names, value)) +
   geom_bar(stat = "identity", fill = colour) +
@@ -193,7 +202,8 @@ In order to make the Ctrl and RNase comparable a normalization is needed.
 
 
 ```{r}
-# preparation for fractionwise normalization
+
+# Preparation for fractionwise normalization
 
 Rep_1_Ctrl_f = t(Rep_1_Ctrl)
 Rep_1_Ctrl_fsums = colSums(Rep_1_Ctrl_f)
@@ -227,6 +237,7 @@ We compute the sums fractionwise and find the two closest sums in order to defin
 
 
 ```{r}
+
 ## First Normalization
 
 Total_Protein_by_fractions_Ctrl =  cbind(Rep_1_Ctrl_fsums, Rep_2_Ctrl_fsums, Rep_3_Ctrl_fsums)
@@ -288,6 +299,7 @@ Norm_RNase
 
 
 ```{r}
+
 #Daten zum Ploten New Normalization
 
 Rep_1_norm_RNase_sums = rowSums(Rep_1_norm_RNase)
@@ -300,7 +312,7 @@ Rep_2_norm_Ctrl_sums = rowSums(Rep_2_norm_Ctrl)
 Rep_3_norm_Ctrl_sums = rowSums(Rep_3_norm_Ctrl)
 
 
-# by Madleen
+# Visualization
 Total_Protein_by_fractions_new = cbind(Rep_1_norm_RNase_sums,Rep_2_norm_RNase_sums, Rep_3_norm_RNase_sums, Rep_1_norm_Ctrl_sums, Rep_2_norm_Ctrl_sums, Rep_3_norm_Ctrl_sums)
 Total_Protein_norm_new = t(Total_Protein_by_fractions_new)/1
 Total_Protein_norm_new = as.data.frame(Total_Protein_norm_new)
@@ -319,8 +331,9 @@ ggplot(plotdata_norm_new, aes(Replicates, Total_Protein_amount_norm_new )) +
 ## 2.2 Second Normalization (by Greta)
 
 
-```{r by Khalida }
-# in order that Gretas function works the normalized Datasets have to be reordered
+```{r}
+
+# In order that Gretas function works the normalized Datasets have to be reordered
 
 Norm_Ctrl = as.data.frame(t(Norm_Ctrl))
 Norm_Ctrl = Norm_Ctrl [order(rownames(Norm_Ctrl)), ]
@@ -332,6 +345,7 @@ Norm_RNase = Norm_RNase [order(rownames(Norm_RNase)), ]
 
 
 ```{r}
+
 Norm_Ctrl
 
 saveRDS(Norm_Ctrl, file = "Norm_Ctrl.rds")
@@ -345,6 +359,7 @@ Data_Norm_Ctrl <- readRDS("Norm_Ctrl.rds")
 
 
 ```{r}
+
 #aim is to eliminate outliers in our dataset, we try to create our own function
 
 anti_outlier_function<- function(input){
@@ -432,7 +447,7 @@ tRNase_combi_df = as.data.frame(t(RNase_combi_df))
 ```{r}
 Fractions = c(1:25)
 
-# by Madleen
+# Visualization
 
 MICA_HUMAN_Protein_Ctrl = ggplot() + 
   geom_line(data = select(Ctrl, contains("MICA_HUMAN_Rep_1")),  aes(x = Fractions, y = MICA_HUMAN_Rep_1, color= 'Ctrl_Rep1')) + 
@@ -456,8 +471,6 @@ MICA_HUMAN_Protein_Ctrl_Norm_Second = ggplot() +
   
   scale_colour_manual(name="legend",values=c(Ctrl_Rep1="red",Ctrl_Rep2="green", Ctrl_Rep3="magenta1")) +
    
-   theme(panel.background = element_rect(fill = "white", colour = "black"))+
-  
   labs(title="MICA_HUMAN_Ctrl_Norm_Second", y= "Protein Amount") 
  MICA_HUMAN_Protein_Ctrl_Norm_Second + scale_x_continuous(breaks = seq(1, 25, by = 1))
 ```
@@ -470,6 +483,7 @@ The method is based on checking the neighbours of each fraction. For the first f
 
 
 ```{r}
+
 # Global and Maxima Detection (need to add threshold in if function)
 maximafunction = function(input, threshold){
   output = 0
@@ -555,7 +569,7 @@ for (i in seq(0.1,0.9,0.1)){
 ```{r}
 # Function to plot random protein with threshold in x-axis and number of maxima in y-axis (only correctly works with input either maxnum_Ctrl_0.1 or "maxnum_RNase_0.1", nonetheless with any desired rows
 
-# Richard's code with a couple embellishments by Madleen
+
 maxnum_plot_col = function(){
   row = sample(1:length(maxnum_Ctrl_0.1),1)
   output1 = 0
@@ -569,6 +583,8 @@ maxnum_plot_col = function(){
   for (i in seq(0.2,0.9,0.1)){
     output2[i*10] = get(paste(gsub("_0.*","","maxnum_RNase"),i,sep="_"))[row]
   }
+
+# Visualization
   
   plot(seq(0.1,0.9,0.1),col = "red",output1, main = names(maxnum_Ctrl_0.1)[row], xlab="Threshold", ylab="Maxima Number", type="l", lwd=5)
   lines(seq(0.1,0.9,0.1),col = "blue",output2, type="l", lwd=5)
@@ -581,6 +597,7 @@ maxnum_plot_col()
 
 
 ```{r}
+
 # Function to get list with only local maxima (the local maxima of all 3 reps are combined in Rep1. Rep2 and Rep3 are useless)
 localmax = function(input){
   temp = list()
@@ -630,6 +647,7 @@ T Test shows us if the global maxima of each of the proteins (all repetitions) b
 
 
 ```{r}
+
 # Function to make data frame where absolute maxima of 3 Reps of a protein are inserted in a column
 abmax = function(input){
   output = data.frame()
@@ -678,6 +696,7 @@ Through K-Means Clustering and comparing our t test results, we define selection
 
 
 ```{r}
+
 # Y Shift
 y_shift = apply(abmax_Ctrl - abmax_RNase, 2, mean)
 
@@ -731,6 +750,7 @@ fviz_cluster(km, data = pxy, geom = c("point"), main = "K Means Clustering with 
 
 
 ```{r}
+
 # Comparing RNA Dependency from both T Test and K Means
 compare = pxy
 compare[,3] = test
@@ -797,6 +817,7 @@ We have defined 2 Criteria for RNA dependency. The first is the result from T Te
 
 
 ```{r}
+
 # Protein that is RNA dependent according to T Test and K Means Clustering (2 Criteria must be fulfilled ). A value 1 in "match" means that the Results from T-Test and K-Means are the same.
 row_rnadep_2 = c()
 for (i in 1:length(match)){
@@ -837,6 +858,7 @@ whichrow = function(input){
 
 
 ```{r}
+
 # Data Frames for each RNA dependent and independent proteins (Both Conditions Fulfilled)
 Ctrl_Dependent_2 = tCtrl_combi_df[,whichrow(row_rnadep_2)]
 Ctrl_Independent_2 = tCtrl_combi_df[,-whichrow(row_rnadep_2)]
@@ -876,6 +898,7 @@ RNase_Independent_Allmax_1 = maxima_RNase_0.4[,-whichrow(row_rnadep_1)]
 
 
 ```{r}
+
 # Protein names and number of times listed as RBP from data bank is taken and put into new data frame
 
 # ~/Desktop/2022-topic-03-team-04/table_RBP_lists.csv
@@ -943,6 +966,7 @@ Too many RNA dependent proteins were not identified (1860), so we have to try to
 
 
 ```{r}
+
 # T-Test function for local maxima
 localtest = function(input1, input2){
   i = 1
@@ -1004,6 +1028,7 @@ To find more RNA dependent proteins, we will include a 3rd criteria to classify 
 
 
 ```{r}
+#by Richard 
 # Check how many RNA dependent proteins (either of the 3 conditions fulfilled) that are identified through our code and from data bank 
 dependent_3 = colnames(Ctrl_Dependent_Abmax_1)
 dependent_3 = unique(sort(append(dependent_3, local_maxima_Rdeep)))
@@ -1035,6 +1060,7 @@ Ctrl and RNase should have lower correlation for RNA dependent than RNA indepede
 
 
 ```{r}
+
 # Function to get the mean of 3 Reps
 mean_rep = function(input){
   output = data.frame(matrix(nrow=25, ncol=3680))
@@ -1133,6 +1159,7 @@ After testing multiplte variables from the new data bank and the data that we ha
 
 
 ```{r}
+
 # HS_RBPs is the new data bank (data frame)
 
 # ~/Desktop/2022-topic-03-team-04/HS_RBPs.RData
