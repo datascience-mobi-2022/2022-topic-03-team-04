@@ -473,7 +473,7 @@ MICA_HUMAN_Protein_Ctrl_Norm_Second = ggplot() +
   
   geom_line(data = select(tCtrl_combi_df, contains("MICA_HUMAN_Rep_3")),  aes(x = Fractions, y = MICA_HUMAN_Rep_3 , color= 'Ctrl_Rep3')) +
   
-  scale_colour_manual(name="legend",values=c(Ctrl_Rep1="red",Ctrl_Rep2="green", Ctrl_Rep3="magenta1")) +
+  scale_colour_manual(name="legend",values=c(Ctrl_Rep1="red",Ctrl_Rep2="black", Ctrl_Rep3="#6600FF")) +
   
   theme(panel.background = element_rect(fill = "white", colour = "black"))+
 
