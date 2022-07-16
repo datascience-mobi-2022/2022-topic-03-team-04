@@ -12,6 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(dplyr) #for the select function 
 library(ggplot2) 
 library(factoextra) # plotting k means
+
 ```
 
 
@@ -458,6 +459,9 @@ MICA_HUMAN_Protein_Ctrl = ggplot() +
   
   scale_colour_manual(name="legend",values=c(Ctrl_Rep1="blue2",Ctrl_Rep2="purple4", Ctrl_Rep3="magenta1")) +
   
+  theme(panel.background = element_rect(fill = "white", colour = "black"))+
+
+  
   labs(title="MICA_HUMAN_Ctrl_Raw", y= "Protein Amount") 
  MICA_HUMAN_Protein_Ctrl + scale_x_continuous(breaks = seq(1, 25, by = 1)) 
     
@@ -470,6 +474,9 @@ MICA_HUMAN_Protein_Ctrl_Norm_Second = ggplot() +
   geom_line(data = select(tCtrl_combi_df, contains("MICA_HUMAN_Rep_3")),  aes(x = Fractions, y = MICA_HUMAN_Rep_3 , color= 'Ctrl_Rep3')) +
   
   scale_colour_manual(name="legend",values=c(Ctrl_Rep1="red",Ctrl_Rep2="green", Ctrl_Rep3="magenta1")) +
+  
+  theme(panel.background = element_rect(fill = "white", colour = "black"))+
+
    
   labs(title="MICA_HUMAN_Ctrl_Norm_Second", y= "Protein Amount") 
  MICA_HUMAN_Protein_Ctrl_Norm_Second + scale_x_continuous(breaks = seq(1, 25, by = 1))
@@ -894,7 +901,7 @@ RNase_Independent_Allmax_1 = maxima_RNase_0.4[,-whichrow(row_rnadep_1)]
 ```
 
 
-## 6.2 Comparing with Data Bank
+## 6.2 Comparing with Data Bank (RBP Lists)
 
 
 ```{r}
@@ -955,6 +962,10 @@ NotRDeep_1 = rownames(test)[row_notrnadep_1]
 
 Not_identified_RDeep_1 = intersect(names(databank_value), NotRDeep_1)
 length(Not_identified_RDeep_1)
+
+# Check how many RNA-dependent proteins could have been found by comparing the total protein names with the protein names in the databank
+Total_RDeep = intersect(names(databank_value), colnames(abmax_Ctrl))
+length(Total_RDeep)
 ```
 
 
@@ -1024,20 +1035,22 @@ length(local_maxima_Rdeep)
 ## 7.2 T Test results of local maxima will be the 3rd criteria
 
 
-To find more RNA dependent proteins, we will include a 3rd criteria to classify the protein as RNA dependent. The 3rd criteria is the result of t-test of local maxima. The reason is that from 2259 Proteins that are listed in the data bank, we only identify 228 of 2259 proteins (10.09%) as RNA dependent protein with 2 conditions. With a 3rd condition, we expect more proteins to be identified as RNA dependent. 
+To find more RNA dependent proteins, we will include a 3rd criteria to classify the protein as RNA dependent. The 3rd criteria is the result of t-test of local maxima. The reason is that from 2088 Proteins that are listed in the data bank, we only identify 228 of 2088 proteins as RNA dependent protein with 2 conditions. With a 3rd condition, we expect more proteins to be identified as RNA dependent. 
 
 
 ```{r}
-#by Richard 
-# Check how many RNA dependent proteins (either of the 3 conditions fulfilled) that are identified through our code and from data bank 
+
+# Check how many RNA dependent proteins (either of the 3 conditions fulfilled) are identified
 dependent_3 = colnames(Ctrl_Dependent_Abmax_1)
 dependent_3 = unique(sort(append(dependent_3, local_maxima_Rdeep)))
+length(dependent_3)
 
+# Check how many RNA dependent proteins (either of the 3 conditions fulfilled)  are identified through our code and from data bank 
 RDeep_3 = intersect(names(databank_value), dependent_3)
-length(RDeep_3)
+length(RDeep_3) # true positive
 
 
-# Find which row of the proteins fulfill either of the 3 conditions
+# Find which rows of the proteins fulfill either of the 3 conditions
 row_rnadep_3 = row_rnadep_1
 row_rnadep_3 = unique(sort(append(row_rnadep_3, which(test_0.4 == TRUE))))
 
@@ -1046,11 +1059,24 @@ row_rnadep_3 = unique(sort(append(row_rnadep_3, which(test_0.4 == TRUE))))
 row_notrnadep_3 = setdiff(1:3680, row_rnadep_3)
 NotRDeep_3 = rownames(test_0.4)[row_notrnadep_3]
 
+#
 
-# Check how many RNA dependent proteins were not identified 
+# Check how many RNA dependent proteins were not identified by the third criteria 
 Not_identified_RDeep_3 = intersect(names(databank_value), NotRDeep_3)
 length(Not_identified_RDeep_3)
+
+
 ```
+
+By comparing our findings with the RBP lists databank we calculated the true postitive, true negative, false positive and false negative rates. The results can be seen in the table. 
+
+
+```{r}
+![](../results/png/TrueFalseRates.png)
+  
+
+```
+
 
 
 ## 8.1 Linear Regression (Using Correlation to Predict Y Shift)
