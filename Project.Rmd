@@ -1070,7 +1070,7 @@ length(Not_identified_RDeep_3)
 By comparing our findings with the RBP lists databank we calculated the true postitive, true negative, false positive and false negative rates. The results can be seen in the table. 
 
 
-![](../results/png/TrueFalseRates.png)
+![](results/png/TrueFalseRates.png)
 
 
 ## 8.1 Linear Regression (Using Correlation to Predict Y Shift)
