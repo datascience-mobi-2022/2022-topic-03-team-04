@@ -227,6 +227,7 @@ Rep_3_RNase_f = t(Rep_3_RNase)
 Rep_3_RNase_fsums = colSums(Rep_3_RNase_f)
 
 Total_Protein_by_fractions = cbind(Rep_1_Ctrl_fsums,Rep_2_Ctrl_fsums, Rep_3_Ctrl_fsums, Rep_1_RNase_fsums, Rep_2_RNase_fsums, Rep_3_RNase_fsums)
+Total_Protein_by_fractions
 
 Total_Protein_sums = as.data.frame(colSums(Total_Protein_by_fractions))
 Total_Protein_sums
