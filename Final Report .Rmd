@@ -36,6 +36,7 @@ The total amount of protein of every replicate should be similar. In our given d
 Therefore, for our first normalization we compute the sums fractionwise and find the two closest sums. We then define normalization factors for the replicates. The quotients of the mean sums and sums of replicates are the normalization factors. 
 
 2.4 Anti-outlier function:
+
 For our second normalization, we defined the mean out of the two most similar replicates and by this wrote an own function to exclude outliers. The outliers were found, removed, and replaced by the mean of the other two most similar replicates. 
 
 
@@ -238,13 +239,22 @@ picture
 
 Discussion 
 
-Normalization 
+Normalization (Fractionwise Normalization and Anti Outlier Function):
 
+The normalization worked as expected. The total amount of protein per replicate was equal for all Ctrl replicates and equal for all RNase replicates, which made the replicates good comparable. The total amount of Ctrl dataframe was higher than the total amount of RNase dataframe. 
 
+The anti outlier function did exactly what we wanted. 
 
 
 
 Peaks Identification
+
+
+Criteria for RNA dependency:
+
+Although our defined two criteria could find RNA-dependent proteins with high true positive rate, the false negative rate is still too high, even after we defined the third criteria. For better true positive and true negative rates more criteria should be found. 
+
+
 
 
 
