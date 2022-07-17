@@ -197,12 +197,46 @@ One possible approach for better results could be using more replicates, define 
 
 
 7. Anhang
+
+
+
+
 ![](../results/png/Peaks_identification_bild.png)
+
+
+
+
 ![](../results/png/Before_Norm.png)
+
+
+
+
+
+
 ![](../results/png/Ctrl_Raw.png)
+
+
+
+
 ![](../results/png/Maxnum_Plot.png)
-![](../results/png/Cluster_WSS.png)
+
+
+
+
+
 ![](../results/png/Regression_Y.png)
+
+
+
+
+
 ![](../results/png/Hist_Y.png)
+
+
+
 ![](../results/png/Hist_X.png)
+
+
+
+
 ![](../results/png/Regression_X.png)
