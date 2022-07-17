@@ -1,7 +1,7 @@
 # Data Analysis Project SS22
 > Molecular Biotechnology, topic_03-team_04 by Maiwen Caudnon-Herger, 18.07.2022
 > Khalida Dushimova, Greta Karathanos, Richard Efraim Langi, Madleen Piegsa 
-### Sorting from GitHub Desktop
+### Working with GitHub Desktop
 > We used GitHub Desktop to make real-time parallel working and collaboration possible. (https://docs.github.com/en/desktop/installing-and-configuring-github-desktop/overview/getting-started-with-github-desktop)
 
 ## Table of Content
@@ -26,7 +26,7 @@ In this folder you will find the final presentation (DatenAnalyseSS22_finalpräs
 
 ![Cover](https://raw.githubusercontent.com/datascience-mobi-2022/2022-topic-03-team-04/main/final/Cover.png)
 
-### 3. Papar folder 
+### 3. Paper folder 
 The paper folder has the summary of the papers (Article Review 1.docx, Article Review 2 and 3.docx) explaining the biological background. The folder also has the summary of the RNA-dependent proteins found (RNA dependent Protein.docx). This file shows four RNA-dependent proteins that can affect lung cancer. 
 
 | RNA-dependent proteins (lung cancer) | biological background|
@@ -40,7 +40,7 @@ The paper folder has the summary of the papers (Article Review 1.docx, Article R
 ### 4. Proposal folder
 This folder contains the first finished presentation for our project proposal from 17.05.2022 (DatenAnalyseSS22_final.pptx). 
 
-#### 5. Results Folder
+### 5. Results folder
 The folder has all the pictures of the results (png) and the results in txt format (txt).
 
 
