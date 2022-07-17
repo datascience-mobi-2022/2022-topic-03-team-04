@@ -227,7 +227,13 @@ The normal distribution of residues was proven through the QQ Plot (heavy-tailed
 
 
 # 5. Conclusion 
-One possible approach for better results could be using more replicates, defining different criteria or maybe trying different data banks, since we only compared our findings with one databank. 
+K-means clustering showed that many proteins were neither detected as RNA-dependent nor as RNA-independent. This is due to our chosen shifting criteria: A positive X-shift and Y-shift showed RNA-dependent proteins and a negative X-shift and Y-shift showed RNA-independent proteins. To avoid a high number of undefined proteins, the shifting criteria could have been extended. For example, one positive and one negative shift or one positive and one zero shift could also represent an RNA-dependent protein. It can be assumed that this approach could decrease our false-negative rate. On the other hand, the false-positive rate would probably be increased. A different method like PCA could have been used for a higher number of shifting criteria.
+
+When comparing our data with RBP Lists, it should be noted that this database also contains RNA-dependent proteins, which are not RBPs, so these were also identified as RNA-dependent in our analysis.
+Concerning the linear regression, other databases that would have offered other variables would probably have been more suitable for predicting the X-shift and Y-shift.
+
+Looking at the biological meaning of our results, one has to keep in mind that the given data consists of mass-spectrometry data from non-synchronized A549 cells which are human lung carcinoma cells of a caucasian male. This is the reason, it might be interesting to identify the biological meaning of detected RNA-dependent proteins in our dataset and their role in lung cancer origin and development. Out of 350 confirmed RNA-dependent proteins, 178 proteins were examined for their association with lung cancer. During the research, 5 human proteins that fulfill this trait were found called P4HA1, PAPD1, CIRBP, TOP2A and IF5A1. These operate as prognosis markers for lung cancer. CIRBP_HUMAN will be described in more detail in the following. CIRP, a cold-inducible RNA binding protein, is a proto-oncogene that was recently discovered.
+CIRBP was highly expressed in NSCLC tissue. Its level was negatively correlated with the prognosis of NSCLC patients. CIRP overexpression supports the transition of the G1/G0 phase to the S phase as well as the formation of an enhanced malignant phenotype of NSCLC. This is shown by increased proliferation, invasion/metastasis and greater tumorigenic capabilities both in vitro as well as in vivo. CIRP also shows ist pro-oncogenic action concerning the cell cycle, DNA replication and Wnt signaling pathway 
 
 
 # 6. References
