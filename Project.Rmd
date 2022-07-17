@@ -22,7 +22,7 @@ Madleen: Results visualization, Presentation
 Richard: Coding (analysis), Report, Presentation
 
 
-## 1. Description of dataset (Raw data)
+## 1. Description of the data set (Raw data)
 
 
 ```{r 1.1 loading data}
@@ -40,7 +40,7 @@ dim(Data.copy)
 
 
 The data set has 150 columns and 3680 rows. 
-Our first aim is to restructure the data set by fractions and divide it in two data sets, one for RNase and one for Ctrl, which will make the further analysis easier to perform. Therefor we create a restructure fucntion.
+Our first aim is to restructure the data set by fractions and divide it into two data sets, one for RNase and one for Ctrl, which will make further analysis easier to perform. Therefore we create a restructure fucntion.
 We pick by repetitions and create Rep1, Rep2 and Rep3 vectors: starting with 1 (Ctrl) or with 2 (RNase). Every six columns there is a new fraction. 
 
 
@@ -76,7 +76,7 @@ restructure_func = function(input_df,start){ #start = 1 for Ctrl and start = 2 f
     row.names(output_df)[i] = paste(rownames(input_df)[k],"Rep",3,sep="_")
     i = i + 1
     
-    k = k + 1 # The row of the old dataframe is advanced by 1
+    k = k + 1 # The row of the old data frame is advanced by 1
   }
   return(output_df)
 }
@@ -192,9 +192,9 @@ ggplot(plotdata, aes(names, value)) +
 ```
 
 
-The bar plot reveals that there is a difference between the replicates and also there is a huge difference between Ctrl and RNase samples. The three replicates of Ctrl and RNase should theoretically have the same total amount since these are the results of the same experiment, but due to human factor in the lab working, the irregularities are not avoidable. 
+The bar plot reveals that there is a difference between the replicates and also there is a huge difference between Ctrl and RNase samples. The three replicates of Ctrl and RNase should theoretically have the same total amount since these are the results of the same experiment, but due to human factors in the lab working, the irregularities are not avoidable. 
 
-In order to make the Ctrl and RNase comparable a normalization is needed.  
+To make the Ctrl and RNase comparable a normalization is needed.  
 
 
 ## 2.1 Fractionwise Normalization 
@@ -233,7 +233,7 @@ Total_Protein_sums
 ```
 
 
-We compute the sums fractionwise and find the two closest sums in order to define normalization factors for the replicates. The quotients of the mean sums and sums of replicates are the noramlization factors.
+We compute the sums fractionwise and find the two closest sums to define normalization factors for the replicates. The quotients of the mean sums and sums of replicates are the normalization factors.
 
 
 ```{r}
@@ -333,7 +333,7 @@ ggplot(plotdata_norm_new, aes(Replicates, Total_Protein_amount_norm_new )) +
 
 ```{r}
 
-# In order that function works the normalized Datasets have to be reordered
+# So that function works the normalized Datasets have to be reordered
 
 Norm_Ctrl = as.data.frame(t(Norm_Ctrl))
 Norm_Ctrl = Norm_Ctrl [order(rownames(Norm_Ctrl)), ]
@@ -359,7 +359,7 @@ Data_Norm_Ctrl <- readRDS("data/Norm_Ctrl.rds")
 
 ```{r}
 
-#aim is to eliminate outliers in our dataset, we try to create our own function
+#aim is to eliminate outliers in our dataset, we try to create our function
 
 anti_outlier_function<- function(input){
 #creating the new df  
@@ -484,7 +484,7 @@ MICA_HUMAN_Protein_Ctrl_Norm_Second = ggplot() +
 ## 3. Peaks Identification 
 
 
-The method is based on checking the neighbours of each fraction. For the first fraction, only the right neighbour will be compared because there is no left neighbour. For the second-twenty fourth fraction, both left and right neighbours will be compared. For the last fraction, only the left neighbour will be compared since right neighbour doesn't exist. If the checked fraction has higher values than the neighbour(s), then the fraction is a maxima. If the the checked fraction has lower values than the neighbour(s), then the fraction is a not a maxima and will be zero-ed in our code.
+The method is based on checking the neighbours of each fraction. For the first fraction, only the right neighbour will be compared because there is no left neighbour. For the second-twenty-fourth fraction, both left and right neighbours will be compared. For the last fraction, only the left neighbour will be compared since right neighbour doesn't exist. If the checked fraction has higher values than the neighbour(s), then the fraction is a maxima. If the the checked fraction has lower values than the neighbour(s), then the fraction is a not a maxima and will be zero-ed in our code.
 
 
 ```{r}
@@ -573,7 +573,7 @@ for (i in seq(0.1,0.9,0.1)){
 
 ```{r}
 
-# Function to plot random protein with threshold in x-axis and number of maxima in y-axis (only correctly works with input either maxnum_Ctrl_0.1 or "maxnum_RNase_0.1", nonetheless with any desired rows
+# Function to plot random protein with thresholds on the x-axis and number of maxima on the y-axis (only correctly works with input either maxnum_Ctrl_0.1 or "maxnum_RNase_0.1", nonetheless with any desired rows
 
 maxnum_plot_col = function(){
   row = sample(1:length(maxnum_Ctrl_0.1),1)
@@ -603,7 +603,7 @@ maxnum_plot_col()
 
 ```{r}
 
-# Function to get list with only local maxima (the local maxima of all 3 reps are combined in Rep1. Rep2 and Rep3 are useless)
+# Function to get a list with only local maxima (the local maxima of all 3 reps are combined in Rep1. Rep2 and Rep3 are useless)
 
 localmax = function(input){
   temp = list()
@@ -649,7 +649,7 @@ for (i in seq(0.1,0.9,0.1)){
 ## 4. T-Test 
 
 
-T Test shows us if the global maxima of each of the proteins (all repetitions) between Ctrl and RNase group has a significance difference. A significant difference between the two groups will be categorized as RNA dependent and it will be our first criteria for RNA dependency.
+T Test shows us if the global maxima of each of the proteins (all repetitions) between Ctrl and RNase group has a significant difference. A significant difference between the two groups will be categorized as RNA dependent and it will be our first criterion for RNA dependency.
 
 H0: There is no significant difference between RNase and Ctrl (p-value > alpha)
 H1: There is a significant difference between RNase and Ctrl (p-value < alpha)
@@ -702,7 +702,7 @@ test
 ## 5. K-Means Clustering
 
 
-Through K-Means Clustering and comparing our t test results, we define selection criteria (Y Shift and X Shift) for determining RNA dependent Proteins. Y Shift is the difference of protein amount between the global maxima of Ctrl and RNase Group. X Shift is the difference of locations of global maxima (fraction) between the global maxima of Ctrl and RNase Group. If the X and Y Shift has positive values (left and down Shift), we define the protein as RNA dependent. If the X and Y Shift has negative values or close to zero (right and up Shift), we define the protein as RNA independent. These shifts will be our second criteria for RNA dependency.
+Through K-Means Clustering and comparing our t-test results, we define selection criteria (Y Shift and X Shift) for determining RNA-dependent Proteins. Y Shift is the difference of protein amount between the global maxima of Ctrl and RNase Group. X Shift is the difference of locations of global maxima (fraction) between the global maxima of Ctrl and RNase Group. If the X and Y Shift has positive values (left and down Shift), we define the protein as RNA dependent. If the X and Y Shift has negative values or is close to zero (right and up Shift), we define the protein as RNA independent. These shifts will be our second criteria for RNA dependency.
 
 
 ```{r}
@@ -756,7 +756,7 @@ fviz_cluster(km, data = pxy, geom = c("point"), main = "K Means Clustering with 
 ## 6.1 Comparing RNA Dependency from both T Test and K Means
 
 
-"Match" shows 1 (True) and 0 (False). True means that the results from T-Test in terms of RNA (in)dependency is the same as K-Means and the other way around for False.
+"Match" shows 1 (True) and 0 (False). True means that the results from the T-Test in terms of RNA (in)dependency are the same as K-Means and the other way around for False.
 
 
 ```{r}
@@ -823,7 +823,7 @@ if(length(which(compare[,4] == 3)) == 63){
 ```
 
 
-We have defined 2 Criteria for RNA dependency. The first is the result from T Test where a significant difference of absolute maxima means RNA dependency. The second one is the result from K means clustering where proteins are grouped into three clusters by their X- and Y-shift characteristics. Positive shift (RNA dependency), no shift (not defined dependency) and negative shift (no RNA dependency). Below we consider 2 cases. First when both criteria are fulfilled and the other one when either criteria is satisfied.
+We have defined 2 Criteria for RNA dependency. The first is the result from the T-Test where a significant difference in absolute maxima means RNA dependency. The second one is the result from K means clustering where proteins are grouped into three clusters by their X- and Y-shift characteristics. Positive shift (RNA dependency), no shift (not defined dependency) and negative shift (no RNA dependency). Below we consider 2 cases. First when both criteria are fulfilled and the other one when either criterion is satisfied.
 
 
 ```{r}
@@ -869,7 +869,7 @@ whichrow = function(input){
 
 ```{r}
 
-# Data Frames for each RNA dependent and independent proteins (Both Conditions Fulfilled)
+# Data Frames for each RNA dependent and independent protein (Both Conditions Fulfilled)
 Ctrl_Dependent_2 = tCtrl_combi_df[,whichrow(row_rnadep_2)]
 Ctrl_Independent_2 = tCtrl_combi_df[,-whichrow(row_rnadep_2)]
 RNase_Dependent_2 = tRNase_combi_df[,whichrow(row_rnadep_2)]
@@ -886,7 +886,7 @@ RNase_Dependent_Allmax_2 = maxima_RNase_0.4[,whichrow(row_rnadep_2)]
 RNase_Independent_Allmax_2 = maxima_RNase_0.4[,-whichrow(row_rnadep_2)]
 
 
-# Data Frames for each RNA dependent and independent proteins (Either Conditions Fulfilled)
+# Data Frames for each RNA dependent and independent protein (Either Conditions Fulfilled)
 Ctrl_Dependent_1 = tCtrl_combi_df[,whichrow(row_rnadep_1)]
 Ctrl_Independent_1 = tCtrl_combi_df[,-whichrow(row_rnadep_1)]
 RNase_Dependent_1 = tRNase_combi_df[,whichrow(row_rnadep_1)]
@@ -908,9 +908,7 @@ RNase_Independent_Allmax_1 = maxima_RNase_0.4[,-whichrow(row_rnadep_1)]
 
 
 ```{r}
-
-# Protein names and number of times listed as RBP from data bank is taken and put into new data frame
-
+# Data Bank with All RNA Dependent Proteins
 # ~/Desktop/2022-topic-03-team-04/table_RBP_lists.csv
 Data.RBPResearch <- read.table("data/table_RBP_lists.csv", header=FALSE, sep = ",")
 
@@ -939,7 +937,7 @@ for (i in 1:length(included_protein)){
 databank_adjusted = databank[row_included_protein] ## Proteins that will be checked
 
 
-# Take only proteins that are at least one time identified from data bank
+# Take only proteins that are at least one time identified from the data bank
 databank_value = databank_adjusted
 
 
@@ -973,7 +971,7 @@ length(Total_RDeep)
 
 
 Too many RNA dependent proteins were not identified (2017), so we have to try to find more maxima and more potential dependent proteins, we can apply our criteria on 
---> local maxima t test and applying our criteria on detected values
+--> local maxima t-test and applying our criteria on detected values
 
 
 ## 7.1 T Test of Local Maxima
@@ -1038,7 +1036,7 @@ length(local_maxima_Rdeep)
 ## 7.2 T Test results of local maxima will be the 3rd criteria
 
 
-To find more RNA dependent proteins, we will include a 3rd criteria to classify the protein as RNA dependent. The 3rd criteria is the result of T Test of local maxima. From 2250 Proteins that are listed in the data bank, we only identify 233 of 2017 proteins as RNA dependent with 2 conditions. With a 3rd condition, we expect more proteins to be identified as RNA dependent. 
+To find more RNA dependent proteins, we will include a 3rd criteria to classify the protein as RNA dependent. The 3rd criteria is the result of the T-Test of local maxima. Of 2250 Proteins that are listed in the data bank, we only identify 233 of 2017 proteins as RNA dependent with 2 conditions. With a 3rd condition, we expect more proteins to be identified as RNA dependent. 
 
 
 ```{r}
@@ -1071,7 +1069,7 @@ length(Not_identified_RDeep_3)
 
 ```
 
-By comparing our findings with the RBP lists databank we calculated the true postitive, true negative, false positive and false negative rates. The results can be seen in the table. 
+By comparing our findings with the RBP lists databank we calculated the true positive, true negative, false positive and false negative rates. The results can be seen in the table. 
 
 
 ![](results/png/TrueFalseRates.png)
@@ -1080,7 +1078,7 @@ By comparing our findings with the RBP lists databank we calculated the true pos
 ## 8.1 Linear Regression (Using Correlation to Predict Y Shift)
 
 
-Ctrl and RNase should have lower correlation for RNA dependent than RNA indepedent. We use the correlation between Ctrl and RNase to predict the Y Shift.
+Ctrl and RNase should have a lower correlation for RNA dependent than RNA independent. We use the correlation between Ctrl and RNase to predict the Y Shift.
 
 
 ```{r}
@@ -1173,13 +1171,13 @@ ggplot(data = compare_df, aes(x = actual_value, y = predicted_value)) +
 ```
 
 
-The QQ plot shows us that the residuals are normally distributed with heavy tails. The normal distribution of residues is centered at 0, that the model fits the real values well. The plot of predicted and actual values of Y shifts shows us, that the model doesn't really work when the values are below 0. When the points are closer to the line, it indicates that the predicted values are close to the actual one. Nevertheless, the model works decently when the values are above 0. Sadly, the actual Y shift has a very high spread and makes it hard to find a perfect linear model to predict the Y shift. 
+The QQ plot shows us that the residuals are normally distributed with heavy tails. The normal distribution of residues is centered at 0, so the model fits the real values well. The plot of predicted and actual values of Y shifts shows us, that the model doesn't really work when the values are below 0. When the points are closer to the line, it indicates that the predicted values are close to the actual ones. Nevertheless, the model works decently when the values are above 0. Sadly, the actual Y shift has a very high spread and makes it hard to find a perfect linear model to predict the Y shift. 
 
 
 ## 8.2 Linear Regression using RBP2GO_Score to Predict X Shift
 
 
-After testing multiplte variables from the new data bank and the data that we have, we decide to use these 2 variables because the other variables  have low correlation and our variables have p value that is less than 0.05 in linear regression. 
+After testing multiple variables from the new data bank and the data that we have, we decide to use these 2 variables because the other variables have low correlation and our variables have a p-value that is less than 0.05 in linear regression. 
 
 
 ```{r}
@@ -1252,4 +1250,4 @@ ggplot(data = compare_df_4, aes(x = actual_value, y = predicted_value)) +
 ```
 
 
-The QQ plot shows us that the residuals are normally distributed with heavy tails. The normal distribution of residues is centered at 0, that the model fits the real values well. The plot of predicted and actual values of X shifts works fairly good when the X shifts are very minimal (shift by one fraction). The linear model unfortunately doesn't predict very well due to the variability of the X shifts, especially when the shifts are higher. 
+The QQ plot shows us that the residuals are normally distributed with heavy tails. The normal distribution of residues is centered at 0, so model fits the real values well. The plot of predicted and actual values of X shifts works fairly good when the X shifts are very minimal (shift by one fraction). The linear model unfortunately doesn't predict very well due to the variability of the X shifts, especially when the shifts are higher. 
