@@ -936,7 +936,7 @@ databank_adjusted = databank[row_included_protein] ## Proteins that will be chec
 
 
 # Take only proteins that are at least one time identified from data bank
-databank_value = databank_adjusted[-which(databank_adjusted == 0)]
+databank_value = databank_adjusted
 
 
 # Check how many RNA dependent proteins (2 conditions fulfilled) that are identified through our code and from data bank
@@ -968,8 +968,8 @@ length(Total_RDeep)
 ```
 
 
-Too many RNA dependent proteins were not identified (1860), so we have to try to find more Maxima and more potential dependent proteins, we can apply our criteria on 
---> local maxima detection and applying our criteria on detected values
+Too many RNA dependent proteins were not identified (2017), so we have to try to find more Maxima and more potential dependent proteins, we can apply our criteria on 
+--> local maxima t test and applying our criteria on detected values
 
 
 ## 7.1 T Test of Local Maxima
@@ -1034,7 +1034,7 @@ length(local_maxima_Rdeep)
 ## 7.2 T Test results of local maxima will be the 3rd criteria
 
 
-To find more RNA dependent proteins, we will include a 3rd criteria to classify the protein as RNA dependent. The 3rd criteria is the result of T Test of local maxima. From 2088 Proteins that are listed in the data bank, we only identify 228 of 2088 proteins as RNA dependent with 2 conditions. With a 3rd condition, we expect more proteins to be identified as RNA dependent. 
+To find more RNA dependent proteins, we will include a 3rd criteria to classify the protein as RNA dependent. The 3rd criteria is the result of T Test of local maxima. From 2250 Proteins that are listed in the data bank, we only identify 233 of 2017 proteins as RNA dependent with 2 conditions. With a 3rd condition, we expect more proteins to be identified as RNA dependent. 
 
 
 ```{r}
@@ -1175,7 +1175,7 @@ The QQ plot shows us that the residuals are normally distributed with heavy tail
 ## 8.2 Linear Regression using RBP2GO_Score to Predict X Shift
 
 
-After testing multiplte variables from the new data bank and the data that we have, we decide to use these 2 variables because they have low correlation and a p value that is less than 0.05 in linear regression. 
+After testing multiplte variables from the new data bank and the data that we have, we decide to use these 2 variables because the others have low correlation and our variables have p value that is less than 0.05 in linear regression. 
 
 
 ```{r}
