@@ -18,8 +18,8 @@ library(factoextra) # plotting k means
 
 Greta: Normalization, Report, Presentation
 Khalida: Coding (analysis), Report, Presentation 
-Madleen: Results visualization
-Richard: Coding (analysis), Report
+Madleen: Results visualization, Presentation
+Richard: Coding (analysis), Report, Presentation
 
 
 ## 1. Description of dataset (Raw data)
@@ -233,7 +233,7 @@ Total_Protein_sums
 ```
 
 
-We compute the sums fractionwise and find the two closest sums in order to define normalization factors fot the replicates. The quotients of the mean sums and sums of replicates are the noramlization factors.
+We compute the sums fractionwise and find the two closest sums in order to define normalization factors for the replicates. The quotients of the mean sums and sums of replicates are the noramlization factors.
 
 
 ```{r}
@@ -328,12 +328,12 @@ ggplot(plotdata_norm_new, aes(Replicates, Total_Protein_amount_norm_new )) +
 ```
 
 
-## 2.2 Second Normalization (by Greta)
+## 2.2 Second Normalization 
 
 
 ```{r}
 
-# In order that Gretas function works the normalized Datasets have to be reordered
+# In order that function works the normalized Datasets have to be reordered
 
 Norm_Ctrl = as.data.frame(t(Norm_Ctrl))
 Norm_Ctrl = Norm_Ctrl [order(rownames(Norm_Ctrl)), ]
@@ -650,6 +650,10 @@ for (i in seq(0.1,0.9,0.1)){
 
 
 T Test shows us if the global maxima of each of the proteins (all repetitions) between Ctrl and RNase group has a significance difference. A significant difference between the two groups will be categorized as RNA dependent and it will be our first criteria for RNA dependency.
+
+H0: There is no significant difference between RNase and Ctrl (p-value > alpha)
+H1: There is a significant difference between RNase and Ctrl (p-value < alpha)
+
 
 
 ```{r}
@@ -968,7 +972,7 @@ length(Total_RDeep)
 ```
 
 
-Too many RNA dependent proteins were not identified (2017), so we have to try to find more Maxima and more potential dependent proteins, we can apply our criteria on 
+Too many RNA dependent proteins were not identified (2017), so we have to try to find more maxima and more potential dependent proteins, we can apply our criteria on 
 --> local maxima t test and applying our criteria on detected values
 
 
@@ -1175,7 +1179,7 @@ The QQ plot shows us that the residuals are normally distributed with heavy tail
 ## 8.2 Linear Regression using RBP2GO_Score to Predict X Shift
 
 
-After testing multiplte variables from the new data bank and the data that we have, we decide to use these 2 variables because the others have low correlation and our variables have p value that is less than 0.05 in linear regression. 
+After testing multiplte variables from the new data bank and the data that we have, we decide to use these 2 variables because the other variables  have low correlation and our variables have p value that is less than 0.05 in linear regression. 
 
 
 ```{r}

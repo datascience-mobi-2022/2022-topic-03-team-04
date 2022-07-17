@@ -1,7 +1,4 @@
 ---
-title: "Report"
-author: "Khalida Dushimova, Richard Efraim Langi, Madleen Piegsa, Greta Karathanos"
-date: '2022-07-12'
 output:
   html_document: default
   pdf_document: default
@@ -44,6 +41,18 @@ Tutor: Niklas Engel
 Khalida Dushimova, Greta Karathanos, Richard Efraim Langi, Madleen Piegsa
 
 ```
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # 1. Introduction
