@@ -2,7 +2,7 @@
 > Molecular Biotechnology, topic_03-team_04 by Maiwen Caudnon-Herger, 18.07.2022
 > Khalida Dushimova, Greta Karathanos, Richard Efraim Langi, Madleen Piegsa 
 ### Working with GitHub Desktop
-> We used GitHub Desktop to make real-time parallel working and collaboration possible. (https://docs.github.com/en/desktop/installing-and-configuring-github-desktop/overview/getting-started-with-github-desktop)
+> We used GitHub Desktop in order to make real-time parallel working and collaboration possible. (https://docs.github.com/en/desktop/installing-and-configuring-github-desktop/overview/getting-started-with-github-desktop)
 
 ## Table of Content
 - Source code 
