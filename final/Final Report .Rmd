@@ -8,51 +8,45 @@ output:
 ---
 
 ```{r setup, include=FALSE}
+library(knitr)
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r}
-library(knitr)
-```
-
-
 1. Introduction
-
-RNA-binding proteins are proteins that bind to the double or single stranded RNA in cells and by this interact with transcripts of RNA-driven processes. This large group of proteins plays the key roles in RNA processing and modification (Alternative splicing, RNA editing and polyadenylation), export, mRNA localization and translation. 
-The malfunction of RBP´s underlies the origin of many diseases from muscular atrophies and neurological disorders to cancer. (Referenz) Therefore, it is necessary to increase the number of recognized RBPs and the understanding of their molecular mechanisms. Since identifying molecular mechanisms is one of the biggest challenge in (nc)RNA (-> non coding), research M.Caudron-Herger et al. created R-Deep with the aim to detect RBPs automatically. In general, R-Deep is a proteome-wide, unbiased, and enrichment-free screen based on density gradient ultracentrifugation. Performing R-Deep, lysates with a previous RNase treatment (RNase group) and without a previous RNase treatment (Ctrl group) were separated by their density. Each fraction was analyzed by mass spectometry or western blot according to their protein amount. True-positive detected RNA-dependent proteins can bind directly to the RNA (RBP) or bind to RBPs. 
+RNA-dependent proteins are defined as RNA-dependent when their interactome depends on RNA. This large group of proteins plays the key roles in RNA processing and modification (Alternative splicing, RNA editing and polyadenylation), export, mRNA localization and translation. 
+The malfunction of RNA-dependent proteins underlies the origin of many diseases from muscular atrophies and neurological disorders to cancer.  Therefore, it is necessary to increase the number of recognized RNA-dependent proteins and the understanding of their molecular mechanisms. Since identifying molecular mechanisms is one of the biggest challenge in (nc)RNA (-> non coding), research M.Caudron-Herger et al. created R-Deep with the aim to detect RNA-dependent proteins automatically. In general, R-Deep is a proteome-wide, unbiased, and enrichment-free screen based on density gradient ultracentrifugation (M.Caudron-Herger et al., 2019). Performing R-Deep, lysates with a previous RNase treatment (RNase group) and without a previous RNase treatment (Ctrl group) were separated by their density. Each fraction was analyzed by mass spectometry or western blot according to their protein amount (M.Caudron-Herger et al., 2020). Detected RNA-dependent proteins can bind directly to the RNA (RBP) or bind to RBPs.
 
 
 2. Materials and Methods
 
-2.1 RDeep:
+2.1 RDeep
 R-DeeP is a proteome-wide, unbiased and enrichment-free screen. The principle of R-DeeP is based on cellular lysate fractionation by density gradient ultracentrifugation. (Referenz) The outcome is analyzed by proteome-wide mass spectometry or individual western blotting. In general, R-DeeP is used to determine RNA-dependent protein, that interact directly or indirectly with RNA. Lysates with (RNase group) and without (Ctrl group) RNase treatment are compared. By that differences in molecular weight, hence and the size of the complexes are determined.RBPs are expected to split after RNase treatment and migrate to different fractions in a sucrose density gradient.
 
 
-2.2 Dataset exploration:
+2.2 Dataset exploration
 Our given dataset consists of mass-spectometry data from non-synchronized A549 cells which are human lung carcinoma cells of a caucasian male. In general, the data show the protein amount of each of our 3680 human proteins per fraction. The RDeep screen has been repeated three times so it comprises three replicates for each sample. All in all, we got 3680 rows with one human proteins per row and 150 columns for our Ctrl and RNase group for 25 fractions and three replicates each. 
 
 
-2.3 Fractionwise Normalization:
+2.3 First Normalization (fractionwise)
 The total amount of protein of every replicate should be similar. In our given dataset this was not the case. Normalization is the process to account for the bias and make samples more comparable. Our aim was to change the values of columns to a common scale without distorting differences in the range of values and by this reducing the variation between our three technical replicates.
 Therefore, for our first normalization we compute the sums fractionwise and find the two closest sums. We then define normalization factors for the replicates. The quotients of the mean sums and sums of replicates are the normalization factors. 
 
 
-2.4 Anti-outlier function:
+2.4 Second Normalization (anti-outlier function)
 For our second normalization, we defined the mean out of the two most similar replicates and by this wrote an own function to exclude outliers. The outliers were found, removed, and replaced by the mean of the other two most similar replicates. 
 
 
-2.5 Peaks identification:
+2.5 Peaks identification
 Peaks We expect RNA dependent proteins to migrate to migrate to different positions in the RNase treated sample compared to the Ctrl sample. As a next step we identify the maxima in both samples to characterize a protein as RNA dependent or RNA independent. We detect the local and the global maxima to draw all the biological information we could possibly get from our given values.
 Our theoretical maximum is a point x whose neighboring values have to be smaller. 
 
 The method is based on checking the neighbours of each fraction. For the first fraction, only the right neighbour will be compared because there is no left neighbour. For the second till twenty fourth fraction, both left and right neighbours will be compared. For the last fraction, only the left neighbour will be compared since right neighbour doesn't exist. If the the checked fraction have higher values than the neighbour(s), then the fraction is a maxima. If the the checked fraction have lower values than the neighbour(s), then the fraction is a not a maxima and will be zero-ed in our code.
 
 
-2.6 Criteria for RNA dependency:
+2.6 Criteria for RNA dependency
 
-2.6.1 T-Test of absolute maxima:
-T-Test of global maxima
-T-Test shows us if the global maxima of each of the proteins (all replicates) between Ctrl and RNase group has a significant difference. We declare a significant difference between both groups as RNA dependent. It will be our first criteria for RNA dependency.
+2.6.1 T-Test of absolute maxima
+T Test is a statistical test under the null hypothesis and can be used to determine the significance of the data. For our data, a two sided unpaired T-Test is performed with Bonferroni correction. The Bonferroni-correction is a method to adjust the significance level α to avoid a type I error (rejecting the null hypothesis when you should not) when performing multiple statistical tests. The formula for a Bonferroni Correction is as follows:  $α_{new} = α_{originial} / n$. T-Test allows us to determine if the global maxima of each of the proteins (all replicates) between Ctrl and RNase group has a significant difference. We declare a significant difference between both groups as RNA dependent. It will be our first criteria for RNA dependency. 
 
 
 2.6.2 K-Means Clustering (Y-shift and X-shift detection):
@@ -63,7 +57,7 @@ If the X- and Y-shift has positive values (left and down shift), we define the p
 
 
 2.6.3 T-Test of local maxima:
-To find more RNA dependent proteins, we will include a 3rd criteria to classify the protein as RNA dependent. The 3rd criteria is the result of t-test of local maxima. 
+To find more RNA dependent proteins, we will include a 3rd criteria to classify the protein as RNA dependent. The 3rd criteria is the result of t-test of local maxima. The same T Test principle from global maxima is used.
 
 
 2.7 Comparison with other databanks:
@@ -120,7 +114,7 @@ To find the optimal number of clusters, a plot of elbow method was used, where t
 
 ![](../results/png/Elbow.png)
 
-The result of k means clustering was shown in **km** with 72.1% as a proprotion of between and total sum squared. A plot of y shift in y axis and x shift in x axis was created to better visualize the cluster. The second cluster had the most data points, then the first cluster and lastly the third cluster with interestingly only 4 data points. What is noticeable is that the second cluster has mostly positive x and y shift values.
+The result of k means clustering was shown in **km**. The values of our within cluster sum of squares of our 3 clusters were 2.275488e^15^, 2.637920e^15^ and 3.487322e^15^. Then, a plot of y shift in y axis and x shift in x axis was created to better visualize the cluster. The second cluster had the most data points, then the first cluster and lastly the third cluster with interestingly only 4 data points. What is noticeable is that the second cluster has mostly positive x and y shift values.
 
 ![](../results/png/K_Means.png)
 
@@ -162,30 +156,32 @@ The normalization worked as expected. The total amount of protein per replicate 
 The self-written **maximafunction** detected the global and local maxima for different thresholds. In order to decide which threshold is the best for the local maxima we ran our **maxnum_plot_col** function, which ploted a random protein with threshold in x-axis and number of maxima in y-axis. Having ran the function several times, we decided to use a threshold value of 40% of the global maxima. Our chosen threshold of 40% was enough to get only significant maxima and reduce the effect of noisy data. 
 
 
-4.3 Criteria for RNA dependency:
+4.3 Criteria for RNA dependency
 
 4.3.1 Criteria for RNA dependency, both T-Test (global maximum) and K-Means (X- and Y-shift for global maxima):
-The elbow method revealed that the optimal number of clusters was three: RNA-dependent proteins cluster (X-shift and Y-shift are positive), RNA-independet proteins cluster (almost no Y-shift or negative) and another RNA-independet proteins cluster with high outliers (negative Y-shift).
+The H0 Hypothesis of the T Test was there is no difference between Ctrl and RNase group. And the H1 Hypothesis said that there was a difference between these 2 groups. When the p value of the test was below our alpha significant value with additional Bonferroni correction to reduce spurious positive results (0.05/number of t test), then the respective protein had a siginificant difference and consequently a RNA dependent protein because we expect a migration of protein after RNAse treatment in mass spectrometry. 
 
-We firstly defined two criteria for RNA-dependency. The k-means clustering of the Y-Shift and X-Shift and the T-Test significance for global maxima. Although our defined two criteria could find RNA-dependent proteins with high true positive rate, the false negative rate was still too high. 
+The elbow method revealed that the optimal number of clusters was three. It was determined through the kink from the elbow plot. The values of our within cluster sum of squares of our 3 clusters were relatively low and that means our clusters were pretty compact. There were 3 clusters produced: first cluster with most data that has almost no Y-shift or even negative shifts. The second cluster with 63 proteins, which have positive X-shift and Y-Shift values. Lastly, the third cluster include only 4 proteins with very high negative Y-Shift values. We concluded that the second cluster is RNA dependent protein because they have positive Y-shift and X-Shift that proves that there are shifts of the proteins. The other 2 clusters are RNA independent proteins due to their negative or almost zero values of Y-shift and for the smallest cluster, it seems to be outliers. 
+
+From the results of T test of global maxima and k means, We firstly defined two criteria for RNA-dependency. The k-means clustering of the Y-Shift and X-Shift and the T-Test significance for global maxima. Although our defined two criteria could find RNA-dependent proteins with high true positive rate, the false negative rate was still too high. 
 
 
 4.3.2 Comparison with Data Bank with two Criteria:
-In order to find the proteins that fulfill the criteria for RNA-dependency, we compared the T-test results for significant difference of the global maxima for Ctrl and RNAse and the K means clustering (Y-shift and X-shift detection) with the databank. The comparison with the table of mammalian RNA-binding protein resources has shown that our applied criteria finds the RNA-dependent proteins with very low false positive rate, but very high false negative rate. 
+In order to find the proteins that fulfill the criteria for RNA-dependency, we compared the T-test results for significant difference of the global maxima for Ctrl and RNAse and the K means clustering (Y-shift and X-shift detection) with the databank. The comparison with the table of mammalian RNA-binding protein resources has shown that our applied criteria finds the RNA-dependent proteins with very low false positive rate, but very high false negative rate.
 
 
 4.3.3 Comparison with Data Bank with three Criteria:
-To find more RNA dependent proteins, we included a 3rd criteria, T-test results for local maxima to decrease the false negative and increase the true positive rates. As can be seen from the table the false negative rate could be decreased but unfortunately our criteria were still not exact enough and the false negative rates are still way too high. 
+To find more RNA dependent proteins, we included a 3rd criteria, T-test results for local maxima to decrease the false negative and increase the true positive rates. The H0 and H1 Hypothesis is identical to the T test of global maxima with the corresponding Bonferroni correction. That means, when the p value was lower than corrected alpha value, we rejected the H0 Hypothesis and assumed the protein is RNA dependent and the otherwise when the p value was same or bigger. As can be seen from the table the false negative rate could be decreased but unfortunately our criteria were still not exact enough and the false negative rates are still way too high. 
 
 ![](../results/png/TrueFalseRates.png)
 
 
 4.4.1 Linear Regression between Y-shift and Correlation
-
+The QQ plot showed us that the residuals were normally distributed with heavy tails. The normal distribution of residues was centered at 0 and showed that the model should fit the real values well. The plot of predicted and actual values of Y shifts showed us, that the model didn't really work when the values were below 0. When the points were closer to the line, it indicates that the predicted values were close to the actual one. Nevertheless, the model worked decently when the values are above 0. Sadly, the actual Y shift had a very high spread and made it hard to find a perfect linear model to predict the Y shift.
 
 
 4.4.2 Linear Regression between X-shift and RBP2GO_Score
-
+The normal distribution of residues was proven through the QQ Plot (heavy tailed) with most of the residues centered at 0. The plot of predicted and actual values of X shifts works fairly good when the X shifts are very minimal (shift by one fraction). The linear model unfortunately doesn't predict very well due to the variability of the X shifts, especially when the shifts are higher. 
 
 
 5. Conclusion 
