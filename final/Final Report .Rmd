@@ -24,7 +24,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 
-![](https://raw.githubusercontent.com/datascience-mobi-2022/2022-topic-03-team-04/main/final/lungenkrebs%20bild.png)
+![](../final/Lung_Cancer.png)
 
 
 ### *Deadline: 18.07.2022*
