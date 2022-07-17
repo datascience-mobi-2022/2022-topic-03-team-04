@@ -2,7 +2,7 @@
 > Molecular Biotechnology, topic_03-team_04 by Maiwen Caudnon-Herger, 18.07.2022
 > Khalida Dushimova, Greta Karathanos, Richard Efraim Langi, Madleen Piegsa 
 ### Working with GitHub Desktop
-> We used GitHub Desktop in order to make real-time parallel working and collaboration possible. (https://docs.github.com/en/desktop/installing-and-configuring-github-desktop/overview/getting-started-with-github-desktop)
+> We used GitHub Desktop to make real-time parallel working and collaboration possible. (https://docs.github.com/en/desktop/installing-and-configuring-github-desktop/overview/getting-started-with-github-desktop)
 
 ## Table of Content
 - Source code 
@@ -14,7 +14,13 @@
   4) Proposal folder
   5) Results Folder
 
-> The goal of the project is to analyse the results of mass spectrometry. The acquired proteins should be checked for RNA dependency. The RNA-dependent proteins should be determined automatically with the analysis. The analysis includes following steps: Data restructuring, normalization, global and local maxima detection, choosing selection criteria, linear regression and further analysis. 
+> The goal of the project is to analyse the results of mass spectrometry. The acquired proteins should be checked for RNA dependency. The RNA-dependent proteins should be determined automatically with the analysis. The analysis includes following steps:
+1) Data restructuring
+2) Normalization
+3) Global and local maxima detection
+4) Chosing selection criteria
+5) Linear regression 
+6) Further analysis. 
 
 ### 1. Data Folder 
 This folder contains the raw data by Maiwen Caudnon-Herger (RDeeP_A549_NS.csv), as well as the normalised data of the Crtl and RNAse group (Norm_Ctrl.rds, Norm_RNase.rds) and the external data for comparison (table_RBP_lists.csv, HS_RBPs.RData). 
@@ -40,7 +46,7 @@ The paper folder has the summary of the papers (Article Review 1.docx, Article R
 ### 4. Proposal folder
 This folder contains the first finished presentation for our project proposal from 17.05.2022 (DatenAnalyseSS22_final.pptx). 
 
-### 5. Results folder
+#### 5. Results Folder
 The folder has all the pictures of the results (png) and the results in txt format (txt).
 
 
