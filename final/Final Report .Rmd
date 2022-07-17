@@ -227,6 +227,7 @@ The normal distribution of residues was proven through the QQ Plot (heavy-tailed
 
 
 # 5. Conclusion 
+
 K-means clustering showed that many proteins were neither detected as RNA-dependent nor as RNA-independent. This is due to our chosen shifting criteria: A positive X-shift and Y-shift showed RNA-dependent proteins and a negative X-shift and Y-shift showed RNA-independent proteins. To avoid a high number of undefined proteins, the shifting criteria could have been extended. For example, one positive and one negative shift or one positive and one zero shift could also represent an RNA-dependent protein. It can be assumed that this approach could decrease our false-negative rate. On the other hand, the false-positive rate would probably be increased. A different method like PCA could have been used for a higher number of shifting criteria. Below is a visualization of extending the shift criteria.
 
 ![](../results/png/ShiftCriteria.png)
