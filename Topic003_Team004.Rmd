@@ -905,7 +905,7 @@ RNase_Independent_Allmax_1 = maxima_RNase_0.4[,-whichrow(row_rnadep_1)]
 
 
 ## 6.2 Comparing with Data Bank (RBP Lists)
-
+All RNA dependent proteins from the data bank were used including the ones that has 0 mentions in Times_listed_as_RBP.
 
 ```{r}
 # Data Bank with All RNA Dependent Proteins
