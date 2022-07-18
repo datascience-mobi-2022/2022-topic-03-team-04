@@ -46,7 +46,7 @@ The paper folder has the summary of the papers (Article Review 1.docx, Article R
 ### 4. Proposal folder
 This folder contains the first finished presentation for our project proposal from 17.05.2022 (DatenAnalyseSS22_final.pptx). 
 
-#### 5. Results Folder
+### 5. Results Folder
 The folder has all the pictures of the results (png) and the results in txt format (txt).
 
 
